@@ -5,12 +5,14 @@
 package frc.robot;
 
 import frc.robot.LimelightHelpers;
+import frc.robot.subsystem.ArmSubsystem;
 import frc.robot.subsystem.DriveSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -21,6 +23,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagDetection;
 
@@ -34,6 +37,7 @@ import com.revrobotics.AbsoluteEncoder;
 
 
 import java.util.AbstractQueue;
+import java.util.function.BooleanSupplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
@@ -47,6 +51,7 @@ public class Robot extends TimedRobot {
   private XboxController m_operatorController = new XboxController(1);
 
   private DriveSubsystem m_drive;
+  private ArmSubsystem m_arm;
 
   /*private AbsoluteEncoder m_armAbsoluteEncoder;*/
 
@@ -64,11 +69,14 @@ public class Robot extends TimedRobot {
 
   private double startTime;
 
+  private Command InputBlockingCommand;
+
 
   public Robot()
   {
     super();
     this.m_drive = new DriveSubsystem();
+    this.m_arm = new ArmSubsystem();
   }
 
   @Override
@@ -98,6 +106,7 @@ public class Robot extends TimedRobot {
       LLTable.getEntry("camMode").setNumber(0);
 
       CommandScheduler.getInstance().registerSubsystem(m_drive);
+      CommandScheduler.getInstance().registerSubsystem(m_arm);
   }
 
   @Override
@@ -116,7 +125,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
 
-    SmartDashboard.putString("GetChassisSpeeds()", this.m_drive.GetChassisSpeeds().toString());
+    SmartDashboard.putString("Chassis Speeds", this.m_drive.GetChassisSpeeds().toString());
+    SmartDashboard.putNumber("Arm Position", this.m_arm.GetArmRotation());
+
    
     //read values periodically
     NetworkTableEntry Tx = LLTable.getEntry("tx");
@@ -130,6 +141,15 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("TargetY", LimelightHelpers.getTY("limelight"));
     SmartDashboard.putNumber("TargetArea", LimelightHelpers.getTA("limelight"));
     SmartDashboard.putNumber("ID", LimelightHelpers.getFiducialID("limelight"));
+
+    SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());
+  
+    if (this.InputBlockingCommand != null && this.InputBlockingCommand.isFinished())
+    {
+      this.InputBlockingCommand = null;
+    }
+
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -140,9 +160,25 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    m_drive.Drive.arcadeDrive(-m_driverController.getLeftY(), -m_driverController.getRightX()*0.7);
+    if (this.InputBlockingCommand == null)
+    {
+      // Run our teleop input handle.
+      
+      m_drive.Drive.arcadeDrive(-m_driverController.getLeftY(), -m_driverController.getRightX()*0.7);
 
+      double armPower = -m_operatorController.getLeftY();
+      m_arm.ArmMotor.set(armPower * 0.7);
+      
+      if (this.m_operatorController.getAButton() == true)
+      {
+        this.InputBlockingCommand = m_arm.MoveTo(103, 40).withTimeout(5);
+        this.InputBlockingCommand.schedule();
+
+        System.out.print("Moving up!");
+      }
     }
+
+  }
 
   @Override
   public void disabledInit() {

@@ -22,11 +22,6 @@ public class DriveSubsystem extends SubsystemBase {
     private CANSparkMax RightLeadMotor = new CANSparkMax(4,MotorType.kBrushless);
     private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
     private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
-    private CANSparkMax ArmMotor = new CANSparkMax(6,MotorType.kBrushless);
-    /**
-     * Intake & Launcher Motor
-     */
-    public CANSparkMax IntakeMotor = new CANSparkMax(7, MotorType.kBrushless);
 
     public DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
 
@@ -36,18 +31,18 @@ public class DriveSubsystem extends SubsystemBase {
     // Movement Reporting
     // ------------------
     /**
-     * Left Motor Velocity in Seconds.
+     * @return The Left Motor Speed in Meters per Second.
      */
-    public double GetLeftMotorVelocity()
+    public double GetLeftMotorSpeed()
     {
-        return this.LeftLeadMotor.getEncoder().getVelocity();
+        return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
     }
-    /**
-     * Right Motor Velocity in Seconds.
+     /**
+     * @return The Right Motor Speed in Meters per Second.
      */
-    public double GetRightMotorVelocity()
+    public double GetRightMotorSpeed()
     {
-        return this.LeftLeadMotor.getEncoder().getVelocity();
+        return this.RightLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
     }
 
     public ChassisSpeeds GetChassisSpeeds()
@@ -61,8 +56,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Requires meters per second.
         var differential_drive_wheel_speeds = new DifferentialDriveWheelSpeeds(
-            GetLeftMotorVelocity() / 60 * 0.48,
-            GetRightMotorVelocity() / 60 * 0.48
+            GetLeftMotorSpeed(),
+            GetRightMotorSpeed()
         );
 
         return differential_drive_kinematics.toChassisSpeeds(differential_drive_wheel_speeds);
