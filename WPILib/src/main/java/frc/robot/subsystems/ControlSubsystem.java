@@ -41,7 +41,7 @@ public class ControlSubsystem extends SubsystemBase {
             {
                 // Clear the command, stop.
                 CommandScheduler.getInstance().cancel(this.InputBlockingCommand);
-                this.Drive.Drive.stopMotor();
+                this.Drive.Stop();
                 this.Arm.ArmMotor.stopMotor();
                 this.InputBlockingCommand = null;
             }
@@ -49,7 +49,7 @@ public class ControlSubsystem extends SubsystemBase {
         }
 
         // Perform actions from the user!
-        this.Drive.Drive.arcadeDrive(-this.DriverController.getLeftY(), -this.DriverController.getRightX() * 0.7);
+        // this.Drive.Drive.arcadeDrive(-this.DriverController.getLeftY(), -this.DriverController.getRightX() * 0.7);
 
         double armPower = -this.OperatorController.getLeftY();
         this.Arm.ArmMotor.set(armPower * 0.7);

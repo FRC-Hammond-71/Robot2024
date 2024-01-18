@@ -23,9 +23,19 @@ public class DriveSubsystem extends SubsystemBase {
     private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
     private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
 
-    public DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
+    private DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
+    // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
 
-    public DriveSubsystem() { }
+    /**
+     * The desired speed and rotation the robot should be moving at.
+     */
+    private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
+
+
+    public DriveSubsystem()
+    {
+        // TODO: Apply deadband to motors.
+    }
 
     // ------------------
     // Movement Reporting
@@ -45,7 +55,7 @@ public class DriveSubsystem extends SubsystemBase {
         return this.RightLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
     }
 
-    public ChassisSpeeds GetChassisSpeeds()
+    public ChassisSpeeds GetOdometry()
     {
         var differential_drive_kinematics = new DifferentialDriveKinematics(20);
 
@@ -63,10 +73,28 @@ public class DriveSubsystem extends SubsystemBase {
         return differential_drive_kinematics.toChassisSpeeds(differential_drive_wheel_speeds);
     }
 
+    public void Drive(ChassisSpeeds speeds)
+    {
+        // Combine the current speeds, and given speeds.
+        this.TargetSpeeds = new ChassisSpeeds(
+            speeds.vxMetersPerSecond - this.TargetSpeeds.vxMetersPerSecond,
+            speeds.vyMetersPerSecond - this.TargetSpeeds.vyMetersPerSecond,
+            speeds.omegaRadiansPerSecond - this.TargetSpeeds.omegaRadiansPerSecond
+        );
+    }
+
+    public void Stop()
+    {
+        this.TargetSpeeds = new ChassisSpeeds();
+        this.Drive.stopMotor();
+    }
+
     @Override
     public void periodic() 
     {
-        SmartDashboard.putString("GetChassisSpeeds()", GetChassisSpeeds().toString());
+        SmartDashboard.putString("GetChassisSpeeds()", GetOdometry().toString());
+
+        
         
         // SmartDashboard.putString("Left Velocity", String.format("%n RPM", GetLeftMotorVelocity()));
         // SmartDashboard.putString("Right Velocity", String.format("%n RPM", GetRightMotorVelocity()));
