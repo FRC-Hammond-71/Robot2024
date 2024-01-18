@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystem.ArmSubsystem;
+import frc.robot.subsystem.ControlSubsystem;
 import frc.robot.subsystem.DriveSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -45,15 +46,15 @@ import edu.wpi.first.wpilibj.SPI;
 
 
 
-public class Robot extends TimedRobot {
-
-  private XboxController m_driverController = new XboxController(0);
-  private XboxController m_operatorController = new XboxController(1);
-
+public class Robot extends TimedRobot 
+{
+  // ----------
+  // Subsystems
+  // ----------
   private DriveSubsystem m_drive;
   private ArmSubsystem m_arm;
+  private ControlSubsystem m_control;
 
-  /*private AbsoluteEncoder m_armAbsoluteEncoder;*/
 
   private NetworkTable LLTable = NetworkTableInstance.getDefault().getTable("Limelight"); ;
 
@@ -77,6 +78,7 @@ public class Robot extends TimedRobot {
     super();
     this.m_drive = new DriveSubsystem();
     this.m_arm = new ArmSubsystem();
+    this.m_control = new ControlSubsystem(m_drive, m_arm);
   }
 
   @Override
@@ -107,6 +109,7 @@ public class Robot extends TimedRobot {
 
       CommandScheduler.getInstance().registerSubsystem(m_drive);
       CommandScheduler.getInstance().registerSubsystem(m_arm);
+      CommandScheduler.getInstance().unregisterSubsystem(m_control);
   }
 
   @Override
@@ -142,43 +145,27 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("TargetArea", LimelightHelpers.getTA("limelight"));
     SmartDashboard.putNumber("ID", LimelightHelpers.getFiducialID("limelight"));
 
-    SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());
-  
-    if (this.InputBlockingCommand != null && this.InputBlockingCommand.isFinished())
-    {
-      this.InputBlockingCommand = null;
-    }
-
     CommandScheduler.getInstance().run();
   }
 
   @Override
-  public void teleopInit() {
-
+  public void teleopInit() 
+  {
+    CommandScheduler.getInstance().registerSubsystem(this.m_control);
   }
+
+  // @Override
+  // public void teleopPeriodic() 
+  // {
+
+  // }
 
   @Override
-  public void teleopPeriodic() {
-
-    if (this.InputBlockingCommand == null)
-    {
-      // Run our teleop input handle.
-      
-      m_drive.Drive.arcadeDrive(-m_driverController.getLeftY(), -m_driverController.getRightX()*0.7);
-
-      double armPower = -m_operatorController.getLeftY();
-      m_arm.ArmMotor.set(armPower * 0.7);
-      
-      if (this.m_operatorController.getAButton() == true)
-      {
-        this.InputBlockingCommand = m_arm.MoveTo(103, 40).withTimeout(5);
-        this.InputBlockingCommand.schedule();
-
-        System.out.print("Moving up!");
-      }
-    }
-
+  public void teleopExit() 
+  {
+    CommandScheduler.getInstance().unregisterSubsystem(this.m_control);
   }
+
 
   @Override
   public void disabledInit() {
@@ -186,7 +173,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() 
+  {
+    this.m_drive.Drive.stopMotor();
+  }
 
   @Override
   public void testInit() {

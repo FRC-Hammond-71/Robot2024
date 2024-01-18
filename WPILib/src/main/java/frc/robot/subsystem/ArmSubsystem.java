@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.MoveArmCommand;
+
 import java.util.Date;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -53,22 +55,8 @@ public class ArmSubsystem extends SubsystemBase {
      * @param speed Degrees per second.
      * @return
      */
-    public Command MoveTo(double position, double speed)
+    public Command MoveTo(double position)
     {
-        // Arm circ 15.707963267948966192313216916398
-
-        var current_position = this.GetArmRotation();
-
-        var wait_seconds = Math.abs((position - current_position) / speed);
-        System.out.println(String.format("Need to wait: %f", wait_seconds));
-        System.out.println(String.format("Motor RPM: %f", speed * 60));
-        System.out.println(String.format("Moving %f degrees", position - current_position));
-
-        // int direction = position > current_position ? -1 : 1;
-        // System.out.println(String.format("Direction: %d", direction));
-
-        // return Commands.run(() -> this.ArmMotor.set(speed * 60 / 6000))
-            
-        //     .andThen(() -> this.ArmMotor.stopMotor()));
+        return new MoveArmCommand(this, position);
     }
 }

@@ -31,14 +31,14 @@ public class DriveSubsystem extends SubsystemBase {
     // Movement Reporting
     // ------------------
     /**
-     * @return The Left Motor Speed in Meters per Second.
+     * @return The Left Motor Speed in Meters / Second.
      */
     public double GetLeftMotorSpeed()
     {
         return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
     }
      /**
-     * @return The Right Motor Speed in Meters per Second.
+     * @return The Right Motor Speed in Meters / Second.
      */
     public double GetRightMotorSpeed()
     {
