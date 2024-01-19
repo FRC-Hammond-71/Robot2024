@@ -1,10 +1,10 @@
-package frc.robot.subsystem;
+package frc.robot.subsystems;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.MoveArmCommand;
-
 import java.util.Date;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -31,6 +30,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem()
     {
+        super();
+
         this.ArmMotor.setSoftLimit(SoftLimitDirection.kForward, 130);
         this.ArmMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
         this.ArmMotor.setInverted(true);

@@ -1,9 +1,9 @@
-package frc.robot.subsystem;
+package frc.robot.subsystems;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -23,8 +23,10 @@ public class DriveSubsystem extends SubsystemBase {
     private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
     private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
 
-    private DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
+    public DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
     // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
+
+    private DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(20);
 
     /**
      * The desired speed and rotation the robot should be moving at.
@@ -34,7 +36,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     public DriveSubsystem()
     {
-        // TODO: Apply deadband to motors.
+        super();
+
+        // this.Drive.setDeadband(0.05);
     }
 
     // ------------------
@@ -43,22 +47,20 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * @return The Left Motor Speed in Meters / Second.
      */
-    public double GetLeftMotorSpeed()
+    public double GetLeftWheelSpeed()
     {
-        return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
+        return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48 / 10.7;
     }
      /**
      * @return The Right Motor Speed in Meters / Second.
      */
-    public double GetRightMotorSpeed()
+    public double GetRightWheelSpeed()
     {
-        return this.RightLeadMotor.getEncoder().getVelocity() / 60 * 0.48;
+        return this.RightLeadMotor.getEncoder().getVelocity() / 60 * 0.48 / 10.7;
     }
 
     public ChassisSpeeds GetOdometry()
     {
-        var differential_drive_kinematics = new DifferentialDriveKinematics(20);
-
         // Wheel Specs:
         // Radius = 3 in
         // Diameter = Radius * 2 = 6 in
@@ -66,21 +68,24 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Requires meters per second.
         var differential_drive_wheel_speeds = new DifferentialDriveWheelSpeeds(
-            GetLeftMotorSpeed(),
-            GetRightMotorSpeed()
+            GetLeftWheelSpeed(),
+            GetRightWheelSpeed()
         );
 
-        return differential_drive_kinematics.toChassisSpeeds(differential_drive_wheel_speeds);
+        // 10.7:1 rotation (Motor makes 10.7 rotations to one wheel turn)
+
+        return this.Kinematics.toChassisSpeeds(differential_drive_wheel_speeds);
     }
 
     public void Drive(ChassisSpeeds speeds)
     {
         // Combine the current speeds, and given speeds.
-        this.TargetSpeeds = new ChassisSpeeds(
-            speeds.vxMetersPerSecond - this.TargetSpeeds.vxMetersPerSecond,
-            speeds.vyMetersPerSecond - this.TargetSpeeds.vyMetersPerSecond,
-            speeds.omegaRadiansPerSecond - this.TargetSpeeds.omegaRadiansPerSecond
-        );
+        // this.TargetSpeeds = new ChassisSpeeds(
+        //     speeds.vxMetersPerSecond - this.TargetSpeeds.vxMetersPerSecond,
+        //     speeds.vyMetersPerSecond - this.TargetSpeeds.vyMetersPerSecond,
+        //     speeds.omegaRadiansPerSecond - this.TargetSpeeds.omegaRadiansPerSecond
+        // );
+        this.TargetSpeeds = speeds;
     }
 
     public void Stop()
@@ -92,10 +97,18 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() 
     {
-        SmartDashboard.putString("GetChassisSpeeds()", GetOdometry().toString());
+        SmartDashboard.putString("GetOdometry()", GetOdometry().toString());
 
-        
-        
+        var wheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
+
+        SmartDashboard.putString("Target  Speeds", this.TargetSpeeds.toString());
+        SmartDashboard.putString("Wheel Speeds", wheelSpeeds.toString());
+
+        var leftMotorP = wheelSpeeds.leftMetersPerSecond / 0.48 * 10.7 * 60;
+        var rightMotorP = wheelSpeeds.rightMetersPerSecond / 0.48 * 10.7 * 60;
+
+        this.Drive.tankDrive(leftMotorP / 5676, rightMotorP / 5676);
+    
         // SmartDashboard.putString("Left Velocity", String.format("%n RPM", GetLeftMotorVelocity()));
         // SmartDashboard.putString("Right Velocity", String.format("%n RPM", GetRightMotorVelocity()));
     }

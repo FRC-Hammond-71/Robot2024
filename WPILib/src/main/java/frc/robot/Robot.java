@@ -5,9 +5,9 @@
 package frc.robot;
 
 import frc.robot.LimelightHelpers;
-import frc.robot.subsystem.ArmSubsystem;
-import frc.robot.subsystem.ControlSubsystem;
-import frc.robot.subsystem.DriveSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ControlSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -107,8 +107,6 @@ public class Robot extends TimedRobot
       //Limelight initiation Code
       LLTable.getEntry("camMode").setNumber(0);
 
-      CommandScheduler.getInstance().registerSubsystem(m_drive);
-      CommandScheduler.getInstance().registerSubsystem(m_arm);
       CommandScheduler.getInstance().unregisterSubsystem(m_control);
   }
 
@@ -128,7 +126,7 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
 
-    SmartDashboard.putString("Chassis Speeds", this.m_drive.GetChassisSpeeds().toString());
+    SmartDashboard.putString("Chassis Speeds", this.m_drive.GetOdometry().toString());
     SmartDashboard.putNumber("Arm Position", this.m_arm.GetArmRotation());
 
    
@@ -175,7 +173,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledPeriodic() 
   {
-    // this.m_drive.Stop();
+    this.m_drive.Stop();
   }
 
   @Override

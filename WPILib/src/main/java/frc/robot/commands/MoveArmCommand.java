@@ -3,7 +3,7 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.subsystem.ArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
 public class MoveArmCommand extends CommandBase 
 {
@@ -13,6 +13,8 @@ public class MoveArmCommand extends CommandBase
 
     public MoveArmCommand(ArmSubsystem arm, double targetRotation)
     {
+        super();
+
         this.Arm = arm;
         this.TargetRotation = targetRotation;
     }
