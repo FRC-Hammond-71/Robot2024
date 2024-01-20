@@ -20,8 +20,8 @@ public class DriveSubsystem extends SubsystemBase {
     // ------ 
     private CANSparkMax LeftLeadMotor = new CANSparkMax(5,MotorType.kBrushless);
     private CANSparkMax RightLeadMotor = new CANSparkMax(4,MotorType.kBrushless);
-    private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
-    private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
+    // private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
+    // private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
 
     public DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
     // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
@@ -37,6 +37,8 @@ public class DriveSubsystem extends SubsystemBase {
     public DriveSubsystem()
     {
         super();
+
+        // this.RightLeadMotor.setInverted(true);
 
         // this.Drive.setDeadband(0.05);
     }
@@ -97,7 +99,9 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() 
     {
-        SmartDashboard.putString("GetOdometry()", GetOdometry().toString());
+        SmartDashboard.putString("GetOdometry", GetOdometry().toString());
+        
+        var turning_error = GetOdometry().omegaRadiansPerSecond / this.TargetSpeeds.omegaRadiansPerSecond;
 
         var wheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
 
@@ -107,9 +111,12 @@ public class DriveSubsystem extends SubsystemBase {
         var leftMotorP = wheelSpeeds.leftMetersPerSecond / 0.48 * 10.7 * 60;
         var rightMotorP = wheelSpeeds.rightMetersPerSecond / 0.48 * 10.7 * 60;
 
+        SmartDashboard.putNumber("TURNING_ERROR", turning_error);
+
         this.Drive.tankDrive(leftMotorP / 5676, rightMotorP / 5676);
+
     
-        // SmartDashboard.putString("Left Velocity", String.format("%n RPM", GetLeftMotorVelocity()));
-        // SmartDashboard.putString("Right Velocity", String.format("%n RPM", GetRightMotorVelocity()));
+        SmartDashboard.putString("Left Speed", String.format("%f RPM", GetLeftWheelSpeed()));
+        SmartDashboard.putString("Right Speed", String.format("%f RPM", GetRightWheelSpeed()));
     }
 }

@@ -12,13 +12,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.AlignWithTagCommand;
 
 /**
  * The operator-control subsystem!
  */
 public class ControlSubsystem extends SubsystemBase {
     
-    public Duration MaxBlockingDuration = Duration.ofSeconds(5);
+    public Duration MaxBlockingDuration = Duration.ofSeconds(10);
 
     private DriveSubsystem Drive;
     private ArmSubsystem Arm;
@@ -52,7 +53,7 @@ public class ControlSubsystem extends SubsystemBase {
         }
 
         // Perform actions from the user!
-        var targetSpeed = new ChassisSpeeds(-this.DriverController.getLeftY() * 3, 0, -this.DriverController.getRightX() * 0.25);
+        var targetSpeed = new ChassisSpeeds(this.DriverController.getLeftY() * 3, 0, -this.DriverController.getRightX() * 0.25);
         SmartDashboard.putString("Input Speeds", targetSpeed.toString());
         this.Drive.Drive(targetSpeed);
         // this.Drive.Drive.arcadeDrive(-this.DriverController.getLeftY(), -this.DriverController.getRightX() * 0.7);
@@ -64,6 +65,10 @@ public class ControlSubsystem extends SubsystemBase {
         if (this.OperatorController.getAButton() == true)
         {
             this.SetBlockingCommand(this.Arm.MoveTo(103)).schedule();
+        }
+        else if (this.DriverController.getBButton() == true)
+        {
+            this.SetBlockingCommand(new AlignWithTagCommand(this.Drive)).schedule();
         }
 
         SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());

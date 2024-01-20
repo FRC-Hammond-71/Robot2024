@@ -143,6 +143,9 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("TargetArea", LimelightHelpers.getTA("limelight"));
     SmartDashboard.putNumber("ID", LimelightHelpers.getFiducialID("limelight"));
 
+    var tx = LimelightHelpers.getTX("limelight");
+    SmartDashboard.putNumber("TX", tx);
+
     CommandScheduler.getInstance().run();
   }
 
