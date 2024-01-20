@@ -7,7 +7,7 @@ package frc.robot;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ControlSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.MovementSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -51,7 +51,7 @@ public class Robot extends TimedRobot
   // ----------
   // Subsystems
   // ----------
-  private DriveSubsystem m_drive;
+  private MovementSubsystem m_drive;
   private ArmSubsystem m_arm;
   private ControlSubsystem m_control;
 
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot
   public Robot()
   {
     super();
-    this.m_drive = new DriveSubsystem();
+    this.m_drive = new MovementSubsystem();
     this.m_arm = new ArmSubsystem();
     this.m_control = new ControlSubsystem(m_drive, m_arm);
   }
@@ -101,7 +101,7 @@ public class Robot extends TimedRobot
       /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
       /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
 
-      ahrs = new AHRS(SPI.Port.kMXP); 
+      // ahrs = new AHRS(SPI.Port.kMXP); 
       CameraServer.startAutomaticCapture();
 
       //Limelight initiation Code
@@ -120,12 +120,6 @@ public class Robot extends TimedRobot
     // SmartDashboard.putNumber("Right Follow Motor Encoder", m_rightFollowEncoder.getPosition()*kDriveTick2Feet);
     
     /* Display 6-axis Processed Angle Data                                      */
-    SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
-    SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
-    SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-    SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
-    SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
-
     SmartDashboard.putString("Chassis Speeds", this.m_drive.GetOdometry().toString());
     SmartDashboard.putNumber("Arm Position", this.m_arm.GetArmRotation());
 

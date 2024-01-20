@@ -1,19 +1,28 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import java.util.Date;
+import frc.robot.LimelightHelpers;
 
-public class DriveSubsystem extends SubsystemBase {
+import java.util.Date;
+import edu.wpi.first.wpilibj.SPI;
+
+public class MovementSubsystem extends SubsystemBase {
 
     // ------
     // Motors
@@ -23,10 +32,17 @@ public class DriveSubsystem extends SubsystemBase {
     // private CANSparkMax LeftFollowMotor = new CANSparkMax(3,MotorType.kBrushless);
     // private CANSparkMax RightFollowMotor =  new CANSparkMax(2,MotorType.kBrushless);
 
+    private double AccumulatedLeftWheel = 0;
+    private double AccumulatedRightWheel = 0;
+
     public DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
     // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
 
     private DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(20);
+
+    private DifferentialDrivePoseEstimator PoseEstimator;
+    
+    private AHRS IMU = new AHRS(SPI.Port.kMXP);
 
     /**
      * The desired speed and rotation the robot should be moving at.
@@ -34,13 +50,16 @@ public class DriveSubsystem extends SubsystemBase {
     private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
 
 
-    public DriveSubsystem()
+    public MovementSubsystem()
     {
         super();
 
-        // this.RightLeadMotor.setInverted(true);
-
-        // this.Drive.setDeadband(0.05);
+        this.PoseEstimator = new DifferentialDrivePoseEstimator(
+            this.Kinematics,
+            new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
+            0, 
+            0, 
+            LimelightHelpers.getBotPose2d("limelight"));
     }
 
     // ------------------
@@ -98,24 +117,37 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() 
-    {
-        SmartDashboard.putString("GetOdometry", GetOdometry().toString());
-        
-        var turning_error = GetOdometry().omegaRadiansPerSecond / this.TargetSpeeds.omegaRadiansPerSecond;
+    {        
+        // var odometry = GetOdometry();
+
+        SmartDashboard.putBoolean("IMU_Connected", this.IMU.isConnected());
+        SmartDashboard.putBoolean("IMU_IsCalibrating", this.IMU.isCalibrating());
+        SmartDashboard.putNumber("IMU_Yaw", this.IMU.getYaw());
+        SmartDashboard.putNumber("IMU_Pitch", this.IMU.getPitch());
+        SmartDashboard.putNumber("IMU_Roll", this.IMU.getRoll());
+
 
         var wheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
 
-        SmartDashboard.putString("Target  Speeds", this.TargetSpeeds.toString());
+        this.PoseEstimator.update(
+            new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
+            this.RightLeadMotor.getEncoder().getPosition() * 0.48 / 10.7,
+            this.LeftLeadMotor.getEncoder().getPosition() * 0.48 / 10.7
+        );
+        this.PoseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d("limelight"), LimelightHelpers.getLatency_Pipeline("limelight"));
+
+        SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
+
+        SmartDashboard.putString("Estimated Position", this.PoseEstimator.getEstimatedPosition().toString());
+
+        SmartDashboard.putString("Target Speeds", this.TargetSpeeds.toString());
         SmartDashboard.putString("Wheel Speeds", wheelSpeeds.toString());
 
         var leftMotorP = wheelSpeeds.leftMetersPerSecond / 0.48 * 10.7 * 60;
         var rightMotorP = wheelSpeeds.rightMetersPerSecond / 0.48 * 10.7 * 60;
 
-        SmartDashboard.putNumber("TURNING_ERROR", turning_error);
-
         this.Drive.tankDrive(leftMotorP / 5676, rightMotorP / 5676);
 
-    
         SmartDashboard.putString("Left Speed", String.format("%f RPM", GetLeftWheelSpeed()));
         SmartDashboard.putString("Right Speed", String.format("%f RPM", GetRightWheelSpeed()));
     }
