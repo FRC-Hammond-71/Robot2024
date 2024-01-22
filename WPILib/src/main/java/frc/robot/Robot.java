@@ -1,202 +1,91 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-// IF ERROR CODE 2 --> CHECK THE TINY SWITCH
 package frc.robot;
 
-import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ControlSubsystem;
 import frc.robot.subsystems.MovementSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.cameraserver.CameraServer;
-//import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.function.BooleanConsumer;
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetection;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.AbsoluteEncoder;
+public class Robot extends TimedRobot {
+	// ----------
+	// Subsystems
+	// ----------
+	private MovementSubsystem m_drive;
+	private ArmSubsystem m_arm;
+	private ControlSubsystem m_control;
 
+	private NetworkTable LLTable = NetworkTableInstance.getDefault().getTable("Limelight");
 
-import java.util.AbstractQueue;
-import java.util.function.BooleanSupplier;
+	private static final String kDefaultAuto = "Cone DE Auto";
+	private static final String kCustomAuto = "Cube DE Auto";
+	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
 
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
+	public Robot() {
+		super();
+		this.m_drive = new MovementSubsystem();
+		this.m_arm = new ArmSubsystem();
+		this.m_control = new ControlSubsystem(m_drive, m_arm);
+	}
 
+	@Override
+	public void simulationInit() {
+		System.out.println("Robot is running in simulation!");
+	}
 
+	@Override
+	public void robotInit() {
+		m_chooser.setDefaultOption("Cone DE Auto", kDefaultAuto);
+		m_chooser.addOption("Cube DE Auto", kCustomAuto);
+		SmartDashboard.putData("Auto choices", m_chooser);
+		/* Communicate w/navX-MXP via the MXP SPI Bus. */
+		/* Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB */
+		/*
+		 * See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for
+		 * details.
+		 */
 
+		// ahrs = new AHRS(SPI.Port.kMXP);
+		CameraServer.startAutomaticCapture();
 
-public class Robot extends TimedRobot 
-{
-  // ----------
-  // Subsystems
-  // ----------
-  private MovementSubsystem m_drive;
-  private ArmSubsystem m_arm;
-  private ControlSubsystem m_control;
+		// Limelight initiation Code
+		LLTable.getEntry("camMode").setNumber(0);
 
+		CommandScheduler.getInstance().unregisterSubsystem(m_control);
+	}
 
-  private NetworkTable LLTable = NetworkTableInstance.getDefault().getTable("Limelight"); ;
+	@Override
+	public void robotPeriodic() {
+		CommandScheduler.getInstance().run();
+	}
 
-  AHRS ahrs;
+	@Override
+	public void teleopInit() {
+		CommandScheduler.getInstance().registerSubsystem(this.m_control);
+	}
 
-  private final double kArmTick2Deg = 32.667;
-  private final double kDriveTick2Feet = 1;
+	// @Override
+	// public void teleopPeriodic()
+	// {
 
-  private static final String kDefaultAuto = "Cone DE Auto";
-  private static final String kCustomAuto = "Cube DE Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+	// }
 
-  private double startTime;
+	@Override
+	public void teleopExit() {
+		CommandScheduler.getInstance().unregisterSubsystem(this.m_control);
+	}
 
-  private Command InputBlockingCommand;
+	@Override
+	public void disabledInit() {
 
+	}
 
-  public Robot()
-  {
-    super();
-    this.m_drive = new MovementSubsystem();
-    this.m_arm = new ArmSubsystem();
-    this.m_control = new ControlSubsystem(m_drive, m_arm);
-  }
-
-  @Override
-  public void robotInit() {
-        
-    // m_robotDrive.setDeadband(0.05);
-
-    m_chooser.setDefaultOption("Cone DE Auto", kDefaultAuto);
-    m_chooser.addOption("Cube DE Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
-    /*m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
-    m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-
-    m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,980);
-    m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse,-980);*/
-
-    
-      /* Communicate w/navX-MXP via the MXP SPI Bus.                                     */
-      /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
-      /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
-
-      // ahrs = new AHRS(SPI.Port.kMXP); 
-      CameraServer.startAutomaticCapture();
-
-      //Limelight initiation Code
-      LLTable.getEntry("camMode").setNumber(0);
-
-      CommandScheduler.getInstance().unregisterSubsystem(m_control);
-  }
-
-  @Override
-  public void robotPeriodic() {
-    /*SmartDashboard.putNumber("Arm Encoder Position", m_armAbsoluteEncoder.getPosition());*/
-    // SmartDashboard.putNumber("Left Lead Motor Encoder", m_leftLeadEncoder.getPosition()*kDriveTick2Feet);
-    // SmartDashboard.putNumber("Right Lead Motor Encoder", m_rightLeadEncoder.getPosition()*kDriveTick2Feet);
-    // SmartDashboard.putNumber("Left Follow Motor Encoder", m_leftFollowEncoder.getPosition()*kDriveTick2Feet);
-    // SmartDashboard.putNumber("Right Follow Motor Encoder", m_rightFollowEncoder.getPosition()*kDriveTick2Feet);
-    // SmartDashboard.putNumber("Right Follow Motor Encoder", m_rightFollowEncoder.getPosition()*kDriveTick2Feet);
-    
-    /* Display 6-axis Processed Angle Data                                      */
-    SmartDashboard.putString("Chassis Speeds", this.m_drive.GetOdometry().toString());
-    SmartDashboard.putNumber("Arm Position", this.m_arm.GetArmRotation());
-
-   
-    //read values periodically
-    NetworkTableEntry Tx = LLTable.getEntry("tx");
-    NetworkTableEntry Ty = LLTable.getEntry("ty");
-    NetworkTableEntry Ta = LLTable.getEntry("ta");
-    NetworkTableEntry Tv = LLTable.getEntry("tv");
-
-    //post to smart dashboard periodically
-    SmartDashboard.putBoolean("Targets", LimelightHelpers.getTV("limelight"));
-    SmartDashboard.putNumber("TargetX", LimelightHelpers.getTX("limelight"));
-    SmartDashboard.putNumber("TargetY", LimelightHelpers.getTY("limelight"));
-    SmartDashboard.putNumber("TargetArea", LimelightHelpers.getTA("limelight"));
-    SmartDashboard.putNumber("ID", LimelightHelpers.getFiducialID("limelight"));
-
-    var tx = LimelightHelpers.getTX("limelight");
-    SmartDashboard.putNumber("TX", tx);
-
-    CommandScheduler.getInstance().run();
-  }
-
-  @Override
-  public void teleopInit() 
-  {
-    CommandScheduler.getInstance().registerSubsystem(this.m_control);
-  }
-
-  // @Override
-  // public void teleopPeriodic() 
-  // {
-
-  // }
-
-  @Override
-  public void teleopExit() 
-  {
-    CommandScheduler.getInstance().unregisterSubsystem(this.m_control);
-  }
-
-
-  @Override
-  public void disabledInit() {
-
-  }
-
-  @Override
-  public void disabledPeriodic() 
-  {
-    this.m_drive.Stop();
-  }
-
-  @Override
-  public void testInit() {
-    double startTime = Timer.getFPGATimestamp();
-  }
-
-  // @Override
-  // public void testPeriodic() {
-  //   double time = Timer.getFPGATimestamp(); 
-    
-  //   if(time - startTime < 1) {
-  //     m_intakeMotor.set(1);
-  //   } else {
-  //     m_armMotor.set(0);
-  //   }
-  // }
-
-  @Override
-  public void simulationInit() {}
-
-  @Override
-  public void simulationPeriodic() {}
-
-  
-
-
+	@Override
+	public void disabledPeriodic() {
+		this.m_drive.Stop();
+	}
 }
-

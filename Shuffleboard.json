@@ -1,0 +1,168 @@
+{
+  "tabPane": [
+    {
+      "title": "SmartDashboard",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "SmartDashboard/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {
+          "3,0": {
+            "size": [
+              3,
+              3
+            ],
+            "content": {
+              "_type": "Graph",
+              "_source0": "network_table:///SmartDashboard/PID LEFT ERROR",
+              "_source1": "network_table:///SmartDashboard/PID RIGHT ERROR",
+              "_title": "PID Adjustment",
+              "_glyph": 33,
+              "_showGlyph": true,
+              "Graph/Visible time": 15.0,
+              "Graph/X-axis auto scrolling": true,
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 20.0,
+              "Y-axis/Lower bound": -20.0,
+              "Y-axis/Unit": "Error",
+              "Visible data/SmartDashboard/PID LEFT ERROR": true,
+              "Visible data/SmartDashboard/PID RIGHT ERROR": true
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              5
+            ],
+            "content": {
+              "_type": "Subsystem Layout",
+              "_title": "Movement",
+              "_glyph": 538,
+              "_showGlyph": true,
+              "Layout/Label position": "BOTTOM",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Estimated Position",
+                  "_title": "Estimated Position",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/IMU",
+                  "_title": "IMU",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Input Blocking Command",
+                  "_title": "Input Blocking Command",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Grid Layout",
+                  "_title": "Motor Usage",
+                  "_glyph": 149,
+                  "_showGlyph": false,
+                  "Layout/Number of columns": 2,
+                  "Layout/Number of rows": 1,
+                  "Layout/Label position": "BOTTOM",
+                  "_children": {
+                    "0,0": {
+                      "_type": "Grid Layout",
+                      "_title": "Left",
+                      "_glyph": 149,
+                      "_showGlyph": false,
+                      "Layout/Number of columns": 1,
+                      "Layout/Number of rows": 2,
+                      "Layout/Label position": "BOTTOM",
+                      "_children": {
+                        "0,0": {
+                          "_type": "Simple Dial",
+                          "_source0": "network_table:///SmartDashboard/Left Speed (M/s)",
+                          "_title": "Actual Speed (M/s)",
+                          "_glyph": 148,
+                          "_showGlyph": false,
+                          "Range/Min": -10.0,
+                          "Range/Max": 10.0,
+                          "Visuals/Show value": true
+                        },
+                        "0,1": {
+                          "_type": "Simple Dial",
+                          "_source0": "network_table:///SmartDashboard/Left Desired Speed (M/s)",
+                          "_title": "Desired Speed (M/s)",
+                          "_glyph": 148,
+                          "_showGlyph": false,
+                          "Range/Min": -10.0,
+                          "Range/Max": 10.0,
+                          "Visuals/Show value": true
+                        }
+                      }
+                    },
+                    "1,0": {
+                      "_type": "Grid Layout",
+                      "_title": "Right",
+                      "_glyph": 149,
+                      "_showGlyph": false,
+                      "Layout/Number of columns": 1,
+                      "Layout/Number of rows": 2,
+                      "Layout/Label position": "BOTTOM",
+                      "_children": {
+                        "0,0": {
+                          "_type": "Simple Dial",
+                          "_source0": "network_table:///SmartDashboard/Right Speed (M/s)",
+                          "_title": "Actual Speed (M/s)",
+                          "_glyph": 148,
+                          "_showGlyph": false,
+                          "Range/Min": -10.0,
+                          "Range/Max": 10.0,
+                          "Visuals/Show value": true
+                        },
+                        "0,1": {
+                          "_type": "Simple Dial",
+                          "_source0": "network_table:///SmartDashboard/Right Desired Speed (M/s)",
+                          "_title": "Desired Speed (M/s)",
+                          "_glyph": 148,
+                          "_showGlyph": false,
+                          "Range/Min": -10.0,
+                          "Range/Max": 10.0,
+                          "Visuals/Show value": true
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "LiveWindow",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "LiveWindow/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {}
+      }
+    }
+  ],
+  "windowGeometry": {
+    "x": 0.0,
+    "y": 0.0,
+    "width": 1741.5849609375,
+    "height": 1039.6981201171875
+  }
+}

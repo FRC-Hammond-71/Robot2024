@@ -1,11 +1,11 @@
 package frc.robot.commands;
 import java.util.Set;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class MoveArmCommand extends CommandBase 
+public class MoveArmCommand extends Command 
 {
     private ArmSubsystem Arm;
     private double TargetRotation;

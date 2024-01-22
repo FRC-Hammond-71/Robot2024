@@ -1,16 +1,12 @@
 package frc.robot.subsystems;
 
 import java.time.Duration;
-import java.util.ResourceBundle.Control;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.AlignWithTagCommand;
 
@@ -54,10 +50,7 @@ public class ControlSubsystem extends SubsystemBase {
 
         // Perform actions from the user!
         var targetSpeed = new ChassisSpeeds(this.DriverController.getLeftY() * 3, 0, -this.DriverController.getRightX() * 0.25);
-        SmartDashboard.putString("Input Speeds", targetSpeed.toString());
         this.Drive.Drive(targetSpeed);
-        // this.Drive.Drive.arcadeDrive(-this.DriverController.getLeftY(), -this.DriverController.getRightX() * 0.7);
-        SmartDashboard.putNumber("BLEHHH", -this.DriverController.getLeftY());
 
         double armPower = -this.OperatorController.getLeftY();
         this.Arm.ArmMotor.set(armPower * 0.7);

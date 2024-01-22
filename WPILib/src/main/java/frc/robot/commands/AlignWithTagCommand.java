@@ -3,11 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.MovementSubsystem;
 
-public class AlignWithTagCommand extends CommandBase 
+public class AlignWithTagCommand extends Command 
 {
     private MovementSubsystem Drive;
 

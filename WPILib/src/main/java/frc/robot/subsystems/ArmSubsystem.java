@@ -1,19 +1,11 @@
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.MoveArmCommand;
-import java.util.Date;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -26,6 +18,8 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public CANSparkMax IntakeMotor = new CANSparkMax(7, MotorType.kBrushless);
 
+    private PIDController ArmPID = new PIDController(1, 0, 0.5);
+
     // Arm rests at 103 degrees
 
     public ArmSubsystem()
@@ -33,9 +27,10 @@ public class ArmSubsystem extends SubsystemBase {
         super();
 
         this.ArmMotor.setSoftLimit(SoftLimitDirection.kForward, 130);
-        this.ArmMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+        this.ArmMotor.setSoftLimit(SoftLimitDirection.kReverse, -5);
+        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
         this.ArmMotor.setInverted(true);
-        // this.ArmMotor.setSoftLimit(SoftLimitDirection.kForward, 1);
     }
 
     // ------------------
