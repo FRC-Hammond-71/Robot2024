@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -17,7 +19,33 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-	public static class OperatorConstants {
-		public static final int kDriverControllerPort = 0;
+	public static class Operator {
+		public static final int ControllerPort = 0;
+	}
+
+	public static class Drivetrain {
+		// https://www.revrobotics.com/rev-21-1650/
+
+		/**
+		 * Wheel radius in Meters.
+		 */
+		public static double WheelRadius = Units.inchesToMeters(3);
+
+		/**
+		 * Wheel circumference in Meters.
+		 */
+		// WheelRadius * 2 * Math.PI
+		public static double WheelCircumference = 0.48;
+
+		/**
+		 * Wheels make 10.7 rotations per Motor rotation (10.71:1)
+		 */
+		public static double WheelGearing = 10.7;
+
+		/**
+		 * The track width in Meters.
+		 */
+		public static double TrackWidth = Units.inchesToMeters(20);
+
 	}
 }

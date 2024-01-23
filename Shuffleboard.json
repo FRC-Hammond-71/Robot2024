@@ -18,19 +18,21 @@
             ],
             "content": {
               "_type": "Graph",
-              "_source0": "network_table:///SmartDashboard/PID LEFT ERROR",
-              "_source1": "network_table:///SmartDashboard/PID RIGHT ERROR",
+              "_source0": "network_table:///SmartDashboard/Right Motor RPS",
+              "_source1": "network_table:///SmartDashboard/PID LEFT ERROR",
+              "_source2": "network_table:///SmartDashboard/PID RIGHT ERROR",
               "_title": "PID Adjustment",
-              "_glyph": 33,
-              "_showGlyph": true,
-              "Graph/Visible time": 15.0,
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Graph/Visible time": 30.0,
               "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": false,
-              "Y-axis/Upper bound": 20.0,
-              "Y-axis/Lower bound": -20.0,
-              "Y-axis/Unit": "Error",
+              "Y-axis/Automatic bounds": true,
+              "Y-axis/Upper bound": 1.0,
+              "Y-axis/Lower bound": -1.0,
+              "Y-axis/Unit": "ul",
               "Visible data/SmartDashboard/PID LEFT ERROR": true,
-              "Visible data/SmartDashboard/PID RIGHT ERROR": true
+              "Visible data/SmartDashboard/PID RIGHT ERROR": true,
+              "Visible data/SmartDashboard/Right Motor RPS": false
             }
           },
           "0,0": {
@@ -60,19 +62,12 @@
                   "_showGlyph": false
                 },
                 {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Input Blocking Command",
-                  "_title": "Input Blocking Command",
-                  "_glyph": 148,
-                  "_showGlyph": false
-                },
-                {
                   "_type": "Grid Layout",
                   "_title": "Motor Usage",
                   "_glyph": 149,
                   "_showGlyph": false,
                   "Layout/Number of columns": 2,
-                  "Layout/Number of rows": 1,
+                  "Layout/Number of rows": 2,
                   "Layout/Label position": "BOTTOM",
                   "_children": {
                     "0,0": {
@@ -81,7 +76,7 @@
                       "_glyph": 149,
                       "_showGlyph": false,
                       "Layout/Number of columns": 1,
-                      "Layout/Number of rows": 2,
+                      "Layout/Number of rows": 3,
                       "Layout/Label position": "BOTTOM",
                       "_children": {
                         "0,0": {
@@ -112,7 +107,7 @@
                       "_glyph": 149,
                       "_showGlyph": false,
                       "Layout/Number of columns": 1,
-                      "Layout/Number of rows": 2,
+                      "Layout/Number of rows": 3,
                       "Layout/Label position": "BOTTOM",
                       "_children": {
                         "0,0": {
@@ -138,8 +133,106 @@
                       }
                     }
                   }
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Input Blocking Command",
+                  "_title": "Input Blocking Command",
+                  "_glyph": 148,
+                  "_showGlyph": false
                 }
               ]
+            }
+          },
+          "6,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Field",
+              "_source0": "network_table:///SmartDashboard/Field",
+              "_title": "Field",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Game/Game": "k2024Crescendo",
+              "Visuals/Robot Icon Size": 50.0,
+              "Visuals/Show Outside Circles": false,
+              "Colors/traj": "#FFFFFFFF"
+            }
+          },
+          "6,0": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Desired Speeds",
+              "_title": "Desired Speeds",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,1": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Wheel Speeds",
+              "_title": "Wheel Speeds",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,3": {
+            "size": [
+              3,
+              3
+            ],
+            "content": {
+              "_type": "Graph",
+              "_source0": "network_table:///SmartDashboard/Left Motor Inaccuracy",
+              "_source1": "network_table:///SmartDashboard/Right Motor Inaccuracy",
+              "_title": "Following Fault",
+              "_glyph": 148,
+              "_showGlyph": true,
+              "Graph/Visible time": 5.0,
+              "Graph/X-axis auto scrolling": true,
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 20.0,
+              "Y-axis/Lower bound": 0.0,
+              "Y-axis/Unit": "ul",
+              "Visible data/SmartDashboard/Left Motor Inaccuracy": true,
+              "Visible data/SmartDashboard/Right Motor Inaccuracy": true
+            }
+          },
+          "9,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Left Motor PER",
+              "_title": "Left Motor PER",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Right Motor PER",
+              "_title": "Right Motor PER",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
@@ -160,9 +253,9 @@
     }
   ],
   "windowGeometry": {
-    "x": 0.0,
-    "y": 0.0,
-    "width": 1741.5849609375,
-    "height": 1039.6981201171875
+    "x": -7.245283126831055,
+    "y": -7.245283126831055,
+    "width": 1753.3585205078125,
+    "height": 1053.2830810546875
   }
 }

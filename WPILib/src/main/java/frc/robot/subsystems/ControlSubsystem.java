@@ -2,20 +2,24 @@ package frc.robot.subsystems;
 
 import java.time.Duration;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.AlignWithTagCommand;
+import frc.robot.subsystems.Movement.*;
 
 /**
  * The operator-control subsystem!
  */
 public class ControlSubsystem extends SubsystemBase {
     
-    public Duration MaxBlockingDuration = Duration.ofSeconds(10);
+    public Duration MaxBlockingDuration = Duration.ofSeconds(30);
 
     private MovementSubsystem Drive;
     private ArmSubsystem Arm;
@@ -49,19 +53,27 @@ public class ControlSubsystem extends SubsystemBase {
         }
 
         // Perform actions from the user!
-        var targetSpeed = new ChassisSpeeds(this.DriverController.getLeftY() * 3, 0, -this.DriverController.getRightX() * 0.25);
+        var targetSpeed = new ChassisSpeeds(this.DriverController.getLeftY() * 10, 0, -this.DriverController.getRightX() * Units.degreesToRadians(360));
         this.Drive.Drive(targetSpeed);
 
         double armPower = -this.OperatorController.getLeftY();
         this.Arm.ArmMotor.set(armPower * 0.7);
         
-        if (this.OperatorController.getAButton() == true)
+        if (this.DriverController.getAButton() == true)
         {
-            this.SetBlockingCommand(this.Arm.MoveTo(103)).schedule();
+            this.SetBlockingCommand(this.Drive.FollowPathByName("Goto Note 1")).schedule();
         }
         else if (this.DriverController.getBButton() == true)
         {
-            this.SetBlockingCommand(new AlignWithTagCommand(this.Drive)).schedule();
+            this.SetBlockingCommand(this.Drive.FollowPathByName("Goto Note 1 - Back")).schedule();
+        }
+        else if (this.DriverController.getXButton() == true)
+        {
+            this.SetBlockingCommand(this.Drive.FollowPathByName("Test Path")).schedule();
+        }
+        else if (this.DriverController.getYButton() == true)
+        {
+            this.SetBlockingCommand(this.Drive.PathFindToPose(new Pose2d(12, 6, new Rotation2d()))).schedule();
         }
 
         SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());
@@ -73,7 +85,7 @@ public class ControlSubsystem extends SubsystemBase {
     public Command SetBlockingCommand(Command command)
     {
         // Force the input-blocking command to be limited to set duration (NOTE: WILL NOT STOP EXECUTION OF ORG COMMAND)
-        command = command.withTimeout(this.MaxBlockingDuration.toSeconds());
+        // command = command.withTimeout(this.MaxBlockingDuration.toSeconds());
 
         this.InputBlockingCommand = this.InputBlockingCommand == null ? command : this.InputBlockingCommand.andThen(command);
         return this.InputBlockingCommand;

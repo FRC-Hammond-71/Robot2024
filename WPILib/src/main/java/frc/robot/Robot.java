@@ -2,7 +2,9 @@ package frc.robot;
 
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ControlSubsystem;
-import frc.robot.subsystems.MovementSubsystem;
+import frc.robot.subsystems.Movement.MovementSubsystem;
+import frc.robot.subsystems.Movement.SimulatedMovementSubsystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.subsystems.Movement.ActualMovementSubsystem;
 
 public class Robot extends TimedRobot {
 	// ----------
@@ -25,13 +28,6 @@ public class Robot extends TimedRobot {
 	private static final String kCustomAuto = "Cube DE Auto";
 	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
 
-	public Robot() {
-		super();
-		this.m_drive = new MovementSubsystem();
-		this.m_arm = new ArmSubsystem();
-		this.m_control = new ControlSubsystem(m_drive, m_arm);
-	}
-
 	@Override
 	public void simulationInit() {
 		System.out.println("Robot is running in simulation!");
@@ -39,9 +35,17 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
-		m_chooser.setDefaultOption("Cone DE Auto", kDefaultAuto);
-		m_chooser.addOption("Cube DE Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+
+		// this.m_drive = RobotBase.isReal() ? new ActualMovementSubsystem() : new SimulatedMovementSubsystem();
+		this.m_drive = new SimulatedMovementSubsystem();
+		this.m_arm = new ArmSubsystem();
+		this.m_control = new ControlSubsystem(m_drive, m_arm);
+
+		// throw new Exception("BRUHHH?");
+
+		// m_chooser.setDefaultOption("Cone DE Auto", kDefaultAuto);
+		// m_chooser.addOption("Cube DE Auto", kCustomAuto);
+		// SmartDashboard.putData("Auto choices", m_chooser);
 		/* Communicate w/navX-MXP via the MXP SPI Bus. */
 		/* Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB */
 		/*

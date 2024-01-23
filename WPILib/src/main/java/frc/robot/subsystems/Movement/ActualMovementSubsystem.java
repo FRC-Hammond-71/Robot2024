@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Movement;
+
+import java.io.Console;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
@@ -11,20 +13,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 
-public class MovementSubsystem extends SubsystemBase {
-
-    // ------------------ Wheel Specs ---------------------------
-    // Radius = 3 in
-    // Diameter = Radius * 2 = 6 in
-    // Circumference = Diameter * PI = 18.85 inches = 0.48 meters
-    // 10.7:1 rotation (Motor makes 10.7 rotations to one wheel turn?)
-    // ----------------------------------------------------------
+public class ActualMovementSubsystem extends MovementSubsystem {
 
     // ------
     // Motors
@@ -44,7 +41,7 @@ public class MovementSubsystem extends SubsystemBase {
     // -----------
     private DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
 
-    private DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(20);
+    private DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
     private DifferentialDrivePoseEstimator PoseEstimator;
 
@@ -55,16 +52,14 @@ public class MovementSubsystem extends SubsystemBase {
      */
     private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
 
-    public MovementSubsystem() {
+    public ActualMovementSubsystem() {
         super();
 
-        /*
-         * m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
-         * m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-         * 
-         * m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,980);
-         * m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse,-980);
-         */
+        // m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+        // m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+
+        // m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,980);
+        // m_armMotor.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse,-980);
 
         this.LeftFollowMotor.follow(this.LeftLeadMotor);
         this.RightFollowMotor.follow(this.RightLeadMotor);
@@ -86,6 +81,7 @@ public class MovementSubsystem extends SubsystemBase {
     /**
      * @return The Left Motor Speed in Meters / Second.
      */
+    @Override
     public double GetLeftWheelSpeed() {
         return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48 * 10.7;
     }
@@ -93,21 +89,40 @@ public class MovementSubsystem extends SubsystemBase {
     /**
      * @return The Right Motor Speed in Meters / Second.
      */
+    @Override
     public double GetRightWheelSpeed() {
-        return this.RightLeadMotor.getEncoder().getVelocity() / 60 * 0.48 * 10.7;
+        return this.RightLeadMotor.getEncoder().getVelocity() / 60 * Constants.Drivetrain.WheelCircumference
+                * Constants.Drivetrain.WheelGearing;
+    }
+
+    public double GetLeftWheelTravel()
+    {
+        return this.LeftLeadMotor.getEncoder().getPosition()
+            * Constants.Drivetrain.WheelCircumference
+            * Constants.Drivetrain.WheelGearing;
+    }
+
+    public double GetRightWheelTravel()
+    {
+        return this.RightLeadMotor.getEncoder().getPosition()
+            * Constants.Drivetrain.WheelCircumference
+            * Constants.Drivetrain.WheelGearing;
     }
 
     /**
      * @return The estimated position of the Robot in Meters.
      */
+    @Override
     public Pose2d GetEstimatedPose() {
         return this.PoseEstimator.getEstimatedPosition();
     }
 
+    @Override
     public void Drive(ChassisSpeeds speeds) {
         this.TargetSpeeds = speeds;
     }
 
+    @Override
     public void Stop() {
         this.TargetSpeeds = new ChassisSpeeds();
         this.Drive.stopMotor();
@@ -125,14 +140,18 @@ public class MovementSubsystem extends SubsystemBase {
 
         this.PoseEstimator.update(
                 new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
-                this.RightLeadMotor.getEncoder().getPosition() * 0.48 * 10.7,
-                this.LeftLeadMotor.getEncoder().getPosition() * 0.48 * 10.7);
+                this.RightLeadMotor.getEncoder().getPosition() * Constants.Drivetrain.WheelCircumference
+                        * Constants.Drivetrain.WheelGearing,
+                this.LeftLeadMotor.getEncoder().getPosition() * Constants.Drivetrain.WheelCircumference
+                        * Constants.Drivetrain.WheelGearing);
 
-        if (RobotBase.isReal()) {
-            this.PoseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d("limelight"),
-                    LimelightHelpers.getLatency_Pipeline("limelight"));
-            SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
-        }
+        this.Field.setRobotPose(this.PoseEstimator.getEstimatedPosition());
+
+        this.PoseEstimator.addVisionMeasurement(
+                LimelightHelpers.getBotPose2d("limelight"),
+                LimelightHelpers.getLatency_Pipeline("limelight"));
+
+        SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
 
         {
             var estimatedPosition = this.GetEstimatedPose();
@@ -141,9 +160,6 @@ public class MovementSubsystem extends SubsystemBase {
                     estimatedPosition.getY(),
                     estimatedPosition.getRotation().getDegrees()));
         }
-
-        // SmartDashboard.putString("Target Speeds", this.TargetSpeeds.toString());
-        // SmartDashboard.putString("Wheel Speeds", wheelSpeeds.toString());
 
         // var leftMotorP = wheelSpeeds.leftMetersPerSecond / 0.48 * 10.7 * 60;
         var leftMotorP = this.LeftMotorsPID.calculate(this.GetLeftWheelSpeed(), desiredWheelSpeeds.leftMetersPerSecond)
@@ -162,5 +178,10 @@ public class MovementSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Right Speed (M/s)", GetRightWheelSpeed());
         SmartDashboard.putNumber("Right Desired Speed (M/s)", desiredWheelSpeeds.rightMetersPerSecond);
+    }
+
+    @Override
+    public ChassisSpeeds GetChassisSpeeds() {
+        return this.TargetSpeeds;
     }
 }
