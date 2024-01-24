@@ -58,23 +58,6 @@ public class ControlSubsystem extends SubsystemBase {
 
         double armPower = -this.OperatorController.getLeftY();
         this.Arm.ArmMotor.set(armPower * 0.7);
-        
-        if (this.DriverController.getAButton() == true)
-        {
-            this.SetBlockingCommand(this.Drive.FollowPathByName("Goto Note 1")).schedule();
-        }
-        else if (this.DriverController.getBButton() == true)
-        {
-            this.SetBlockingCommand(this.Drive.FollowPathByName("Goto Note 1 - Back")).schedule();
-        }
-        else if (this.DriverController.getXButton() == true)
-        {
-            this.SetBlockingCommand(this.Drive.FollowPathByName("Test Path")).schedule();
-        }
-        else if (this.DriverController.getYButton() == true)
-        {
-            this.SetBlockingCommand(this.Drive.PathFindToPose(new Pose2d(12, 6, new Rotation2d()))).schedule();
-        }
 
         SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());
     }

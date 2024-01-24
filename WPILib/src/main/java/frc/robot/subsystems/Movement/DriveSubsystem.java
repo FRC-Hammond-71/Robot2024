@@ -60,9 +60,9 @@ public abstract class DriveSubsystem extends SubsystemBase {
         //     });
     }
 
-    public Command PathFindToPose(Pose2d pose)
+    public Command PathFindToPose(Pose2d pose, PathConstraints constraints)
     {
-        return AutoBuilder.pathfindToPose(pose, new PathConstraints(2, 3, 0.2, 3), 0);
+        return AutoBuilder.pathfindToPose(pose, constraints, 0);
     }
 
     public abstract void Stop();
