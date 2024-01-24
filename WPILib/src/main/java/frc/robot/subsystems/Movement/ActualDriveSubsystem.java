@@ -6,6 +6,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +22,7 @@ import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 
-public class ActualMovementSubsystem extends MovementSubsystem {
+public class ActualDriveSubsystem extends DriveSubsystem {
 
     // ------
     // Motors
@@ -36,10 +37,12 @@ public class ActualMovementSubsystem extends MovementSubsystem {
     private PIDController LeftMotorsPID = new PIDController(5, 0.25, 0.5);
     private PIDController RightMotorsPID = new PIDController(5, 0.25, 0.5);
 
+    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
+
     // -----------
     // Controllers
     // -----------
-    private DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
+    // private DifferentialDrive Drive = new DifferentialDrive(LeftLeadMotor, RightLeadMotor);
 
     private DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
@@ -52,7 +55,7 @@ public class ActualMovementSubsystem extends MovementSubsystem {
      */
     private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
 
-    public ActualMovementSubsystem() {
+    public ActualDriveSubsystem() {
         super();
 
         // m_armMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
@@ -82,7 +85,8 @@ public class ActualMovementSubsystem extends MovementSubsystem {
      * @return The Left Motor Speed in Meters / Second.
      */
     @Override
-    public double GetLeftWheelSpeed() {
+    public double GetLeftWheelSpeed() 
+    {
         return this.LeftLeadMotor.getEncoder().getVelocity() / 60 * 0.48 * 10.7;
     }
 
@@ -125,7 +129,9 @@ public class ActualMovementSubsystem extends MovementSubsystem {
     @Override
     public void Stop() {
         this.TargetSpeeds = new ChassisSpeeds();
-        this.Drive.stopMotor();
+        this.LeftLeadMotor.stopMotor();
+        this.RightLeadMotor.stopMotor();
+        // this.Drive.stopMotor();
     }
 
     @Override
@@ -139,11 +145,10 @@ public class ActualMovementSubsystem extends MovementSubsystem {
         var desiredWheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
 
         this.PoseEstimator.update(
-                new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
-                this.RightLeadMotor.getEncoder().getPosition() * Constants.Drivetrain.WheelCircumference
-                        * Constants.Drivetrain.WheelGearing,
-                this.LeftLeadMotor.getEncoder().getPosition() * Constants.Drivetrain.WheelCircumference
-                        * Constants.Drivetrain.WheelGearing);
+            new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
+            this.GetLeftWheelTravel(),
+            this.GetRightWheelTravel()
+        );
 
         this.Field.setRobotPose(this.PoseEstimator.getEstimatedPosition());
 
@@ -168,10 +173,19 @@ public class ActualMovementSubsystem extends MovementSubsystem {
         var rightMotorP = this.RightMotorsPID.calculate(this.GetRightWheelSpeed(),
                 desiredWheelSpeeds.rightMetersPerSecond) / 0.48 / 10.7 * 60 / 5676;
 
-        SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
-        SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
+        // SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
+        // SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
 
-        this.Drive.tankDrive(leftMotorP, rightMotorP);
+        var whatr = this.FeedForward.calculate(this.GetRightWheelSpeed(), desiredWheelSpeeds.rightMetersPerSecond, 0.02);
+        var whatl = this.FeedForward.calculate(this.GetLeftWheelSpeed(), desiredWheelSpeeds.leftMetersPerSecond, 0.02);
+
+        SmartDashboard.putNumber("WhatL", whatl);
+        SmartDashboard.putNumber("WhatL", whatr);
+
+        this.LeftLeadMotor.setVoltage(whatl);
+        this.RightLeadMotor.setVoltage(whatr);
+
+        // this.Drive.tankDrive(leftMotorP, rightMotorP);
 
         SmartDashboard.putNumber("Left Speed (M/s)", GetLeftWheelSpeed());
         SmartDashboard.putNumber("Left Desired Speed (M/s)", desiredWheelSpeeds.leftMetersPerSecond);

@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 
-public class SimulatedMovementSubsystem extends MovementSubsystem {
+public class SimulatedDriveSubsystem extends DriveSubsystem {
 
     private DifferentialDrivetrainSim Drive = new DifferentialDrivetrainSim(
         DCMotor.getNEO(2),
@@ -73,7 +73,7 @@ public class SimulatedMovementSubsystem extends MovementSubsystem {
     private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
     private DifferentialDriveWheelSpeeds PreviousWheelSpeeds = new DifferentialDriveWheelSpeeds();
 
-    public SimulatedMovementSubsystem() 
+    public SimulatedDriveSubsystem() 
     {
         super();
 
@@ -171,12 +171,10 @@ public class SimulatedMovementSubsystem extends MovementSubsystem {
             
         this.Field.setRobotPose(this.PoseEstimator.getEstimatedPosition());
         
-        if (RobotBase.isReal()) {
-            this.PoseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d("limelight"),
-            LimelightHelpers.getLatency_Pipeline("limelight"));
-            SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
-        }
-        
+        this.PoseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d("limelight"),
+        LimelightHelpers.getLatency_Pipeline("limelight"));
+        SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
+    
         {
             var estimatedPosition = this.GetEstimatedPose();
             SmartDashboard.putString("Estimated Position", String.format("(%.2f, %.2f) %.2f°",

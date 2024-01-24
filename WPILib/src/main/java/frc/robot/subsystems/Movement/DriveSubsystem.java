@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.utilities.PathPlannerUtils;
 
-public abstract class MovementSubsystem extends SubsystemBase {
+public abstract class DriveSubsystem extends SubsystemBase {
 
     public Field2d Field = new Field2d();
 
-    protected MovementSubsystem()
+    protected DriveSubsystem()
     {
         SmartDashboard.putData(Field);
     }

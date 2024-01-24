@@ -2,8 +2,8 @@ package frc.robot;
 
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ControlSubsystem;
-import frc.robot.subsystems.Movement.MovementSubsystem;
-import frc.robot.subsystems.Movement.SimulatedMovementSubsystem;
+import frc.robot.subsystems.Movement.DriveSubsystem;
+import frc.robot.subsystems.Movement.SimulatedDriveSubsystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.subsystems.Movement.ActualMovementSubsystem;
+import frc.robot.subsystems.Movement.ActualDriveSubsystem;
 
 public class Robot extends TimedRobot {
 	// ----------
 	// Subsystems
 	// ----------
-	private MovementSubsystem m_drive;
+	private DriveSubsystem m_drive;
 	private ArmSubsystem m_arm;
 	private ControlSubsystem m_control;
 
@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 
 		// this.m_drive = RobotBase.isReal() ? new ActualMovementSubsystem() : new SimulatedMovementSubsystem();
-		this.m_drive = new SimulatedMovementSubsystem();
+		this.m_drive = new ActualDriveSubsystem();
 		this.m_arm = new ArmSubsystem();
 		this.m_control = new ControlSubsystem(m_drive, m_arm);
 

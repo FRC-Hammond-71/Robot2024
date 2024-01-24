@@ -5,14 +5,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
-import frc.robot.subsystems.Movement.ActualMovementSubsystem;
-import frc.robot.subsystems.Movement.MovementSubsystem;
+import frc.robot.subsystems.Movement.ActualDriveSubsystem;
+import frc.robot.subsystems.Movement.DriveSubsystem;
 
 public class AlignWithTagCommand extends Command 
 {
-    private MovementSubsystem Drive;
+    private DriveSubsystem Drive;
 
-    public AlignWithTagCommand(MovementSubsystem drive)
+    public AlignWithTagCommand(DriveSubsystem drive)
     {
         this.Drive = drive;
     }

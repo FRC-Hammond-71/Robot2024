@@ -21,14 +21,14 @@ public class ControlSubsystem extends SubsystemBase {
     
     public Duration MaxBlockingDuration = Duration.ofSeconds(30);
 
-    private MovementSubsystem Drive;
+    private DriveSubsystem Drive;
     private ArmSubsystem Arm;
     private Command InputBlockingCommand;
 
     private XboxController DriverController = new XboxController(0);
     private XboxController OperatorController = new XboxController(1);
 
-    public ControlSubsystem(MovementSubsystem drive, ArmSubsystem arm)
+    public ControlSubsystem(DriveSubsystem drive, ArmSubsystem arm)
     {
         super();
 

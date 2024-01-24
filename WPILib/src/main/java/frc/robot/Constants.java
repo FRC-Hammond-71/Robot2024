@@ -40,7 +40,7 @@ public final class Constants {
 		/**
 		 * Wheels make 10.7 rotations per Motor rotation (10.71:1)
 		 */
-		public static double WheelGearing = 10.7;
+		public static double WheelGearing = 10.71;
 
 		/**
 		 * The track width in Meters.
