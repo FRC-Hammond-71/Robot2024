@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.time.Duration;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 import frc.robot.commands.AlignWithTagCommand;
 import frc.robot.subsystems.Movement.*;
 
@@ -52,12 +55,23 @@ public class ControlSubsystem extends SubsystemBase {
             else return;
         }
 
-        // Perform actions from the user!
-        var targetSpeed = new ChassisSpeeds(this.DriverController.getLeftY() * 10, 0, -this.DriverController.getRightX() * Units.degreesToRadians(360));
+        if (DriverController.getXButton() == true && LimelightHelpers.getTV("limelight"))
+        {
+
+        }
+
+        var forward = this.DriverController.getLeftY();
+        if (Math.abs(forward) < 0.1)
+        {
+            forward = 0;
+        }
+
+        var targetSpeed = new ChassisSpeeds(-forward * 2, 0, -this.DriverController.getRightX() * Units.degreesToRadians(360));
         this.Drive.Drive(targetSpeed);
 
         double armPower = -this.OperatorController.getLeftY();
-        this.Arm.ArmMotor.set(armPower * 0.7);
+        this.Arm.ArmMotor.set(armPower * 0.4);
+        // this.Arm.ArmMotor.setIdleMode(IdleMode.kBrake);
 
         SmartDashboard.putString("Input Blocking Command", this.InputBlockingCommand == null ? "None" : this.InputBlockingCommand.getName());
     }
@@ -76,6 +90,10 @@ public class ControlSubsystem extends SubsystemBase {
 
     public void ClearBlockingCommand()
     {
-        this.InputBlockingCommand = null;
+        if (this.InputBlockingCommand != null)
+        {
+            this.InputBlockingCommand.cancel();
+            this.InputBlockingCommand = null;
+        }
     }
 }

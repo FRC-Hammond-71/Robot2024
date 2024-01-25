@@ -31,14 +31,13 @@
               "Y-axis/Lower bound": -1.0,
               "Y-axis/Unit": "ul",
               "Visible data/SmartDashboard/PID LEFT ERROR": true,
-              "Visible data/SmartDashboard/PID RIGHT ERROR": true,
-              "Visible data/SmartDashboard/Right Motor RPS": false
+              "Visible data/SmartDashboard/PID RIGHT ERROR": true
             }
           },
           "0,0": {
             "size": [
               3,
-              5
+              6
             ],
             "content": {
               "_type": "Subsystem Layout",
@@ -58,6 +57,13 @@
                   "_type": "Text View",
                   "_source0": "network_table:///SmartDashboard/IMU",
                   "_title": "IMU",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Desired Movement",
+                  "_title": "Desired Movement",
                   "_glyph": 148,
                   "_showGlyph": false
                 },
@@ -144,10 +150,10 @@
               ]
             }
           },
-          "6,2": {
+          "6,0": {
             "size": [
-              3,
-              2
+              5,
+              3
             ],
             "content": {
               "_type": "Field",
@@ -157,34 +163,7 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false,
-              "Colors/traj": "#FFFFFFFF"
-            }
-          },
-          "6,0": {
-            "size": [
-              4,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Desired Speeds",
-              "_title": "Desired Speeds",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "6,1": {
-            "size": [
-              4,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Wheel Speeds",
-              "_title": "Wheel Speeds",
-              "_glyph": 148,
-              "_showGlyph": false
+              "Visuals/Show Outside Circles": false
             }
           },
           "3,3": {
@@ -208,32 +187,6 @@
               "Visible data/SmartDashboard/Left Motor Inaccuracy": true,
               "Visible data/SmartDashboard/Right Motor Inaccuracy": true
             }
-          },
-          "9,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Left Motor PER",
-              "_title": "Left Motor PER",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "9,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Right Motor PER",
-              "_title": "Right Motor PER",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
           }
         }
       }
@@ -253,9 +206,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -7.245283126831055,
-    "y": -7.245283126831055,
-    "width": 1753.3585205078125,
-    "height": 1053.2830810546875
+    "x": -8.0,
+    "y": -8.0,
+    "width": 1936.0,
+    "height": 1056.0
   }
 }
