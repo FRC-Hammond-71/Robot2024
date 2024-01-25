@@ -66,7 +66,7 @@ public class ControlSubsystem extends SubsystemBase {
             forward = 0;
         }
 
-        var targetSpeed = new ChassisSpeeds(-forward * 2, 0, -this.DriverController.getRightX() * Units.degreesToRadians(360));
+        var targetSpeed = new ChassisSpeeds(-forward * 4, 0, -this.DriverController.getRightX() * Units.degreesToRadians(360));
         this.Drive.Drive(targetSpeed);
 
         double armPower = -this.OperatorController.getLeftY();

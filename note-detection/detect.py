@@ -48,7 +48,7 @@ def draw_objects(draw: ImageDraw.ImageDraw, objs, labels):
   for obj in objs:
     bbox = obj.bbox    
     draw.rectangle((bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax),
-                   outline='red')
+                   outline='red', width=3)
     draw.rectangle((bbox.xmin, bbox.ymin - 20, bbox.xmin + 60, bbox.ymin), fill="red")
     draw.text((bbox.xmin + 10, bbox.ymin - 15),
               '%s %.2f' % (labels.get(obj.id, obj.id), obj.score),

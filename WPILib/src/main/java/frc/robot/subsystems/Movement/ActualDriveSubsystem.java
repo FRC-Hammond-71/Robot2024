@@ -7,6 +7,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
@@ -40,8 +42,8 @@ public class ActualDriveSubsystem extends DriveSubsystem {
     // ---------
     // Motor PID (These need tuning!)
     // ---------
-    private PIDController LeftMotorsPID = new PIDController(0.1, 0, 0);
-    private PIDController RightMotorsPID = new PIDController(0.1, 0, 0);
+    private PIDController LeftMotorsPID = new PIDController(0.1, 0, 0.1);
+    private PIDController RightMotorsPID = new PIDController(0.1, 0, 0.1);
 
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
 
@@ -98,13 +100,14 @@ public class ActualDriveSubsystem extends DriveSubsystem {
                 new Rotation2d(Units.degreesToRadians(-this.IMU.getAngle())),
                 0,
                 0,
-                LimelightHelpers.getBotPose2d("limelight"));
+                LimelightHelpers.getBotPose2d("limelight"),
+                VecBuilder.fill(0.02, 0.02, 0.01),
+                VecBuilder.fill(0.1, 0.1, 0.1));
 
         Shuffleboard.getTab("Drive").add(this.LeftMotorsPID);
         Shuffleboard.getTab("Drive").add(this.RightMotorsPID);
         Shuffleboard.getTab("Drive").addDouble("Feed Forward",
                 () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond));
-
     }
 
     // ------------------
@@ -165,22 +168,24 @@ public class ActualDriveSubsystem extends DriveSubsystem {
     public void periodic() {
 
         this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, 2, 0, Units.degreesToRadians(200));
-        
+
         SmartDashboard.putString("IMU", String.format("Yaw: %.2f Pitch: %.2f Roll: %.2f",
-        this.IMU.getAngle(),
-        this.IMU.getPitch(),
-        this.IMU.getRoll()));
-        
+                this.IMU.getAngle(),
+                this.IMU.getPitch(),
+                this.IMU.getRoll()));
+
         // Use kinematics to calculate desired wheel speeds.
         var desiredWheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
-        
-        SmartDashboard.putNumber("Left Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()));
-        SmartDashboard.putNumber("Right Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
-        
-        this.PreviousWheelSpeeds = desiredWheelSpeeds;
-        
-        SmartDashboard.putString("Desired Movement", String.format("Forward: %.2f (M/s) Rot: %.2f (D/s)", this.TargetSpeeds.vxMetersPerSecond, Units.radiansToDegrees(this.TargetSpeeds.omegaRadiansPerSecond)));
 
+        SmartDashboard.putNumber("Left Motor Inaccuracy",
+                Math.abs(PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()));
+        SmartDashboard.putNumber("Right Motor Inaccuracy",
+                Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
+
+        this.PreviousWheelSpeeds = desiredWheelSpeeds;
+
+        SmartDashboard.putString("Desired Movement", String.format("Forward: %.2f (M/s) Rot: %.2f (D/s)",
+                this.TargetSpeeds.vxMetersPerSecond, Units.radiansToDegrees(this.TargetSpeeds.omegaRadiansPerSecond)));
 
         this.PoseEstimator.update(
                 new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
@@ -197,7 +202,8 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 
         // System.out.println(this.LeftLeadMotor.getEncoder().getPosition());
 
-        // SmartDashboard.putString("Limelight BotPose", LimelightHelpers.getBotPose2d("limelight").toString());
+        // SmartDashboard.putString("Limelight BotPose",
+        // LimelightHelpers.getBotPose2d("limelight").toString());
 
         {
             var estimatedPosition = this.GetEstimatedPose();
@@ -219,7 +225,7 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 
         SmartDashboard.putNumber("Right Speed (M/s)", GetRightWheelSpeed());
         SmartDashboard.putNumber("Right Desired Speed (M/s)", desiredWheelSpeeds.rightMetersPerSecond);
-        
+
         SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
         SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
 

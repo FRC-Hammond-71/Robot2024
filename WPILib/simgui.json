@@ -19,6 +19,8 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drive/Go Around": "Command",
+      "/Shuffleboard/Drive/Go to Origin": "Command",
       "/Shuffleboard/Drive/PIDController[1]": "PIDController",
       "/Shuffleboard/Drive/PIDController[2]": "PIDController",
       "/SmartDashboard/Auto choices": "String Chooser",

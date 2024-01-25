@@ -3,6 +3,7 @@ package frc.robot.subsystems.Movement;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -40,7 +41,7 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
     private DifferentialDrivetrainSim Drive = new DifferentialDrivetrainSim(
         DCMotor.getNEO(2),
         Constants.Drivetrain.WheelGearing,
-        (double) 7.5, // Random value
+        (double) 8, // Random value
         (double) 90,
         Constants.Drivetrain.WheelRadius,
         Constants.Drivetrain.TrackWidth,
@@ -50,16 +51,15 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
         // heading:          0.001 rad
         // l and r velocity: 0.1   m/s
         // l and r position: 0.005 m
-        VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005)
-        // VecBuilder.fill(0, 0, 0, 0, 0, 0, 0)
-
+        // VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005)
+        VecBuilder.fill(0, 0, 0, 0, 0, 0, 0)
     );
 
     // ---------
     // Motor PID (These need tuning!)
     // ---------
-    private PIDController LeftMotorsPID = new PIDController(5, 0.25, 0.5);
-    private PIDController RightMotorsPID = new PIDController(5, 0.25, 0.5);
+    private PIDController LeftMotorsPID = new PIDController(10, 0, 0);
+    private PIDController RightMotorsPID = new PIDController(10, 0, 0);
 
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
 
@@ -115,7 +115,10 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
         
         Shuffleboard.getTab("Drive").add("Go to Origin", this.PathFindToPose(
             new Pose2d(),
-            new PathConstraints(2, 3, 0.2, 3)
+            new PathConstraints(4, 4, 0.2, 3)
+        ));
+        Shuffleboard.getTab("Drive").add("Go Around", this.FollowPath(
+            PathPlannerPath.fromPathFile("Test Path")
         ));
     }
 
@@ -166,7 +169,7 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
     public void simulationPeriodic() {
 
         // Clamp the movement.
-        this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, 3, 0, Units.degreesToRadians(100));
+        // this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, 3, 0, Units.degreesToRadians(100));
 
         SmartDashboard.putString("IMU", String.format("Yaw: %.2f",
             this.Drive.getHeading().getDegrees()
@@ -180,7 +183,7 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
             this.Drive.getLeftPositionMeters(),
             this.Drive.getRightPositionMeters()
         );
-            
+        
         this.Field.setRobotPose(this.PoseEstimator.getEstimatedPosition());
         
         // this.PoseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d("limelight"),
@@ -201,21 +204,9 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
         
         SmartDashboard.putNumber("Left Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()));
         SmartDashboard.putNumber("Right Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
-        
-        // LeftMotorsPID.calculate(this.GetLeftWheelSpeed(), desiredWheelSpeeds.leftMetersPerSecond);
-        // RightMotorsPID.calculate(this.GetRightWheelSpeed(), desiredWheelSpeeds.rightMetersPerSecond);
-
-        // var leftMotorRPM = desiredWheelSpeeds.leftMetersPerSecond / 0.48 * 60 * 10.7;
-        // var rightMotorPPM = desiredWheelSpeeds.rightMetersPerSecond / 0.48 * 60 * 10.7;
-
-        // var leftMotorVoltage = (leftMotorRPM / 5676)  * RobotController.getInputVoltage();
-        // var rightMotorVoltage = (rightMotorPPM / 5676) * RobotController.getInputVoltage();
-    
-        // SmartDashboard.putNumber("Left Motor PER", leftMotorRPM / 5676);
-        // SmartDashboard.putNumber("Right Motor PER", rightMotorPPM / 5676);
-        
-        // SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
-        // SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
+                
+        SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
+        SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
 
         this.Drive.setInputs(
             LeftMotorsPID.calculate(this.GetLeftWheelSpeed(), desiredWheelSpeeds.leftMetersPerSecond) + FeedForward.calculate(desiredWheelSpeeds.leftMetersPerSecond), 
