@@ -163,7 +163,9 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/traj": "#FFFFFFFF",
+              "Colors/Speaker": "#FFFFFFFF"
             }
           },
           "3,3": {
@@ -187,6 +189,19 @@
               "Visible data/SmartDashboard/Left Motor Inaccuracy": true,
               "Visible data/SmartDashboard/Right Motor Inaccuracy": true
             }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Desired Speeds",
+              "_title": "Desired Speeds",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -206,9 +221,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1056.0
+    "x": 863.0943603515625,
+    "y": 0.0,
+    "width": 882.1132202148438,
+    "height": 1045.132080078125
   }
 }

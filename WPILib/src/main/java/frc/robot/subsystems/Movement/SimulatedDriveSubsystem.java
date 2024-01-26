@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
@@ -109,17 +110,9 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
             new Pose2d()
         );
 
-        Shuffleboard.getTab("Drive").add(this.LeftMotorsPID);
-        Shuffleboard.getTab("Drive").add(this.RightMotorsPID);
-        Shuffleboard.getTab("Drive").addDouble("Feed Forward", () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond));
-        
-        Shuffleboard.getTab("Drive").add("Go to Origin", this.PathFindToPose(
-            new Pose2d(),
-            new PathConstraints(4, 4, 0.2, 3)
-        ));
-        Shuffleboard.getTab("Drive").add("Go Around", this.FollowPath(
-            PathPlannerPath.fromPathFile("Test Path")
-        ));
+        Shuffleboard.getTab("Movement").add(this.LeftMotorsPID);
+        Shuffleboard.getTab("Movement").add(this.RightMotorsPID);
+        Shuffleboard.getTab("Movement").addDouble("Feed Forward", () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond));
     }
 
     // ------------------
@@ -200,31 +193,50 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
         
         this.Drive.update(0.02);
         
-        SmartDashboard.putString("Desired Speeds", this.TargetSpeeds.toString());
+        // SmartDashboard.putString("Desired Speeds", this.TargetSpeeds.toString());
         
-        SmartDashboard.putNumber("Left Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()));
-        SmartDashboard.putNumber("Right Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
+        // SmartDashboard.putNumber("Left Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()));
+        // SmartDashboard.putNumber("Right Motor Inaccuracy", Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
                 
-        SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
-        SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
+        // SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
+        // SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
 
         this.Drive.setInputs(
             LeftMotorsPID.calculate(this.GetLeftWheelSpeed(), desiredWheelSpeeds.leftMetersPerSecond) + FeedForward.calculate(desiredWheelSpeeds.leftMetersPerSecond), 
             RightMotorsPID.calculate(this.GetRightWheelSpeed(), desiredWheelSpeeds.rightMetersPerSecond) + FeedForward.calculate(desiredWheelSpeeds.rightMetersPerSecond)
         );
         
-        SmartDashboard.putNumber("Left Speed (M/s)", GetLeftWheelSpeed());
-        SmartDashboard.putNumber("Left Desired Speed (M/s)", desiredWheelSpeeds.leftMetersPerSecond);
+        // SmartDashboard.putNumber("Left Speed (M/s)", GetLeftWheelSpeed());
+        // SmartDashboard.putNumber("Left Desired Speed (M/s)", desiredWheelSpeeds.leftMetersPerSecond);
         
-        SmartDashboard.putNumber("Right Speed (M/s)", GetRightWheelSpeed());
-        SmartDashboard.putNumber("Right Desired Speed (M/s)", desiredWheelSpeeds.rightMetersPerSecond);
+        // SmartDashboard.putNumber("Right Speed (M/s)", GetRightWheelSpeed());
+        // SmartDashboard.putNumber("Right Desired Speed (M/s)", desiredWheelSpeeds.rightMetersPerSecond);
 
         this.PreviousWheelSpeeds = desiredWheelSpeeds;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) 
+    {
+        // super.initSendable(builder);
+
+        // this.LeftMotorsPID.initSendable(builder);
+        // this.RightMotorsPID.initSendable(builder);
+
+        builder.addDoubleProperty("Left Speed (M/s)", this::GetLeftWheelSpeed, null);
+        builder.addDoubleProperty("Right Speed (M/s)", this::GetRightWheelSpeed, null);
+
+        builder.addStringProperty("Desired Speeds", () -> this.TargetSpeeds.toString(), null);
+
+        builder.addDoubleProperty("Left Motor Inaccuracy", () -> Math.abs(this.PreviousWheelSpeeds.leftMetersPerSecond - this.GetLeftWheelSpeed()), null);
+        builder.addDoubleProperty("Right Motor Inaccuracy", () -> Math.abs(this.PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()), null);
+
+        builder.addDoubleProperty("Feed Forward", () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond), null);
     }
         
     @Override
     public ChassisSpeeds GetChassisSpeeds() 
     {
         return this.TargetSpeeds;
-    }    
+    }
 }

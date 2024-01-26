@@ -19,10 +19,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Automation/AlightWithSpeakerCommand": "Command",
+      "/Shuffleboard/Automation/PIDController[4]": "PIDController",
       "/Shuffleboard/Drive/Go Around": "Command",
       "/Shuffleboard/Drive/Go to Origin": "Command",
       "/Shuffleboard/Drive/PIDController[1]": "PIDController",
       "/Shuffleboard/Drive/PIDController[2]": "PIDController",
+      "/Shuffleboard/General/Scheduler": "Scheduler",
+      "/Shuffleboard/Movement/PIDController[1]": "PIDController",
+      "/Shuffleboard/Movement/PIDController[2]": "PIDController",
+      "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
       "/SmartDashboard/Auto choices": "String Chooser",
       "/SmartDashboard/Field": "Field2d"
     },
