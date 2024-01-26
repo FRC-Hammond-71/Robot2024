@@ -37,24 +37,9 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 
 		this.m_drive = RobotBase.isReal() ? new ActualDriveSubsystem() : new SimulatedDriveSubsystem();
-		// this.m_drive = new SimulatedDriveSubsystem();
-		// this.m_drive =  new ActualDriveSubsystem();
 		this.m_arm = new ArmSubsystem();
 		this.m_control = new ControlSubsystem(m_drive, m_arm);
 
-		// throw new Exception("BRUHHH?");
-
-		// m_chooser.setDefaultOption("Cone DE Auto", kDefaultAuto);
-		// m_chooser.addOption("Cube DE Auto", kCustomAuto);
-		// SmartDashboard.putData("Auto choices", m_chooser);
-		/* Communicate w/navX-MXP via the MXP SPI Bus. */
-		/* Alternatively: I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB */
-		/*
-		 * See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for
-		 * details.
-		 */
-
-		// ahrs = new AHRS(SPI.Port.kMXP);
 		CameraServer.startAutomaticCapture();
 
 		// Limelight initiation Code
@@ -85,8 +70,9 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledInit() {
-
+	public void disabledInit() 
+	{
+		
 	}
 
 	@Override
