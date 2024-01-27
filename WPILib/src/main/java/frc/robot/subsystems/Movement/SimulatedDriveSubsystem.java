@@ -109,10 +109,6 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
             0,
             new Pose2d()
         );
-
-        Shuffleboard.getTab("Movement").add(this.LeftMotorsPID);
-        Shuffleboard.getTab("Movement").add(this.RightMotorsPID);
-        Shuffleboard.getTab("Movement").addDouble("Feed Forward", () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond));
     }
 
     // ------------------
@@ -220,11 +216,18 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
     {
         // super.initSendable(builder);
 
+        builder.setSmartDashboardType("list");
+
+        builder.addCloseable(this.LeftMotorsPID);
+        builder.addCloseable(this.RightMotorsPID);
+
+        builder.addDoubleProperty("Feed Forward", () -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond), null);
+
         // this.LeftMotorsPID.initSendable(builder);
         // this.RightMotorsPID.initSendable(builder);
 
-        builder.addDoubleProperty("Left Speed (M/s)", this::GetLeftWheelSpeed, null);
-        builder.addDoubleProperty("Right Speed (M/s)", this::GetRightWheelSpeed, null);
+        builder.addDoubleProperty("Left Speed (M per s)", this::GetLeftWheelSpeed, null);
+        builder.addDoubleProperty("Right Speed (M per s)", this::GetRightWheelSpeed, null);
 
         builder.addStringProperty("Desired Speeds", () -> this.TargetSpeeds.toString(), null);
 

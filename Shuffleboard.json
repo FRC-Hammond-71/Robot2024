@@ -29,9 +29,7 @@
               "Y-axis/Automatic bounds": true,
               "Y-axis/Upper bound": 1.0,
               "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul",
-              "Visible data/SmartDashboard/PID LEFT ERROR": true,
-              "Visible data/SmartDashboard/PID RIGHT ERROR": true
+              "Y-axis/Unit": "ul"
             }
           },
           "0,0": {
@@ -165,7 +163,7 @@
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
               "Colors/traj": "#FFFFFFFF",
-              "Colors/Speaker": "#FFFFFFFF"
+              "Colors/Target": "#FFFFFFFF"
             }
           },
           "3,3": {
@@ -185,14 +183,12 @@
               "Y-axis/Automatic bounds": false,
               "Y-axis/Upper bound": 20.0,
               "Y-axis/Lower bound": 0.0,
-              "Y-axis/Unit": "ul",
-              "Visible data/SmartDashboard/Left Motor Inaccuracy": true,
-              "Visible data/SmartDashboard/Right Motor Inaccuracy": true
+              "Y-axis/Unit": "ul"
             }
           },
-          "11,0": {
+          "6,3": {
             "size": [
-              1,
+              3,
               1
             ],
             "content": {
@@ -223,7 +219,7 @@
   "windowGeometry": {
     "x": 863.0943603515625,
     "y": 0.0,
-    "width": 882.1132202148438,
+    "width": 881.2075805664062,
     "height": 1045.132080078125
   }
 }

@@ -1,42 +1,40 @@
 package frc.robot.commands;
 
-import java.util.List;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Movement.DriveSubsystem;
 
-public class AlightWithSpeakerCommand extends Command {
+public class FaceAtCommand extends Command {
 
-	// NOTE: This may not be correct.
-	public static Pose2d SpeakerPosition = new Pose2d(16.25, 5.6, Rotation2d.fromDegrees(0));
+	public Pose2d Position;
 
 	private DriveSubsystem Drive;
 
 	private PIDController TurningPID = new PIDController(2, 0, 0);
 
-	public AlightWithSpeakerCommand(DriveSubsystem drive)
+	public FaceAtCommand(DriveSubsystem drive, Pose2d position)
 	{
 		super();
 
 		this.Drive = drive;
+		this.Position = position;
 
 		addRequirements(drive);
 
-		Shuffleboard.getTab("Automation").add(this.TurningPID);
+		// Shuffleboard.getTab("Automation").add("Turning PID", this.TurningPID);
 	}
 
 	public Rotation2d GetTargetHeading()
 	{
-		return SpeakerPosition.getTranslation().minus(Drive.GetEstimatedPose().getTranslation()).getAngle();
+		return Position.getTranslation().minus(Drive.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
 	}
 
 	public Rotation2d GetHeadingError()
@@ -47,7 +45,7 @@ public class AlightWithSpeakerCommand extends Command {
 	@Override
 	public void initialize() 
 	{
-		this.Drive.Field.getObject("Speaker").setPose(SpeakerPosition);	
+		this.Drive.Field.getObject("Target").setPose(this.Position);	
 	}
 
 	@Override
@@ -60,6 +58,7 @@ public class AlightWithSpeakerCommand extends Command {
 	@Override
 	public void execute() 
 	{		
+		// this.Drive.Drive(new ChassisSpeeds(0, 0, this.GetHeadingError().getRadians() + Units.degreesToRadians(2)));
 		this.Drive.Drive(new ChassisSpeeds(0, 0, TurningPID.calculate(this.Drive.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
 	}
 
@@ -70,15 +69,5 @@ public class AlightWithSpeakerCommand extends Command {
 		this.Drive.Stop();
 		this.TurningPID.reset();
 		this.TurningPID.setSetpoint(0);
-	}
-
-	@Override
-	public void initSendable(SendableBuilder builder) 
-	{
-		super.initSendable(builder);
-
-		// builder.setSmartDashboardType("");
-
-		builder.addFloatProperty("Delta Heading Degree", () -> (float)GetHeadingError().getDegrees(), null);
 	}
 }

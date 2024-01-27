@@ -1,14 +1,12 @@
 package frc.robot;
 
-import frc.robot.commands.AlightWithSpeakerCommand;
+import frc.robot.commands.FaceAtCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ControlSubsystem;
 import frc.robot.subsystems.Movement.DriveSubsystem;
 import frc.robot.subsystems.Movement.SimulatedDriveSubsystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -22,7 +20,6 @@ public class Robot extends TimedRobot {
 	// ----------
 	private DriveSubsystem m_drive;
 	private ArmSubsystem m_arm;
-	private ControlSubsystem m_control;
 
 	private NetworkTable LLTable = NetworkTableInstance.getDefault().getTable("Limelight");
 
@@ -40,18 +37,15 @@ public class Robot extends TimedRobot {
 
 		this.m_drive = RobotBase.isReal() ? new ActualDriveSubsystem() : new SimulatedDriveSubsystem();
 		this.m_arm = new ArmSubsystem();
-		this.m_control = new ControlSubsystem(m_drive, m_arm);
 
 		CameraServer.startAutomaticCapture();
 
-		Shuffleboard.getTab("Automation").add(new AlightWithSpeakerCommand(m_drive));
 		Shuffleboard.getTab("Movement").add(m_drive);
-		Shuffleboard.getTab("General").add(CommandScheduler.getInstance());
+		Shuffleboard.getTab("Automation").add(m_drive.FollowPathByName("Test Path"));
+		// Shuffleboard.getTab("General").add(CommandScheduler.getInstance());
 
 		// Limelight initiation Code
 		LLTable.getEntry("camMode").setNumber(0);
-
-		CommandScheduler.getInstance().unregisterSubsystem(m_control);
 	}
 
 	@Override
@@ -60,19 +54,13 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void teleopInit() {
-		CommandScheduler.getInstance().registerSubsystem(this.m_control);
+	public void teleopInit() 
+	{
 	}
 
-	// @Override
-	// public void teleopPeriodic()
-	// {
-
-	// }
-
 	@Override
-	public void teleopExit() {
-		CommandScheduler.getInstance().unregisterSubsystem(this.m_control);
+	public void teleopExit() 
+	{
 	}
 
 	@Override

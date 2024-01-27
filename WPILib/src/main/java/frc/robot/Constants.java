@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -19,12 +20,38 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-	public static class Operator {
-		public static final int ControllerPort = 0;
+
+	public static class Controllers
+	{
+		/**
+		 * The driver port to be used when instantiating a controller.
+		 */
+		public static final int DriverPort = 0;
+
+		/**
+		 * The arm operator port to be used when instantiating a controller.
+		 */
+		public static final int ArmOperatorPort = 1;
+
+		/**
+		 * The required distance before any input will be registered.
+		 */
+		public static final double Deadzone = 0.1;
 	}
+
 
 	public static class Drivetrain {
 		// https://www.revrobotics.com/rev-21-1650/
+
+		/**
+		 * The maximum speed the robot may go forward per second.
+		 */
+		public static double MaxForwardSpeed = 4;
+
+		/**
+		 * The maximum rotational speed the robot may go per second.
+		 */
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(200);
 
 		/**
 		 * Wheel radius in Meters.
