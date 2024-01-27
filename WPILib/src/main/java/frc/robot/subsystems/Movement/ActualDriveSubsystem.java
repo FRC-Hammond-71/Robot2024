@@ -15,6 +15,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -67,6 +69,9 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	public ActualDriveSubsystem() {
 		super();
 
+		this.LeftLeadMotor.setInverted(true);
+		this.RightLeadMotor.setInverted(false);
+
 		this.LeftFollowMotor.follow(this.LeftLeadMotor);
 		this.RightFollowMotor.follow(this.RightLeadMotor);
 
@@ -99,9 +104,10 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 				new Rotation2d(Units.degreesToRadians(-this.IMU.getAngle())),
 				this.GetLeftWheelTravel(),
 				this.GetRightWheelTravel(),
-				LimelightHelpers.getBotPose2d("limelight"),
+				new Pose2d(14.6, 5.64, Rotation2d.fromDegrees(0)),
+				// LimelightHelpers.getBotPose2d("limelight").plus(new Transform2d(new Translation2d(16.54 / 2, 8.2 / 2), Rotation2d.fromDegrees(0))),
 				VecBuilder.fill(0.02, 0.02, 0.01),
-				VecBuilder.fill(0.1, 0.1, 0.1));
+				VecBuilder.fill(0.05, 0.05, 0.05));
 
 		// #region Logging
 		Shuffleboard.getTab("Drive").addNumber("Left Velocity Inaccuracy",
@@ -182,10 +188,7 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	 */
 	@Override
 	public Pose2d GetEstimatedPose() {
-		var pose = LimelightHelpers.getTV("limelight") ? LimelightHelpers.getBotPose2d("limelight")
-				: new Pose2d();
-		return GeometryUtil.flipFieldPose(pose);
-		// return this.PoseEstimator.getEstimatedPosition();
+		return this.PoseEstimator.getEstimatedPosition();
 	}
 
 	@Override
@@ -204,21 +207,30 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	@Override
 	public void periodic() {
 
-		this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, 2, 0, Units.degreesToRadians(200));
+		this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, 2, 0, Units.degreesToRadians(100));
 
 		// Use kinematics to calculate desired wheel speeds.
 		var desiredWheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
 
 		this.PreviousWheelSpeeds = desiredWheelSpeeds;
 
+		
 		this.PoseEstimator.update(
-				new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
-				this.GetLeftWheelTravel(),
-				this.GetRightWheelTravel());
+			new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
+			-this.GetLeftWheelTravel(),
+			-this.GetRightWheelTravel());
+			
+			var ll_pose = LimelightHelpers.getBotPose2d("limelight");
+			ll_pose = new Pose2d(new Translation2d(
+				ll_pose.getX() + 16.54 / 2,
+				ll_pose.getY() + 8.2 / 2
+				), ll_pose.getRotation());
 
+				
 		this.PoseEstimator.addVisionMeasurement(
-				LimelightHelpers.getBotPose2d("limelight"),
-				LimelightHelpers.getLatency_Pipeline("limelight"));
+				ll_pose,
+				LimelightHelpers.getLatency_Pipeline("limelight")
+		);
 
 		this.Field.setRobotPose(this.GetEstimatedPose());
 

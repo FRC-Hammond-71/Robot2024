@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.commands.AlightWithSpeakerCommand;
 import frc.robot.commands.AlignWithTagCommand;
 import frc.robot.subsystems.Movement.*;
 
@@ -57,9 +58,10 @@ public class ControlSubsystem extends SubsystemBase {
             } else return;
         }
 
-        if (DriverController.getXButton() == true && LimelightHelpers.getTV("limelight")) {
+        if (DriverController.getXButtonPressed() == true) {
 
-            // Reset position.
+            System.out.println("Wooo!");
+            this.SetBlockingCommand(new AlightWithSpeakerCommand(this.Drive)).schedule();
 
         }
 
@@ -87,7 +89,7 @@ public class ControlSubsystem extends SubsystemBase {
         }
 
         var targetSpeed = new ChassisSpeeds(forward * 4, 0,
-                -this.DriverController.getRightX() * Units.degreesToRadians(360));
+                this.DriverController.getRightX() * Units.degreesToRadians(360));
 
         this.Drive.Drive(targetSpeed);
     }

@@ -77,7 +77,7 @@ public class AlightWithSpeakerCommand extends Command {
 	{
 		super.initSendable(builder);
 
-		builder.setSmartDashboardType("");
+		// builder.setSmartDashboardType("");
 
 		builder.addFloatProperty("Delta Heading Degree", () -> (float)GetHeadingError().getDegrees(), null);
 	}
