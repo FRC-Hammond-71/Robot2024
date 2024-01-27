@@ -7,10 +7,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,13 +22,13 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.commands.ExtendedCommands;
 import frc.robot.utilities.ChassisSpeedsUtils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class ActualDriveSubsystem extends DriveSubsystem {
@@ -61,9 +64,10 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	private ChassisSpeeds TargetSpeeds = new ChassisSpeeds();
 	private DifferentialDriveWheelSpeeds PreviousWheelSpeeds = new DifferentialDriveWheelSpeeds();
 
-	public ActualDriveSubsystem() 
-	{
+	public ActualDriveSubsystem() {
 		super();
+
+		
 
 		this.LeftLeadMotor.setInverted(true);
 		this.RightLeadMotor.setInverted(false);
@@ -74,14 +78,21 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 		this.LeftLeadMotor.getEncoder().setPosition(0);
 		this.RightLeadMotor.getEncoder().setPosition(0);
 
+		System.out.println(this.LeftFollowMotor.getEncoder().getCountsPerRevolution());
+		System.out.println(this.LeftFollowMotor.getEncoder().getMeasurementPeriod());
+
+		this.IMU.reset();
+
+		// https://www.chiefdelphi.com/t/considering-the-intricacies-of-autonomous-pathfinding-algorithms-and-the-myriad-of-sensor-fusion-techniques-in-frc-how-might-one-harmonize-the-celestial-dance-of-encoder-ticks-and-gyroscopic-precession/441692/28
 		this.PoseEstimator = new DifferentialDrivePoseEstimator(
 				this.Kinematics,
 				new Rotation2d(Units.degreesToRadians(-this.IMU.getAngle())),
-				this.GetLeftWheelTravel(),
-				this.GetRightWheelTravel(),
+				0,
+				0,
 				new Pose2d(14.6, 5.64, Rotation2d.fromDegrees(0)),
-				// LimelightHelpers.getBotPose2d("limelight").plus(new Transform2d(new Translation2d(16.54 / 2, 8.2 / 2), Rotation2d.fromDegrees(0))),
-				VecBuilder.fill(0.02, 0.02, 0.01),
+				// LimelightHelpers.getBotPose2d("limelight").plus(new Transform2d(new
+				// Translation2d(16.54 / 2, 8.2 / 2), Rotation2d.fromDegrees(0))),
+				VecBuilder.fill(0.02, 0.02, 0.02),
 				VecBuilder.fill(0.05, 0.05, 0.05));
 
 		AutoBuilder.configureRamsete(
@@ -111,9 +122,10 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 		Shuffleboard.getTab("Movement").addNumber("Right Velocity Inaccuracy",
 				() -> Math.abs(PreviousWheelSpeeds.rightMetersPerSecond - this.GetRightWheelSpeed()));
 
-		Shuffleboard.getTab("Movement").addString("Desired Movement", () -> String.format("Forward: %.2f (M/s) Rot: %.2f (D/s)",
-				this.TargetSpeeds.vxMetersPerSecond,
-				Units.radiansToDegrees(this.TargetSpeeds.omegaRadiansPerSecond)));
+		Shuffleboard.getTab("Movement").addString("Desired Movement",
+				() -> String.format("Forward: %.2f (M/s) Rot: %.2f (D/s)",
+						this.TargetSpeeds.vxMetersPerSecond,
+						Units.radiansToDegrees(this.TargetSpeeds.omegaRadiansPerSecond)));
 
 		Shuffleboard.getTab("Movement").addString("Estimated Position", () -> {
 
@@ -125,24 +137,34 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 					estimatedPosition.getRotation().getDegrees());
 		});
 
-		Shuffleboard.getTab("Movement").addString("IMU", () -> String.format("Yaw: %.2f Pitch: %.2f Roll: %.2f",
+		Shuffleboard.getTab("Movement").addString("IMU", () -> String.format("Heading: %.2f VX: %.2f VY: %.2f VZ: %.2f",
 				this.IMU.getAngle(),
-				this.IMU.getPitch(),
-				this.IMU.getRoll()));
+				this.IMU.getVelocityX(),
+				this.IMU.getVelocityY(),
+				this.IMU.getVelocityZ()));
+
+		Shuffleboard.getTab("Movement").addNumber("Left Wheel Encoder",
+				() -> this.LeftLeadMotor.getEncoder().getPosition());
+		Shuffleboard.getTab("Movement").addNumber("Right Wheel Encoder",
+				() -> this.RightLeadMotor.getEncoder().getPosition());
 
 		Shuffleboard.getTab("Movement").addNumber("Left Speed (M/s)", () -> GetLeftWheelSpeed());
-		Shuffleboard.getTab("Movement").addNumber("Left Desired Speed (M/s)", () -> PreviousWheelSpeeds.leftMetersPerSecond);
+		Shuffleboard.getTab("Movement").addNumber("Left Desired Speed (M/s)",
+				() -> PreviousWheelSpeeds.leftMetersPerSecond);
 
 		Shuffleboard.getTab("Movement").addNumber("Right Speed (M/s)", () -> GetRightWheelSpeed());
-		Shuffleboard.getTab("Movement").addNumber("Right Desired Speed (M/s)", () -> PreviousWheelSpeeds.rightMetersPerSecond);
+		Shuffleboard.getTab("Movement").addNumber("Right Desired Speed (M/s)",
+				() -> PreviousWheelSpeeds.rightMetersPerSecond);
 
 		Shuffleboard.getTab("Movement").add(this.LeftMotorsPID);
 		Shuffleboard.getTab("Movement").add(this.RightMotorsPID);
 		Shuffleboard.getTab("Movement").addDouble("Feed Forward",
 				() -> this.FeedForward.calculate(this.TargetSpeeds.vxMetersPerSecond));
 
-		// SmartDashboard.putNumber("PID LEFT ERROR", this.LeftMotorsPID.getPositionError());
-		// SmartDashboard.putNumber("PID RIGHT ERROR", this.RightMotorsPID.getPositionError());
+		// SmartDashboard.putNumber("PID LEFT ERROR",
+		// this.LeftMotorsPID.getPositionError());
+		// SmartDashboard.putNumber("PID RIGHT ERROR",
+		// this.RightMotorsPID.getPositionError());
 		// #endregion
 	}
 
@@ -188,14 +210,14 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	}
 
 	/**
-	 * @return The Limelight Pose - Compensated for Limelight reporting with origin at middle of the map.
+	 * @return The Limelight Pose - Compensated for Limelight reporting with origin
+	 *         at middle of the map.
 	 */
-	private Pose2d GetLimelightPose()
-	{
+	private Pose2d GetLimelightPose() {
 		var pose = LimelightHelpers.getBotPose2d("limelight");
 		pose = new Pose2d(
-			new Translation2d(pose.getX() + 16.54 / 2, pose.getY() + 8.2 / 2), 
-			pose.getRotation());
+				new Translation2d(pose.getX() + 16.54 / 2, pose.getY() + 8.2 / 2),
+				pose.getRotation());
 
 		return pose;
 	}
@@ -216,30 +238,43 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	@Override
 	public void periodic() {
 
-		this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, Constants.Drivetrain.MaxForwardSpeed, 0, Constants.Drivetrain.MaxRotationalSpeed.getRadians());
+		this.TargetSpeeds = ChassisSpeedsUtils.Clamp(TargetSpeeds, Constants.Drivetrain.MaxForwardSpeed, 0,
+				Constants.Drivetrain.MaxRotationalSpeed.getRadians());
 
 		// Use kinematics to calculate desired wheel speeds.
 		var desiredWheelSpeeds = this.Kinematics.toWheelSpeeds(this.TargetSpeeds);
 
 		this.PreviousWheelSpeeds = desiredWheelSpeeds;
-		
+
+		// var imuSpeed = (this.GetLeftWheelSpeed() / this.GetRightWheelSpeed()) / 2;
+		// var imuHeading = this.IMU.getFusedHeading();
+		// var x = Math.cos(imuHeading) * imuSpeed
+
 		this.PoseEstimator.update(
-			new Rotation2d(Units.degreesToRadians(this.IMU.getAngle())),
-			-this.GetLeftWheelTravel(),
-			-this.GetRightWheelTravel());
-			
-		if (LimelightHelpers.getTV("limelight"))
-		{
-			// The Limelight has a target!
-			this.PoseEstimator.addVisionMeasurement(
-					GetLimelightPose(),
-					LimelightHelpers.getLatency_Pipeline("limelight")
-			);
-		}
-		else
-		{
+				new Rotation2d(-Units.degreesToRadians(this.IMU.getAngle())),
+				-this.GetLeftWheelTravel(),
+				-this.GetRightWheelTravel());
+
+		if (LimelightHelpers.getTV("limelight")) {
+			var limelightPose = this.GetLimelightPose();
+			var error = this.PoseEstimator.getEstimatedPosition().minus(limelightPose);
+
+			System.out.println(error);
+
+			if (error.getX() > 1 || error.getX() < -1 || error.getY() > 1 || error.getY() < -1) {
+				// Ignore - too much error
+				System.out.println("TOO MUCH LL ERROR");
+			} else {
+				// The Limelight has a target!
+				this.PoseEstimator.addVisionMeasurement(
+						limelightPose,
+						Timer.getFPGATimestamp() - LimelightHelpers.getLatency_Capture("limelight") * 1000);
+				this.Field.getObject("Robot - LL").setPose(limelightPose);
+			}
+		} else {
 			// Rumble when loosing track of AprilTags. For fun! (Lol)
-			ExtendedCommands.RumbleController(DriverController, RumbleType.kBothRumble, 0.5, Duration.ofMillis(500)).schedule();
+			ExtendedCommands.RumbleController(DriverController, RumbleType.kBothRumble, 0.5, Duration.ofMillis(500))
+					.schedule();
 		}
 
 		this.Field.setRobotPose(this.GetEstimatedPose());
@@ -257,5 +292,16 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	@Override
 	public ChassisSpeeds GetChassisSpeeds() {
 		return this.TargetSpeeds;
+	}
+
+	@Override
+	public void ResetEstimatedPose(Pose2d pose) {
+		this.LeftLeadMotor.getEncoder().setPosition(0);
+		this.RightLeadMotor.getEncoder().setPosition(0);
+		this.PoseEstimator.resetPosition(pose.getRotation(), 0, 0, pose);
+		this.IMU.setAngleAdjustment(180);
+		this.IMU.reset();
+		this.IMU.resetDisplacement();
+
 	}
 }

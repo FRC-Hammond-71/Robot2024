@@ -242,4 +242,10 @@ public class SimulatedDriveSubsystem extends DriveSubsystem {
     {
         return this.TargetSpeeds;
     }
+
+    @Override
+    public void ResetEstimatedPose(Pose2d pose) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'ResetEstimatedPose'");
+    }
 }

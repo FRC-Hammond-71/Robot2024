@@ -18,7 +18,7 @@ public class FaceAtCommand extends Command {
 
 	private DriveSubsystem Drive;
 
-	private PIDController TurningPID = new PIDController(2, 0, 0);
+	private PIDController TurningPID = new PIDController(3, 2, 0);
 
 	public FaceAtCommand(DriveSubsystem drive, Pose2d position)
 	{
@@ -52,13 +52,14 @@ public class FaceAtCommand extends Command {
 	public boolean isFinished() 
 	{
 		var heading_error = this.GetHeadingError();
-		return heading_error.getDegrees() < 2 && heading_error.getDegrees() > -2;
+		System.out.println(heading_error);
+		return heading_error.getDegrees() < 10 && heading_error.getDegrees() > -10;
 	}
 
 	@Override
 	public void execute() 
 	{		
-		// this.Drive.Drive(new ChassisSpeeds(0, 0, this.GetHeadingError().getRadians() + Units.degreesToRadians(2)));
+		// this.Drive.Drive(new ChassisSpeeds(0, 0, this.GetHeadingError().getRadians() * 0.8 + Units.degreesToRadians(20)));
 		this.Drive.Drive(new ChassisSpeeds(0, 0, TurningPID.calculate(this.Drive.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
 	}
 

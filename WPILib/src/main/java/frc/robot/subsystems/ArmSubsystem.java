@@ -31,10 +31,10 @@ public class ArmSubsystem extends SubsystemBase {
     {
         super();
 
-        this.ArmMotor.setSoftLimit(SoftLimitDirection.kForward, 145);
-        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-        this.ArmMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+        // this.ArmMotor.setSoftLimit(SoftLimitDirection.kForward, 180);
+        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+        // this.ArmMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+        this.ArmMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
         this.ArmMotor.setInverted(false);
 
         setDefaultCommand(Commands.run(() -> {
@@ -56,11 +56,12 @@ public class ArmSubsystem extends SubsystemBase {
 
             if (ArmOperatorController.getLeftY() > -Constants.Controllers.Deadzone && ArmOperatorController.getLeftY() < Constants.Controllers.Deadzone)
             {
-                // No input from the operator - keep the arm in same position.   
+                // No input from the operator - keep the arm in same position.  
+                this.ArmMotor.stopMotor(); 
             }
             else 
             {
-                this.ArmMotor.set(ArmOperatorController.getLeftY() * 0.8);
+                this.ArmMotor.set(ArmOperatorController.getLeftY() * 0.9);
             }
         }, this));
     }

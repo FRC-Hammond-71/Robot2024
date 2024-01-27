@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Movement;
 
+import java.sql.Driver;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindRamsete;
@@ -46,6 +48,18 @@ public abstract class DriveSubsystem extends SubsystemBase {
 
         setDefaultCommand(Commands.run(() -> {
 
+            if (DriverController.getXButtonPressed() == true)
+            {
+                new FaceAtCommand(this, new Pose2d(16.25, 5.6, Rotation2d.fromDegrees(180))).schedule();   
+            }
+
+            if (DriverController.getLeftBumperPressed())
+            {
+                System.out.println("Reset position!");
+
+                this.ResetEstimatedPose(new Pose2d(14.6, 5.64, Rotation2d.fromDegrees(0)));
+            }
+
             double forward = this.DriverController.getLeftY();
             forward = forward > -Constants.Controllers.Deadzone && forward < Constants.Controllers.Deadzone ? 0 : forward;
 
@@ -61,6 +75,8 @@ public abstract class DriveSubsystem extends SubsystemBase {
 
         }, this));
     }
+
+    public abstract void ResetEstimatedPose(Pose2d pose);
 
     public abstract double GetLeftWheelSpeed();
 

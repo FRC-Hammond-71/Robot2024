@@ -36,7 +36,7 @@ public final class Constants {
 		/**
 		 * The required distance before any input will be registered.
 		 */
-		public static final double Deadzone = 0.1;
+		public static final double Deadzone = 0.08;
 	}
 
 
