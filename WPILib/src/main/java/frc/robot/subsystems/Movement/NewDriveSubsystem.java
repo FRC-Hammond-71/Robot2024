@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -35,10 +36,10 @@ public class NewDriveSubsystem extends SubsystemBase
     // ------
 	// Motors
 	// ------
-	private CANSparkMax LeftLeadMotor = new CANSparkMax(5, MotorType.kBrushless);
-	private CANSparkMax RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
-	private CANSparkMax LeftFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
-	private CANSparkMax RightFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
+	private CANSparkMax LeftLeadMotor;
+	private CANSparkMax RightLeadMotor;
+	private CANSparkMax LeftFollowMotor;
+	private CANSparkMax RightFollowMotor;
 
     // -------
     // Sensors
@@ -61,23 +62,31 @@ public class NewDriveSubsystem extends SubsystemBase
     public NewDriveSubsystem()
     {
         super();
-
+        
         SmartDashboard.putData(this.Field);
-        
-        this.LeftLeadMotor.setInverted(true);
-		this.RightLeadMotor.setInverted(false);
-        
-		this.LeftFollowMotor.follow(this.LeftLeadMotor);
-		this.RightFollowMotor.follow(this.RightLeadMotor);
-        
-        this.LeftLeadMotor.getEncoder().setPosition(0);
-		this.RightLeadMotor.getEncoder().setPosition(0);
-        this.LeftLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.RightLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.RightLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
 
-        System.out.println(String.format("Encoder CountsPerRevolution %s", this.RightLeadMotor.getEncoder().getCountsPerRevolution()));
+        if (RobotBase.isReal())
+        {
+            this.LeftLeadMotor = new CANSparkMax(5, MotorType.kBrushless);
+            this.RightLeadMotor =  new CANSparkMax(4, MotorType.kBrushless);
+            this.LeftFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
+            this.RightFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
+
+            this.LeftLeadMotor.setInverted(true);
+            this.RightLeadMotor.setInverted(false);
+            
+            this.LeftFollowMotor.follow(this.LeftLeadMotor);
+            this.RightFollowMotor.follow(this.RightLeadMotor);
+            
+            this.LeftLeadMotor.getEncoder().setPosition(0);
+            this.RightLeadMotor.getEncoder().setPosition(0);
+            this.LeftLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.RightLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.RightLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            
+            System.out.println(String.format("Encoder CountsPerRevolution %s", this.RightLeadMotor.getEncoder().getCountsPerRevolution()));
+        }
 
         this.PoseEstimator = new DifferentialDrivePoseEstimator(Kinematics, Rotation2d.fromDegrees(0), 0, 0, new Pose2d());
 

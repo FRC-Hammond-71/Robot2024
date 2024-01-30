@@ -67,8 +67,6 @@ public class ActualDriveSubsystem extends DriveSubsystem {
 	public ActualDriveSubsystem() {
 		super();
 
-		
-
 		this.LeftLeadMotor.setInverted(true);
 		this.RightLeadMotor.setInverted(false);
 
