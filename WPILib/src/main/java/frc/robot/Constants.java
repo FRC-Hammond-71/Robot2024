@@ -56,13 +56,13 @@ public final class Constants {
 		/**
 		 * Wheel radius in Meters.
 		 */
-		public static double WheelRadius = Units.inchesToMeters(3);
+		public static double WheelRadius = Units.inchesToMeters(2);
 
 		/**
 		 * Wheel circumference in Meters.
 		 */
 		// WheelRadius * 2 * Math.PI
-		public static double WheelCircumference = 0.48;
+		public static double WheelCircumference = WheelRadius * 2 * Math.PI;
 
 		/**
 		 * Wheels make 10.7 rotations per Motor rotation (10.71:1)
@@ -72,7 +72,7 @@ public final class Constants {
 		/**
 		 * The track width in Meters.
 		 */
-		public static double TrackWidth = Units.inchesToMeters(20);
+		public static double TrackWidth = Units.inchesToMeters(21.487);
 
 	}
 }

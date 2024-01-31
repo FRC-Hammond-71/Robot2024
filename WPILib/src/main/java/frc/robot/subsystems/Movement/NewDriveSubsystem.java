@@ -6,6 +6,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
-import frc.robot.commands.FaceAtCommand;
 
 public class NewDriveSubsystem extends SubsystemBase 
 {
@@ -40,7 +40,11 @@ public class NewDriveSubsystem extends SubsystemBase
 	private CANSparkMax RightLeadMotor;
 	private CANSparkMax LeftFollowMotor;
 	private CANSparkMax RightFollowMotor;
-
+    // ------
+    // Motor PID (do we want this?)
+    // ------
+    private PIDController LeftMotorsPID = new PIDController(.05, 0, 0);
+    private PIDController RightMotorsPID = new PIDController(.05,0,0);
     // -------
     // Sensors
     // -------
@@ -177,3 +181,5 @@ public class NewDriveSubsystem extends SubsystemBase
     }
 
 }
+
+
