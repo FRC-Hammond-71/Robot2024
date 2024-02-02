@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -19,7 +20,9 @@ import edu.wpi.first.math.util.Units;
  * wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
+public final class Constants 
+{
+	public static Field2d Field = new Field2d();
 
 	public static class Controllers
 	{
@@ -38,7 +41,6 @@ public final class Constants {
 		 */
 		public static final double Deadzone = 0.08;
 	}
-
 
 	public static class Drivetrain {
 		// https://www.revrobotics.com/rev-21-1650/
@@ -74,5 +76,49 @@ public final class Constants {
 		 */
 		public static double TrackWidth = Units.inchesToMeters(21.487);
 
+	}
+
+	public static class GroundIntake
+	{
+		public static class Motor
+		{
+			public static int Port = 5;
+	
+			public static double Speed = 0.8;
+		}
+
+	}
+
+	public static class Launcher
+	{
+		public static int PitchMotorCANPort = 8;
+
+		public static Rotation2d MaxPitch = Rotation2d.fromDegrees(80); 
+
+		public static Rotation2d LoadingPitch = Rotation2d.fromDegrees(60); 
+		
+		public static Rotation2d MaximumLoadingPitchError = Rotation2d.fromDegrees(5); 
+
+		public static int PitchEncoderChannel = 0;
+
+		public static class LaunchMotor
+		{
+			/**
+			 * The desired CANSPARKMAX port of the Launch motor.
+			 */
+			public static int CANPort = 7;
+		}
+
+		public static class IntakeMotor
+		{
+			/**
+			 * The desired CANSPARKMAX port of the Shooter Intake motor.
+			 */
+			public static int CANPort = 6;
+
+			public static double Speed = 0.8;
+		}
+	
+		public static int RotationLimitSwitchChannel = 1;
 	}
 }

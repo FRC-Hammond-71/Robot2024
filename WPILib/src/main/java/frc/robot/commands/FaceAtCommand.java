@@ -10,42 +10,46 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Movement.DriveSubsystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.FieldLocalizationSubsystem;
 
 public class FaceAtCommand extends Command {
 
 	public Pose2d Position;
 
 	private DriveSubsystem Drive;
+	private FieldLocalizationSubsystem FieldLocalization;
 
 	private PIDController TurningPID = new PIDController(3, 2, 0);
 
-	public FaceAtCommand(DriveSubsystem drive, Pose2d position)
+	public FaceAtCommand(DriveSubsystem drive, FieldLocalizationSubsystem localizationSubsystem, Pose2d position)
 	{
 		super();
 
 		this.Drive = drive;
+		this.FieldLocalization = localizationSubsystem;
+
 		this.Position = position;
 
 		addRequirements(drive);
-
-		// Shuffleboard.getTab("Automation").add("Turning PID", this.TurningPID);
+		addRequirements(localizationSubsystem);
 	}
 
 	public Rotation2d GetTargetHeading()
 	{
-		return Position.getTranslation().minus(Drive.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
+		return Position.getTranslation().minus(FieldLocalization.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
 	}
 
 	public Rotation2d GetHeadingError()
 	{
-		return this.GetTargetHeading().minus(Drive.GetEstimatedPose().getRotation());
+		return this.GetTargetHeading().minus(FieldLocalization.GetEstimatedPose().getRotation());
 	}
 
 	@Override
 	public void initialize() 
 	{
-		this.Drive.Field.getObject("Target").setPose(this.Position);	
+		Constants.Field.getObject("Target").setPose(this.Position);	
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public class FaceAtCommand extends Command {
 	public void execute() 
 	{		
 		// this.Drive.Drive(new ChassisSpeeds(0, 0, this.GetHeadingError().getRadians() * 0.8 + Units.degreesToRadians(20)));
-		this.Drive.Drive(new ChassisSpeeds(0, 0, TurningPID.calculate(this.Drive.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
+		this.Drive.Set(new ChassisSpeeds(0, 0, TurningPID.calculate(FieldLocalization.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
 	}
 
 	@Override
