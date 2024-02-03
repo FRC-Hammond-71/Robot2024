@@ -163,7 +163,8 @@
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
               "Colors/traj": "#FFFFFFFF",
-              "Colors/Target": "#FFFFFFFF"
+              "Colors/Target": "#FFFFFFFF",
+              "Colors/Robot - LL": "#FFFFFFFF"
             }
           },
           "3,3": {
@@ -186,15 +187,54 @@
               "Y-axis/Unit": "ul"
             }
           },
-          "6,3": {
+          "7,3": {
             "size": [
               3,
-              1
+              3
             ],
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Desired Speeds",
               "_title": "Desired Speeds",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_PipelineName",
+              "_title": "limelight_PipelineName",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Interface",
+              "_title": "limelight_Interface",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/limelight_Stream",
+              "_title": "limelight_Stream",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -217,9 +257,9 @@
     }
   ],
   "windowGeometry": {
-    "x": 863.0943603515625,
-    "y": 0.0,
-    "width": 881.2075805664062,
-    "height": 1045.132080078125
+    "x": -8.0,
+    "y": -8.0,
+    "width": 1936.0,
+    "height": 1056.0
   }
 }
