@@ -36,7 +36,6 @@ public class Robot extends TimedRobot {
 		CameraServer.startAutomaticCapture();
 
 		Shuffleboard.getTab("Movement").add(Drive);
-		Shuffleboard.
 		// Shuffleboard.getTab("General").add(CommandScheduler.getInstance());
 	}
 

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -22,6 +23,8 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 {
     private DifferentialDrivePoseEstimator PoseEstimator;
     private DriveSubsystem Drive;
+
+    private Pose2d IMUAccumulatedPose = new Pose2d();
 
     public FieldLocalizationSubsystem(DriveSubsystem drive)
     {
@@ -60,7 +63,9 @@ public class FieldLocalizationSubsystem extends SubsystemBase
     public void ResetPosition(Pose2d initialPosition)
     {
         this.Drive.ResetSensors();
-        this.Drive.IMU.setAngleAdjustment(initialPosition.getRotation().getDegrees());
+        this.IMUAccumulatedPose = initialPosition;
+        this.Drive.IMU.reset();
+        // this.Drive.IMU.setAngleAdjustment(initialPosition.getRotation().getDegrees());
 		this.PoseEstimator.resetPosition(initialPosition.getRotation(), 0, 0, initialPosition);
     }
 
@@ -84,6 +89,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
     public void periodic() 
     {
         var wheelPositions = this.Drive.GetWheelPositions();
+        
         this.PoseEstimator.update(Rotation2d.fromDegrees(this.Drive.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
         
         if (HasVisionPosition())
@@ -91,6 +97,15 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             var visionMeasurement = this.GetVisionPosition();
             
             this.PoseEstimator.addVisionMeasurement(visionMeasurement.Pose, visionMeasurement.BeganComputingAt);
+        }
+
+        {
+            // Update using IMU
+            var x = this.Drive.IMU.getWorldLinearAccelX();
+            var y = this.Drive.IMU.getWorldLinearAccelY();
+            var z = this.Drive.IMU.getWorldLinearAccelZ(); // Heading
+                       
+            
         }
     }
 
