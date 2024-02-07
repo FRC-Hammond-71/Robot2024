@@ -40,14 +40,42 @@
       "/Shuffleboard/Movement/PIDController[2]": "PIDController",
       "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
       "/SmartDashboard/Auto choices": "String Chooser",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/New Auto": "Command",
+      "/SmartDashboard/Note 1": "Command",
+      "/SmartDashboard/Speaker Auto": "Command"
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "Target": {
+          "arrows": false
+        },
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
+        "path": {
+          "arrows": false,
+          "color": [
+            0.0,
+            0.3828445076942444,
+            0.945147693157196,
+            255.0
+          ],
+          "style": "Track"
+        },
         "right": 2961,
+        "robot path pose": {
+          "arrowSize": 15,
+          "arrowWeight": 2.0,
+          "color": [
+            0.6605189442634583,
+            0.14821341633796692,
+            0.7805907130241394,
+            255.0
+          ],
+          "length": 0.4000000059604645,
+          "width": 0.4000000059604645
+        },
         "top": 79,
         "traj": {
           "arrows": false,
@@ -63,6 +91,9 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        "Movement": {
+          "open": true
+        },
         "open": true
       },
       "SmartDashboard": {
@@ -71,6 +102,9 @@
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
     "Server": {
       "open": true
     },

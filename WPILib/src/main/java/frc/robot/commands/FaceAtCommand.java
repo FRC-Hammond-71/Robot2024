@@ -1,29 +1,27 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FieldLocalizationSubsystem;
 
 public class FaceAtCommand extends Command {
 
-	public Pose2d Position;
+	public Translation2d Position;
 
 	private DriveSubsystem Drive;
 	private FieldLocalizationSubsystem FieldLocalization;
 
-	private PIDController TurningPID = new PIDController(3, 2, 0);
+	private PIDController TurningPID = new PIDController(0.5, 0.5, 0);
 
-	public FaceAtCommand(DriveSubsystem drive, FieldLocalizationSubsystem localizationSubsystem, Pose2d position)
+	public FaceAtCommand(DriveSubsystem drive, FieldLocalizationSubsystem localizationSubsystem, Translation2d position)
 	{
 		super();
 
@@ -38,7 +36,7 @@ public class FaceAtCommand extends Command {
 
 	public Rotation2d GetTargetHeading()
 	{
-		return Position.getTranslation().minus(FieldLocalization.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
+		return Position.minus(FieldLocalization.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
 	}
 
 	public Rotation2d GetHeadingError()
@@ -49,7 +47,7 @@ public class FaceAtCommand extends Command {
 	@Override
 	public void initialize() 
 	{
-		Constants.Field.getObject("Target").setPose(this.Position);	
+		Constants.Field.getObject("Target").setPose(new Pose2d(this.Position, new Rotation2d()));	
 	}
 
 	@Override
@@ -57,22 +55,22 @@ public class FaceAtCommand extends Command {
 	{
 		var heading_error = this.GetHeadingError();
 		System.out.println(heading_error);
-		return heading_error.getDegrees() < 10 && heading_error.getDegrees() > -10;
+		return heading_error.getDegrees() < 2 && heading_error.getDegrees() > -2;
 	}
 
 	@Override
 	public void execute() 
 	{		
-		// this.Drive.Drive(new ChassisSpeeds(0, 0, this.GetHeadingError().getRadians() * 0.8 + Units.degreesToRadians(20)));
-		this.Drive.Set(new ChassisSpeeds(0, 0, TurningPID.calculate(FieldLocalization.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
+		this.Drive.Set(
+			new ChassisSpeeds(0, 0, TurningPID.calculate(FieldLocalization.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
 	}
 
 	@Override
 	public void end(boolean interrupted) 
 	{
-		// this.Drive.Field.getObject("Speaker").close();
 		this.Drive.Stop();
 		this.TurningPID.reset();
 		this.TurningPID.setSetpoint(0);
+		System.out.println("We are done aligning with Speaker!");
 	}
 }

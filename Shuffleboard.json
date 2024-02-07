@@ -162,9 +162,10 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
-              "Colors/traj": "#FFFFFFFF",
+              "Colors/path": "#FFFFFFFF",
               "Colors/Target": "#FFFFFFFF",
-              "Colors/Robot - LL": "#FFFFFFFF"
+              "Colors/robot path pose": "#FFFFFFFF",
+              "Colors/target pose": "#FFFFFFFF"
             }
           },
           "3,3": {
@@ -238,6 +239,216 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "11,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Target Angle",
+              "_title": "ArmSubsystem/Target Angle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Actual Angle",
+              "_title": "ArmSubsystem/Actual Angle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Holding",
+              "_title": "ArmSubsystem/Holding",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "6,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Error",
+              "_title": "ArmSubsystem/Error",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Speed",
+              "_title": "DriveSubsystem/Desired Speed",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Rotation",
+              "_title": "DriveSubsystem/Desired Rotation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LauncherSubsystem/Launcher Speed",
+              "_title": "LauncherSubsystem/Launcher Speed",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/FieldLocalizationSubsystem/Estimated Position",
+              "_title": "FieldLocalizationSubsystem/Estimated Position",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ks",
+              "_title": "DriveSubsystem/FEED Ks",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Kv",
+              "_title": "DriveSubsystem/FEED Kv",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ka",
+              "_title": "DriveSubsystem/FEED Ka",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Wheel Speed",
+              "_title": "DriveSubsystem/Desired Wheel Speed",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Wheel Rotation",
+              "_title": "DriveSubsystem/Desired Wheel Rotation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Speed",
+              "_title": "DriveSubsystem/Actual Wheel Speed",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Rotation",
+              "_title": "DriveSubsystem/Actual Wheel Rotation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,6": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/New Auto",
+              "_title": "New Auto",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -254,12 +465,159 @@
         "titleType": 0,
         "tiles": {}
       }
+    },
+    {
+      "title": "Arm",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {
+          "3,1": {
+            "size": [
+              2,
+              3
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Arm",
+              "_glyph": 149,
+              "_showGlyph": false,
+              "Layout/Label position": "HIDDEN",
+              "_children": [
+                {
+                  "_type": "Simple Dial",
+                  "_source0": "network_table:///SmartDashboard/ArmSubsystem/Actual Angle",
+                  "_title": "Position",
+                  "_glyph": 148,
+                  "_showGlyph": true,
+                  "Range/Min": 0.0,
+                  "Range/Max": 70.0,
+                  "Visuals/Show value": true
+                },
+                {
+                  "_type": "Grid Layout",
+                  "_title": "Grid Layout",
+                  "_glyph": 149,
+                  "_showGlyph": false,
+                  "Layout/Number of columns": 2,
+                  "Layout/Number of rows": 1,
+                  "Layout/Label position": "BOTTOM",
+                  "_children": {
+                    "1,0": {
+                      "_type": "Text View",
+                      "_source0": "network_table:///SmartDashboard/ArmSubsystem/Error",
+                      "_title": "/SmartDashboard/ArmSubsystem/Error",
+                      "_glyph": 148,
+                      "_showGlyph": false
+                    },
+                    "0,0": {
+                      "_type": "Text View",
+                      "_source0": "network_table:///SmartDashboard/ArmSubsystem/Target Angle",
+                      "_title": "/SmartDashboard/ArmSubsystem/Target Angle",
+                      "_glyph": 148,
+                      "_showGlyph": false
+                    }
+                  }
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///SmartDashboard/ArmSubsystem/Holding",
+                  "_title": "/SmartDashboard/ArmSubsystem/Holding",
+                  "_glyph": 148,
+                  "_showGlyph": false,
+                  "Colors/Color when true": "#B3E6B3FF",
+                  "Colors/Color when false": "#FF8080FF"
+                }
+              ]
+            }
+          },
+          "1,1": {
+            "size": [
+              2,
+              3
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List Layout",
+              "_glyph": 149,
+              "_showGlyph": false,
+              "Layout/Label position": "BOTTOM",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Kv",
+                  "_title": "SmartDashboard/DriveSubsystem/FEED Kv",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ka",
+                  "_title": "SmartDashboard/DriveSubsystem/FEED Ka",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ks",
+                  "_title": "SmartDashboard/DriveSubsystem/FEED Ks",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                }
+              ]
+            }
+          },
+          "3,5": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Number Bar",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Rotation",
+              "_title": "SmartDashboard/DriveSubsystem/Actual Wheel Rotation",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Range/Min": -180.0,
+              "Range/Max": 180.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 5,
+              "Visuals/Show text": true,
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "3,4": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Number Bar",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Speed",
+              "_title": "SmartDashboard/DriveSubsystem/Actual Wheel Speed",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Range/Min": -4.0,
+              "Range/Max": 4.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 5,
+              "Visuals/Show text": true,
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          }
+        }
+      }
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1056.0
+    "x": 953.0,
+    "y": 0.0,
+    "width": 974.0,
+    "height": 1159.0
   }
 }

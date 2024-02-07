@@ -1,16 +1,18 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Controllers;
 import frc.robot.LimelightHelpers;
 
@@ -21,27 +23,41 @@ import frc.robot.LimelightHelpers;
  */
 public class FieldLocalizationSubsystem extends SubsystemBase 
 {
-    private DifferentialDrivePoseEstimator PoseEstimator;
     private DriveSubsystem Drive;
+    
+    // https://www.chiefdelphi.com/t/considering-the-intricacies-of-autonomous-pathfinding-algorithms-and-the-myriad-of-sensor-fusion-techniques-in-frc-how-might-one-harmonize-the-celestial-dance-of-encoder-ticks-and-gyroscopic-precession/441692/28
+    private DifferentialDrivePoseEstimator PoseEstimator;
 
+    // -------
+    // Sensors
+    // -------
+    private AHRS IMU;
+    private Timer IMURefreshTimer;
     private Pose2d IMUAccumulatedPose = new Pose2d();
+    /**
+     * The update rate of the IMU in Seconds.
+     */
+    private double IMUUpdateRate;
 
     public FieldLocalizationSubsystem(DriveSubsystem drive)
     {
         super();
-        // Do not automatically register.
-        CommandScheduler.getInstance().unregisterSubsystem(this);
 
         this.Drive = drive;
-
+        
         if (RobotBase.isReal())
         {
-            this.PoseEstimator = new DifferentialDrivePoseEstimator(this.Drive.Kinematics, Rotation2d.fromDegrees(0), 0, 0, new Pose2d());
-        }
-        else
-        {
-            // TODO: Support simulation of Robot
-            throw new UnsupportedOperationException("DriveSubsystem cannot be simulated!");
+            this.IMU = new AHRS(SPI.Port.kMXP);;
+            this.IMURefreshTimer = new Timer();
+            this.IMUUpdateRate = 1 / this.IMU.getActualUpdateRate();
+            System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
+            
+            this.PoseEstimator = new DifferentialDrivePoseEstimator(
+                this.Drive.Kinematics, 
+                Rotation2d.fromDegrees(0), 0, 0, 
+                new Pose2d(),
+                VecBuilder.fill(0.02, 0.02, 0.01),
+                VecBuilder.fill(0.1, 0.1, 0.1));
         }
 
         setDefaultCommand(Commands.run(() -> 
@@ -57,16 +73,19 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
     public Pose2d GetEstimatedPose()
     {
-        return this.PoseEstimator.getEstimatedPosition();
+        return RobotBase.isReal() ? this.PoseEstimator.getEstimatedPosition() : this.Drive.SimulatedDrive.getPose();
     }
 
     public void ResetPosition(Pose2d initialPosition)
     {
-        this.Drive.ResetSensors();
-        this.IMUAccumulatedPose = initialPosition;
-        this.Drive.IMU.reset();
-        // this.Drive.IMU.setAngleAdjustment(initialPosition.getRotation().getDegrees());
-		this.PoseEstimator.resetPosition(initialPosition.getRotation(), 0, 0, initialPosition);
+        this.Drive.ResetEncoders();
+
+        if (RobotBase.isReal())
+        {
+            this.IMU.reset();
+            this.IMUAccumulatedPose = initialPosition;
+            this.PoseEstimator.resetPosition(initialPosition.getRotation(), 0, 0, initialPosition);
+        }
     }
 
     public boolean HasVisionPosition()
@@ -87,26 +106,76 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
     @Override
     public void periodic() 
-    {
+    {        
+        if (!RobotBase.isReal()) 
+        {
+            Constants.Field.setRobotPose(this.GetEstimatedPose());
+            return;
+        };
+
         var wheelPositions = this.Drive.GetWheelPositions();
-        
-        this.PoseEstimator.update(Rotation2d.fromDegrees(this.Drive.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
+        this.PoseEstimator.update(Rotation2d.fromDegrees(this.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
         
         if (HasVisionPosition())
         {
+            System.out.println("Updating Vision Measurements...");
+
             var visionMeasurement = this.GetVisionPosition();
             
             this.PoseEstimator.addVisionMeasurement(visionMeasurement.Pose, visionMeasurement.BeganComputingAt);
+
+            Constants.Field.getObject("Robot - Vision").setPose(visionMeasurement.Pose);
         }
 
+        if (this.IMURefreshTimer.hasElapsed(this.IMUUpdateRate)) 
         {
-            // Update using IMU
-            var x = this.Drive.IMU.getWorldLinearAccelX();
-            var y = this.Drive.IMU.getWorldLinearAccelY();
-            var z = this.Drive.IMU.getWorldLinearAccelZ(); // Heading
-                       
-            
+            System.out.printf("Updating IMU Measurements at %d ...", this.IMU.getLastSensorTimestamp());
+
+            // TODO: Use the difference between the current time and getLastSensorTimestamp() to interpolate veleocity. 
+
+            // One G equates to One M/s^2
+            // Then scale velocity values by the duration (seconds) passed since last refresh. 
+            double deltaX = this.IMU.getVelocityX() * this.IMURefreshTimer.get();
+            double deltaY = this.IMU.getVelocityY() * this.IMURefreshTimer.get();
+            double deltaRotation = this.IMU.getVelocityZ() * this.IMURefreshTimer.get() / Constants.Drivetrain.TrackCircumference;
+            // For the Robot to do a full rotation it must rotate 3.42917278846 meters.
+
+            this.IMUAccumulatedPose = new Pose2d(
+                this.IMUAccumulatedPose.getX() + deltaX,
+                this.IMUAccumulatedPose.getY() + deltaY,
+                this.IMUAccumulatedPose.getRotation().plus(Rotation2d.fromDegrees(deltaRotation * 360))
+            );
+
+            this.IMURefreshTimer.reset();
+
+            // TODO: Contribute IMU Accumulated Position to PoseEstimator!
+
+            Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
         }
+
+        Constants.Field.setRobotPose(this.GetEstimatedPose());
+    }
+
+    @Override
+    public void simulationPeriodic() 
+    {
+        
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) 
+    {
+        if (RobotBase.isReal())
+        {
+            builder.addDoubleProperty("IMU Update Rate", () -> Units.secondsToMilliseconds(this.IMUUpdateRate), null);
+        }
+
+        builder.addStringProperty("Estimated Position", () -> {
+
+            var estimatedPose = this.GetEstimatedPose();
+            return String.format("X: %.2f Y: %.2f Heading: %.2f", estimatedPose.getX(), estimatedPose.getY(), estimatedPose.getRotation().getDegrees());
+
+        }, null);
     }
 
     public class VisionPoseMeasurement

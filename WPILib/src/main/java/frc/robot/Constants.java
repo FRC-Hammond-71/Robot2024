@@ -1,28 +1,26 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants 
 {
 	public static Field2d Field = new Field2d();
+
+	/**
+	 * Weight of Robot in Lb
+	 */
+	public static double RobotWeight = 100;
+
+	public static class RedField
+	{
+		/**
+		 * The position of the note-entrance of the Speaker game element. 
+		 */
+		public static Translation3d SpeakerPosition = new Translation3d(16.194929, 5.517298, 0);
+	}
 
 	public static class Controllers
 	{
@@ -42,18 +40,29 @@ public final class Constants
 		public static final double Deadzone = 0.08;
 	}
 
-	public static class Drivetrain {
+	public static class Drivetrain 
+	{
 		// https://www.revrobotics.com/rev-21-1650/
 
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxForwardSpeed = 4;
+		public static double MaxForwardSpeed = 2.5;
+
+		/**
+		 * The maximum rate-of-change of forward speeds in (M/s).
+		 */
+		public static double MaxForwardSpeedDelta = MaxForwardSpeed - 1;
 
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(200);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(180);
+
+		/**
+		 * The maximum rate-of-change of forward speeds in (M/s).
+		 */
+		public static double MaxRotationalSpeedDelta = Math.PI;
 
 		/**
 		 * Wheel radius in Meters.
@@ -76,6 +85,10 @@ public final class Constants
 		 */
 		public static double TrackWidth = Units.inchesToMeters(21.487);
 
+		/**
+		 * The track circumference in Meters. 
+		 */
+		public static double TrackCircumference = TrackWidth * 2 * Math.PI;
 	}
 
 	public static class GroundIntake
@@ -89,17 +102,42 @@ public final class Constants
 
 	}
 
-	public static class Launcher
+	public static class Arm
 	{
 		public static int PitchMotorCANPort = 8;
 
-		public static Rotation2d MaxPitch = Rotation2d.fromDegrees(80); 
-
-		public static Rotation2d LoadingPitch = Rotation2d.fromDegrees(60); 
-		
-		public static Rotation2d MaximumLoadingPitchError = Rotation2d.fromDegrees(5); 
-
 		public static int PitchEncoderChannel = 0;
+
+		public static int RotationLimitSwitchChannel = 1;
+
+		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(110); 
+
+		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(60); 
+
+		// Shooting from further would require a 0.5 degree inaccuracy
+		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1.5);
+
+		public static double MomentOfInertia = 5;
+
+		/**
+		 * To rotate the Arm a full rotation, the motor must rotate 414.285714 times.
+		 */
+		public static double Gearing = 414.285714;
+
+		/**
+		 * The diameter of the chain plate that is connected to the Arm in Meters.
+		 */
+		public static double ChainDiameter = Units.inchesToMeters(6.211);
+
+		public static double ChainCircumference = ChainDiameter * 2 * Math.PI;
+	}
+
+	public static class Launcher
+	{
+		/**
+		 * The diameter of the Launchers wheel in Meters.
+		 */
+		public static double WheelDiameter = Units.inchesToMeters(3.965079); 
 
 		public static class LaunchMotor
 		{
@@ -118,7 +156,5 @@ public final class Constants
 
 			public static double Speed = 0.8;
 		}
-	
-		public static int RotationLimitSwitchChannel = 1;
 	}
 }
