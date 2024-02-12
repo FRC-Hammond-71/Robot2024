@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.time.Duration;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.ElapsedTimer;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 
@@ -31,12 +34,8 @@ public class FieldLocalizationSubsystem extends SubsystemBase
     // Sensors
     // -------
     private AHRS IMU;
-    private Timer IMURefreshTimer;
+    private ElapsedTimer IMUTimer;
     private Pose2d IMUAccumulatedPose = new Pose2d();
-    /**
-     * The update rate of the IMU in Seconds.
-     */
-    private double IMUUpdateRate;
 
     public FieldLocalizationSubsystem()
     {
@@ -44,9 +43,8 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         
         if (RobotBase.isReal())
         {
-            this.IMU = new AHRS(SPI.Port.kMXP);;
-            this.IMURefreshTimer = new Timer();
-            this.IMUUpdateRate = 1 / this.IMU.getActualUpdateRate();
+            this.IMU = new AHRS(SPI.Port.kMXP);
+            this.IMUTimer = new ElapsedTimer(Duration.ofSeconds(1 / this.IMU.getActualUpdateRate()));
             System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
             
             this.PoseEstimator = new DifferentialDrivePoseEstimator(
@@ -124,7 +122,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             Constants.Field.getObject("Robot - Vision").setPose(visionMeasurement.Pose);
         }
 
-        if (this.IMURefreshTimer.hasElapsed(this.IMUUpdateRate)) 
+        if (this.IMUTimer.hasElapsed()) 
         {
             System.out.printf("Updating IMU Measurements at %d ...", this.IMU.getLastSensorTimestamp());
 
@@ -132,9 +130,9 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
             // One G equates to One M/s^2
             // Then scale velocity values by the duration (seconds) passed since last refresh. 
-            double deltaX = this.IMU.getVelocityX() * this.IMURefreshTimer.get();
-            double deltaY = this.IMU.getVelocityY() * this.IMURefreshTimer.get();
-            double deltaRotation = this.IMU.getVelocityZ() * this.IMURefreshTimer.get() / Constants.Drivetrain.TrackCircumference;
+            double deltaX = this.IMU.getVelocityX() * this.IMUTimer.Timer.get();
+            double deltaY = this.IMU.getVelocityY() * this.IMUTimer.Timer.get();
+            double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get() / Constants.Drivetrain.TrackCircumference;
             // For the Robot to do a full rotation it must rotate 3.42917278846 meters.
 
             this.IMUAccumulatedPose = new Pose2d(
@@ -145,7 +143,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
             // NOTE: May need to use Pose2d.transformBy?
 
-            this.IMURefreshTimer.reset();
+            this.IMUTimer.Timer.reset();
 
             // TODO: Contribute IMU Accumulated Position to PoseEstimator!
 
@@ -166,7 +164,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("IMU Update Rate", () -> Units.secondsToMilliseconds(this.IMUUpdateRate), null);
+            builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
         }
 
         builder.addStringProperty("Estimated Position", () -> {

@@ -35,12 +35,14 @@ public class PathUntilNoteCommand extends FollowPathCommand
     @Override
     public void execute() 
     {
+        // TODO: Possibly repath using vision data of note?
         super.execute();
     }
 
     @Override
     public boolean isFinished() 
     {
+        // Continue path until Robot has note or path has been finished!
         return this.hasNote.get() || super.isFinished();
     }   
 }

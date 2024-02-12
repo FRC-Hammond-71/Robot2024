@@ -62,10 +62,10 @@ public class DriveSubsystem extends SubsystemBase
         
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor = new CANSparkMax(5, MotorType.kBrushless);
+            this.LeftLeadMotor = new CANSparkMax(1, MotorType.kBrushless);
             this.RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
-            this.LeftFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
-            this.RightFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
+            this.LeftFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
+            this.RightFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
 
             this.LeftLeadMotor.setInverted(true);
             this.RightLeadMotor.setInverted(false);
@@ -98,11 +98,11 @@ public class DriveSubsystem extends SubsystemBase
 
         setDefaultCommand(Commands.run(() -> 
         {
-            if (Controllers.DriverController.getXButtonPressed())
-            {
-                GameCommands.GotoSpeakerAndLaunch().schedule();
-                return;
-            }
+            // if (Controllers.DriverController.getXButtonPressed())
+            // {
+            //     GameCommands.GotoSpeakerAndLaunch().schedule();
+            //     return;
+            // }
 
             double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
             double rotation = Controllers.ApplyDeadzone(Controllers.DriverController.getRightX());
