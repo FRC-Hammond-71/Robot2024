@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.LauncherFiringSolution;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FieldLocalizationSubsystem;
@@ -22,15 +23,15 @@ public class GameCommands
 
     public static Command AutoRotateAndLaunch()
     {
-        var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.FieldLocalization.GetEstimatedPose());
+        var firingSolution = LauncherFiringSolution.CalculateToSpeaker(RobotContainer.FieldLocalization.GetEstimatedPose());
 
         System.out.printf("Firing at %.2f Degrees\n", firingSolution.ArmAngle.getDegrees());
 
         // Consider checking if a note is loaded? If not, command will end?
         // Robot could roa
-        return new FaceAtCommand(Robot.Drive, Robot.FieldLocalization, firingSolution.TargetPosition.toTranslation2d())
-            .andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
-            .andThen(Robot.Launcher.Launch());
+        return new FaceAtCommand(RobotContainer.Drive, RobotContainer.FieldLocalization, firingSolution.TargetPosition.toTranslation2d())
+            .andThen(RobotContainer.Arm.RunRotate(firingSolution.ArmAngle))
+            .andThen(RobotContainer.Launcher.Launch());
     }
 
     public static Command GotoSpeakerAndLaunch()

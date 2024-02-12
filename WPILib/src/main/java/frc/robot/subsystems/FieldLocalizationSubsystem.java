@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Controllers;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
 
 /**
  * The localization subsystem utilizes several sensors on the Robot to estimate where the Robot is on the field.
@@ -22,9 +23,7 @@ import frc.robot.LimelightHelpers;
  * <p>The <code>LocalizationSubsystem</code> is required to be updated after the <code>DriveSubsystem</code>!</p>
  */
 public class FieldLocalizationSubsystem extends SubsystemBase 
-{
-    private DriveSubsystem Drive;
-    
+{    
     // https://www.chiefdelphi.com/t/considering-the-intricacies-of-autonomous-pathfinding-algorithms-and-the-myriad-of-sensor-fusion-techniques-in-frc-how-might-one-harmonize-the-celestial-dance-of-encoder-ticks-and-gyroscopic-precession/441692/28
     private DifferentialDrivePoseEstimator PoseEstimator;
 
@@ -39,11 +38,9 @@ public class FieldLocalizationSubsystem extends SubsystemBase
      */
     private double IMUUpdateRate;
 
-    public FieldLocalizationSubsystem(DriveSubsystem drive)
+    public FieldLocalizationSubsystem()
     {
         super();
-
-        this.Drive = drive;
         
         if (RobotBase.isReal())
         {
@@ -53,7 +50,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
             
             this.PoseEstimator = new DifferentialDrivePoseEstimator(
-                this.Drive.Kinematics, 
+                RobotContainer.Drive.Kinematics, 
                 Rotation2d.fromDegrees(0), 0, 0, 
                 new Pose2d(),
                 VecBuilder.fill(0.02, 0.02, 0.01),
@@ -73,12 +70,12 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
     public Pose2d GetEstimatedPose()
     {
-        return RobotBase.isReal() ? this.PoseEstimator.getEstimatedPosition() : this.Drive.SimulatedDrive.getPose();
+        return RobotBase.isReal() ? this.PoseEstimator.getEstimatedPosition() : RobotContainer.Drive.SimulatedDrive.getPose();
     }
 
     public void ResetPosition(Pose2d initialPosition)
     {
-        this.Drive.ResetEncoders();
+        RobotContainer.Drive.ResetEncoders();
 
         if (RobotBase.isReal())
         {
@@ -113,7 +110,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             return;
         };
 
-        var wheelPositions = this.Drive.GetWheelPositions();
+        var wheelPositions = RobotContainer.Drive.GetWheelPositions();
         this.PoseEstimator.update(Rotation2d.fromDegrees(this.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
         
         if (HasVisionPosition())
@@ -145,6 +142,8 @@ public class FieldLocalizationSubsystem extends SubsystemBase
                 this.IMUAccumulatedPose.getY() + deltaY,
                 this.IMUAccumulatedPose.getRotation().plus(Rotation2d.fromDegrees(deltaRotation * 360))
             );
+
+            // NOTE: May need to use Pose2d.transformBy?
 
             this.IMURefreshTimer.reset();
 

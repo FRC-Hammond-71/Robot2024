@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -29,10 +28,10 @@ public class ArmSubsystem extends SubsystemBase
     private SingleJointedArmSim SimulatedArm;
 
     // https://www.revrobotics.com/rev-21-1651/
-    private CANSparkMax IntakeMotor;
+    private CANSparkMax IntakeMotor, Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
-    private CANSparkMax Motor;
+    
     private DutyCycleEncoder Encoder;
     private DigitalInput LimitSwitch;
 

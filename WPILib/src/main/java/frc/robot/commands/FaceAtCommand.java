@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -20,6 +22,9 @@ public class FaceAtCommand extends Command {
 	private FieldLocalizationSubsystem FieldLocalization;
 
 	private PIDController TurningPID = new PIDController(0.5, 0.5, 0);
+
+	private final TrapezoidProfile MotionProfile = new TrapezoidProfile(new Constraints(2.5, 0.75));
+	private TrapezoidProfile.State MotionState = new TrapezoidProfile.State();
 
 	public FaceAtCommand(DriveSubsystem drive, FieldLocalizationSubsystem localizationSubsystem, Translation2d position)
 	{
@@ -59,8 +64,12 @@ public class FaceAtCommand extends Command {
 	}
 
 	@Override
-	public void execute() 
+	public void execute()
 	{		
+		var error = GetTargetHeading().minus(FieldLocalization.GetEstimatedPose().getRotation());
+
+		this.MotionState = this.MotionProfile.calculate(0.02, this.MotionState, new TrapezoidProfile.State());
+
 		this.Drive.Set(
 			new ChassisSpeeds(0, 0, TurningPID.calculate(FieldLocalization.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
 	}

@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -46,10 +48,6 @@ public class DriveSubsystem extends SubsystemBase
 
     // private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
 
-    // ks = the static voltage required to initially move wheels
-    // kv = The voltage to keep moving at a velocity
-    // ka = Voltage required to accelerate at the desired acceleration
-
     // private SlewRateLimiter ForwardRateLimiter = new SlewRateLimiter(Constants.Drivetrain.MaxForwardSpeedDelta);
     // private SlewRateLimiter RotationRateLimiter = new SlewRateLimiter(Constants.Drivetrain.MaxRotationalSpeedDelta);
 
@@ -71,6 +69,9 @@ public class DriveSubsystem extends SubsystemBase
 
             this.LeftLeadMotor.setInverted(true);
             this.RightLeadMotor.setInverted(false);
+
+            this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
+            this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
             
             this.LeftFollowMotor.follow(this.LeftLeadMotor);
             this.RightFollowMotor.follow(this.RightLeadMotor);
@@ -81,8 +82,6 @@ public class DriveSubsystem extends SubsystemBase
             this.RightLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
             this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
             this.RightLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-            
-            System.out.println(String.format("Encoder CountsPerRevolution %s", this.RightLeadMotor.getEncoder().getCountsPerRevolution()));
         }
         else
         {
@@ -101,8 +100,6 @@ public class DriveSubsystem extends SubsystemBase
         {
             if (Controllers.DriverController.getXButtonPressed())
             {
-                // PathCommands.PathToSpeaker().withTimeout(10).schedule();
-                // PathCommands.PathToSpeaker().withTimeout(10).schedule();
                 GameCommands.GotoSpeakerAndLaunch().schedule();
                 return;
             }
