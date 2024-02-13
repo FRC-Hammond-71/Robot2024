@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,29 +19,30 @@ import frc.robot.commands.PathCommands;
 public class LauncherSubsystem extends SubsystemBase {
 
     // https://www.revrobotics.com/rev-21-1650/
-    private CANSparkMax GroundIntakeMotor;
-    
-    // https://www.revrobotics.com/rev-21-1651/
-    private CANSparkMax LaunchMotor;
+    private CANSparkMax GroundIntakeMotor, LaunchMotor;
 
     // private PIDController LaunchMotorPID = new PIDController(0, 0, 0);
 
     public LauncherSubsystem() 
     {
+        super();
+
         if (RobotBase.isReal()) 
         {
-            this.LaunchMotor = new CANSparkMax(Constants.Launcher.LaunchMotor.CANPort, MotorType.kBrushless);
+            // this.LaunchMotor = new CANSparkMax(Constants.Launcher.LaunchMotor.CANPort, MotorType.kBrushless);
             this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.Motor.Port, MotorType.kBrushless);
+
+            this.GroundIntakeMotor.setInverted(true);
+            this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
         } 
         else 
         {
-            // // TODO: Support simulation of Robot
-            // throw new UnsupportedOperationException("LauncherSubsystem cannot be simulated!");
+            throw new UnsupportedOperationException("LauncherSubsystem cannot be simulated!");
         }
 
         setDefaultCommand(Commands.run(() -> 
         {
-            // this.LaunchMotor.set(Controllers.ShooterController.getXButton() ? 1 : 0);
+            this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
 
         }, this));
     }
@@ -55,7 +57,8 @@ public class LauncherSubsystem extends SubsystemBase {
 
     public double Speed()
     {
-        return RobotBase.isReal() ? this.LaunchMotor.getEncoder().getVelocity() : 0;
+        return 0;
+        // return RobotBase.isReal() ? this.LaunchMotor.getEncoder().getVelocity() : 0;
     }
 
     public void Stop()
@@ -63,7 +66,7 @@ public class LauncherSubsystem extends SubsystemBase {
         if (RobotBase.isReal())
         {
             this.GroundIntakeMotor.stopMotor();
-            this.LaunchMotor.stopMotor();
+            // this.LaunchMotor.stopMotor();
         }
     }
     
@@ -71,6 +74,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public void initSendable(SendableBuilder builder) 
     {
         builder.addDoubleProperty("Launcher Speed", () -> this.Speed(), null);
+        builder.addDoubleProperty("Intake Speed", () -> this.GroundIntakeMotor.get(), null);
     }
 
     public Command RunGroundIntake()

@@ -20,6 +20,7 @@ public class Robot extends TimedRobot
 		System.out.println("Robot has initialized!");	
 
 		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Drive);
+		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Launcher);
 	}
 
 	@Override
@@ -33,7 +34,6 @@ public class Robot extends TimedRobot
 		}
 
 		// Execute / iterate all subsystems, then commands.
-		System.out.println("Updating Timed Robot");
 		CommandScheduler.getInstance().run();
 	}
 

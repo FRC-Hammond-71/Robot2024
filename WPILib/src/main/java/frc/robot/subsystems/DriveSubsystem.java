@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -108,13 +109,16 @@ public class DriveSubsystem extends SubsystemBase
             // }
 
             double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
+
+            forward = Math.copySign(Math.pow(forward, 2), forward);
+
             double rotation = Controllers.ApplyDeadzone(Controllers.DriverController.getRightX());
 
             this.Set(new ChassisSpeeds
             (
                 forward * Constants.Drivetrain.MaxForwardSpeed,
                 0,
-                Rotation2d.fromDegrees(rotation * 300).getRadians()
+                Rotation2d.fromDegrees(rotation * 200).getRadians()
             ));
         }, this));
     }
@@ -173,7 +177,6 @@ public class DriveSubsystem extends SubsystemBase
      */
     public void Set(ChassisSpeeds speeds)
     {
-        System.out.println("Set speed!");
         this.Speeds = speeds;
         this.UpdateMotors();
     }
@@ -189,8 +192,8 @@ public class DriveSubsystem extends SubsystemBase
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond));
-            this.RightLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.25));
+            this.RightLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.25));
         }
         else
         {
@@ -203,7 +206,6 @@ public class DriveSubsystem extends SubsystemBase
     @Override
     public void periodic() 
     {
-        System.out.println("HLELLOOO!!");
         this.UpdateMotors();
     }
     @Override
@@ -230,6 +232,5 @@ public class DriveSubsystem extends SubsystemBase
         builder.addDoubleProperty("FEED Ks", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(v, this.FeedForward.kv, this.FeedForward.ka));
         builder.addDoubleProperty("FEED Kv", () -> this.FeedForward.kv, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, v, this.FeedForward.ka));
         builder.addDoubleProperty("FEED Ka", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, this.FeedForward.kv, v));
-
     }
 }
