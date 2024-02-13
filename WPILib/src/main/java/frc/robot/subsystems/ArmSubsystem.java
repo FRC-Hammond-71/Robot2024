@@ -166,18 +166,18 @@ public class ArmSubsystem extends SubsystemBase
     @Override
     public void periodic() 
     {
-        if (RobotBase.isReal() && this.LimitSwitch.get())
-        {
-            // Limit switch is at the "forward-most" angle of the Robot.
+        // if (RobotBase.isReal() && this.LimitSwitch.get())
+        // {
+        //     // Limit switch is at the "forward-most" angle of the Robot.
 
-            this.Encoder.reset();
-            this.Encoder.setPositionOffset(360 / Constants.Arm.MaxAngle.getDegrees());
-            this.Stop();
-        }
-        else
-        {
-            this.UpdateMotors();
-        }
+        //     this.Encoder.reset();
+        //     this.Encoder.setPositionOffset(360 / Constants.Arm.MaxAngle.getDegrees());
+        //     this.Stop();
+        // }
+        // else
+        // {
+        //     this.UpdateMotors();
+        // }
     }
     @Override
     public void simulationPeriodic() 

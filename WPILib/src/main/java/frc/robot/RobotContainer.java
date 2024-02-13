@@ -14,6 +14,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.GameCommands;
@@ -47,7 +48,7 @@ public class RobotContainer
 		SmartDashboard.putData(Drive);
 		SmartDashboard.putData(Launcher);
 		SmartDashboard.putData(FieldLocalization);
-
+		
 		AutoBuilder.configureRamsete(
 			FieldLocalization::GetEstimatedPose,
 			(pose) -> FieldLocalization.ResetPosition(pose),

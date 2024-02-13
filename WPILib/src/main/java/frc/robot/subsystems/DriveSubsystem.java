@@ -8,6 +8,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
@@ -36,7 +37,7 @@ public class DriveSubsystem extends SubsystemBase
     public DifferentialDrivetrainSim SimulatedDrive;
 
     // https://www.revrobotics.com/rev-21-1650/
-	private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
+	public CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
 
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
@@ -71,7 +72,9 @@ public class DriveSubsystem extends SubsystemBase
             this.RightLeadMotor.setInverted(false);
 
             this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
+            this.RightLeadMotor.setIdleMode(IdleMode.kBrake);
             this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
+            this.LeftLeadMotor.setIdleMode(IdleMode.kBrake);
             
             this.LeftFollowMotor.follow(this.LeftLeadMotor);
             this.RightFollowMotor.follow(this.RightLeadMotor);
@@ -111,7 +114,7 @@ public class DriveSubsystem extends SubsystemBase
             (
                 forward * Constants.Drivetrain.MaxForwardSpeed,
                 0,
-                Constants.Drivetrain.MaxRotationalSpeed.times(rotation).getRadians()
+                Rotation2d.fromDegrees(rotation * 300).getRadians()
             ));
         }, this));
     }
@@ -170,6 +173,7 @@ public class DriveSubsystem extends SubsystemBase
      */
     public void Set(ChassisSpeeds speeds)
     {
+        System.out.println("Set speed!");
         this.Speeds = speeds;
         this.UpdateMotors();
     }
@@ -178,19 +182,15 @@ public class DriveSubsystem extends SubsystemBase
     {
         // Apply rate-limits
         var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
-            // ForwardRateLimiter.calculate(this.Speeds.vxMetersPerSecond),
             this.Speeds.vxMetersPerSecond,
             0,
-            // RotationRateLimiter.calculate(this.Speeds.omegaRadiansPerSecond),
             this.Speeds.omegaRadiansPerSecond
         ));
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(
-                InputFilter.calculate(FeedForward.calculate(this.LeftLeadMotor.getEncoder().getVelocity() / 60, nextWheelSpeeds.leftMetersPerSecond, 0.02)));
-            this.RightLeadMotor.setVoltage(
-                InputFilter.calculate(FeedForward.calculate(this.RightLeadMotor.getEncoder().getVelocity() / 60, nextWheelSpeeds.rightMetersPerSecond, 0.02)));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond));
+            this.RightLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond));
         }
         else
         {
@@ -203,6 +203,7 @@ public class DriveSubsystem extends SubsystemBase
     @Override
     public void periodic() 
     {
+        System.out.println("HLELLOOO!!");
         this.UpdateMotors();
     }
     @Override

@@ -18,6 +18,8 @@ public class Robot extends TimedRobot
 	public void robotInit() 
 	{
 		System.out.println("Robot has initialized!");	
+
+		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Drive);
 	}
 
 	@Override
@@ -27,9 +29,11 @@ public class Robot extends TimedRobot
 		if (Controllers.DriverController.getPOV() == 180 || Controllers.ShooterController.getPOV() == 180) 
 		{
 			this.EmergencyStop();
+			return;
 		}
 
 		// Execute / iterate all subsystems, then commands.
+		System.out.println("Updating Timed Robot");
 		CommandScheduler.getInstance().run();
 	}
 
@@ -46,8 +50,18 @@ public class Robot extends TimedRobot
 	}
 
 	@Override
+	public void teleopPeriodic() 
+	{
+		// double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
+
+		// RobotContainer.Drive.LeftLeadMotor.set(forward);
+		// RobotContainer.Drive.RightLeadMotor.set(forward);
+	}
+
+	@Override
 	public void teleopExit() 
 	{
+
 	}
 
 	@Override
