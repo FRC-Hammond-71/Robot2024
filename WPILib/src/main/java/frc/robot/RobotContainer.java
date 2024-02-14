@@ -22,7 +22,7 @@ import frc.robot.commands.RampLauncherCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FieldLocalizationSubsystem;
-import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.LaunchSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -38,47 +38,11 @@ public class RobotContainer
 
 	public final static ArmSubsystem Arm = new ArmSubsystem();
 	public final static DriveSubsystem Drive = new DriveSubsystem();
-	public final static LauncherSubsystem Launcher = new LauncherSubsystem();
+	public final static LaunchSubsystem Launcher = new LaunchSubsystem();
 	public final static FieldLocalizationSubsystem FieldLocalization = new FieldLocalizationSubsystem();
 
 	public RobotContainer()
 	{
-		SmartDashboard.putData(Constants.Field);
-		SmartDashboard.putData(Arm);
-		SmartDashboard.putData(Drive);
-		SmartDashboard.putData(Launcher);
-		SmartDashboard.putData(FieldLocalization);
-		
-		AutoBuilder.configureRamsete(
-			FieldLocalization::GetEstimatedPose,
-			(pose) -> FieldLocalization.ResetPosition(pose),
-			() -> Drive.GetSpeeds(),
-			(targetSpeeds) -> Drive.Set(targetSpeeds),
-			new ReplanningConfig(true, false),
-			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
-			Drive);
-			
-		NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
-		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
-		NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
-
-		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-			// Do whatever you want with the pose here
-			Constants.Field.setRobotPose(pose);
-		});
-
-		// Logging callback for target robot pose
-		PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-			// Do whatever you want with the pose here
-			Constants.Field.getObject("robot path pose").setPose(pose);
-		});
-
-		// Logging callback for the active path, this is sent as a list of poses
-		PathPlannerLogging.setLogActivePathCallback((poses) -> {
-			// Do whatever you want with the poses here
-			Constants.Field.getObject("path").setPoses(poses);
-		});
-
 		// CameraServer.startAutomaticCapture();
 
 		// Configure the trigger bindings

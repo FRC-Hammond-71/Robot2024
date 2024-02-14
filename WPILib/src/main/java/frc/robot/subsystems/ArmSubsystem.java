@@ -28,7 +28,7 @@ public class ArmSubsystem extends SubsystemBase
     private SingleJointedArmSim SimulatedArm;
 
     // https://www.revrobotics.com/rev-21-1651/
-    private CANSparkMax IntakeMotor, Motor;
+    private CANSparkMax Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
     
@@ -44,7 +44,6 @@ public class ArmSubsystem extends SubsystemBase
     {
         if (RobotBase.isReal())
         {
-            this.IntakeMotor = new CANSparkMax(Constants.Launcher.IntakeMotor.CANPort, MotorType.kBrushless);
             this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
             this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
@@ -63,23 +62,22 @@ public class ArmSubsystem extends SubsystemBase
                 Constants.Arm.MaxAngle.getRadians());
         }
 
-        // setDefaultCommand(Commands.run(() -> 
-        // {
-        //     if (Controllers.ShooterController.getBButtonPressed())
-        //     {
-        //         // Debugging
-        //         System.out.println("Beginning Arm Calibration!");
+        setDefaultCommand(Commands.run(() -> 
+        {
+            // if (Controllers.ShooterController.getBButtonPressed())
+            // {
+            //     // Debugging
+            //     System.out.println("Beginning Arm Calibration!");
 
-        //         this.RunCalibration().schedule();
-        //         return;
-        //     }
+            //     this.RunCalibration().schedule();
+            //     return;
+            // }
+            // this.IntakeMotor.set(Controllers.ShooterController.getAButton() ? 1 : 0);
 
-        //     // this.IntakeMotor.set(Controllers.ShooterController.getAButton() ? 1 : 0);
-
-        //     double forward = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 10;
-        //     // Will move the target angle by 10 or so.
-        //     this.SetAngle(this.TargetAngle.plus(Rotation2d.fromDegrees(forward)));
-        // }, this));
+            double forward = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 10;
+            // Will move the target angle by 10 or so.
+            this.SetAngle(this.TargetAngle.plus(Rotation2d.fromDegrees(forward)));
+        }, this));
     }
 
     public Rotation2d GetActualAngle() 
@@ -221,11 +219,6 @@ public class ArmSubsystem extends SubsystemBase
             // Is Finished
             () -> this.LimitSwitch.get(),
             this);
-    }
-    
-    public Command RunIntake()
-    {
-        return Commands.runEnd(() -> this.IntakeMotor.set(1), () -> this.IntakeMotor.stopMotor(), this);
     }
 
     /**

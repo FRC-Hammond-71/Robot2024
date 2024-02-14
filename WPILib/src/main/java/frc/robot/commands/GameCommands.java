@@ -1,24 +1,19 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.LauncherFiringSolution;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.FieldLocalizationSubsystem;
-import frc.robot.subsystems.LauncherSubsystem;
 
 public class GameCommands 
 {
-    public static Command IntakeNoteAndLoadIntoLauncher(ArmSubsystem arm, LauncherSubsystem launch)
+    public static Command IntakeNoteAndLoadIntoLauncher()
     {
-        return arm.RunRotate(Constants.Arm.LoadingAngle)
-            .andThen(Commands.parallel(launch.RunGroundIntake(), arm.RunIntake()))
-            .onlyWhile(() -> !launch.IsLoaded());
+        return RobotContainer.Arm.RunRotate(Constants.Arm.LoadingAngle)
+            .andThen(Commands.parallel(RobotContainer.Launcher.RunGroundIntake(), RobotContainer.Launcher.RunIntake()))
+            .onlyWhile(() -> !RobotContainer.Launcher.IsLoaded())
+            .withName("IntakeNoteAndLoadIntoLauncher");
     }
 
     public static Command AutoRotateAndLaunch()
@@ -28,14 +23,16 @@ public class GameCommands
         System.out.printf("Firing at %.2f Degrees\n", firingSolution.ArmAngle.getDegrees());
 
         // Consider checking if a note is loaded? If not, command will end?
-        // Robot could roa
-        return new FaceAtCommand(RobotContainer.Drive, RobotContainer.FieldLocalization, firingSolution.TargetPosition.toTranslation2d())
+        return new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d())
             .andThen(RobotContainer.Arm.RunRotate(firingSolution.ArmAngle))
-            .andThen(RobotContainer.Launcher.Launch());
+            .andThen(RobotContainer.Launcher.Launch())
+            .withName("AutoRotateAndLaunch");
     }
 
     public static Command GotoSpeakerAndLaunch()
     {
-        return PathCommands.PathToSpeaker().andThen(AutoRotateAndLaunch());
+        return PathCommands.PathToSpeaker()
+            .andThen(AutoRotateAndLaunch())
+            .withName("GotoSpeakerAndLaunch");
     }
 }

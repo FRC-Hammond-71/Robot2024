@@ -3,6 +3,7 @@ package frc.robot.commands;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,76 +11,74 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FieldLocalizationSubsystem;
 
 public class FaceAtCommand extends Command {
 
-	public Translation2d Position;
+	public final Translation2d Target;
 
-	private DriveSubsystem Drive;
-	private FieldLocalizationSubsystem FieldLocalization;
+	public PIDController OutputController = new PIDController(Math.PI * 1.5, Math.PI / 2, Math.PI / 4); 
 
-	private PIDController TurningPID = new PIDController(0.5, 0.5, 0);
-
-	private final TrapezoidProfile MotionProfile = new TrapezoidProfile(new Constraints(2.5, 0.75));
-	private TrapezoidProfile.State MotionState = new TrapezoidProfile.State();
-
-	public FaceAtCommand(DriveSubsystem drive, FieldLocalizationSubsystem localizationSubsystem, Translation2d position)
+	public FaceAtCommand(Translation2d position)
 	{
 		super();
 
-		this.Drive = drive;
-		this.FieldLocalization = localizationSubsystem;
+		this.Target = position;
 
-		this.Position = position;
-
-		addRequirements(drive);
-		addRequirements(localizationSubsystem);
+		addRequirements(RobotContainer.Drive);
+		addRequirements(RobotContainer.FieldLocalization);
 	}
 
+	/**
+	 * @return The angle between the Robot and the Target.
+	 */
 	public Rotation2d GetTargetHeading()
 	{
-		return Position.minus(FieldLocalization.GetEstimatedPose().getTranslation()).getAngle().minus(Rotation2d.fromDegrees(180));
+		return Target.minus(RobotContainer.FieldLocalization.GetEstimatedPose().getTranslation()).getAngle();
 	}
 
 	public Rotation2d GetHeadingError()
 	{
-		return this.GetTargetHeading().minus(FieldLocalization.GetEstimatedPose().getRotation());
+		return this.GetTargetHeading().minus(RobotContainer.FieldLocalization.GetEstimatedPose().getRotation());
 	}
 
 	@Override
 	public void initialize() 
 	{
-		Constants.Field.getObject("Target").setPose(new Pose2d(this.Position, new Rotation2d()));	
+		Constants.Field.getObject("Target").setPose(new Pose2d(this.Target, new Rotation2d()));	
 	}
 
 	@Override
 	public boolean isFinished() 
 	{
 		var heading_error = this.GetHeadingError();
-		System.out.println(heading_error);
-		return heading_error.getDegrees() < 2 && heading_error.getDegrees() > -2;
+		// System.out.println(heading_error);
+		return heading_error.getDegrees() < 1 && heading_error.getDegrees() > -1;
 	}
 
 	@Override
 	public void execute()
 	{		
-		var error = GetTargetHeading().minus(FieldLocalization.GetEstimatedPose().getRotation());
+		var output = this.OutputController.calculate(RobotContainer.FieldLocalization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());		
+		// Hard-limit, just in case something goes wrong with the calculation! 
+		output = Math.max(Math.min(Math.PI, output), -Math.PI);
+		
+		System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output, RobotContainer.FieldLocalization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());
 
-		this.MotionState = this.MotionProfile.calculate(0.02, this.MotionState, new TrapezoidProfile.State());
-
-		this.Drive.Set(
-			new ChassisSpeeds(0, 0, TurningPID.calculate(FieldLocalization.GetEstimatedPose().getRotation().getRadians(), GetTargetHeading().getRadians())));
+		RobotContainer.Drive.Set(
+			new ChassisSpeeds(0, 0, output));
 	}
 
 	@Override
 	public void end(boolean interrupted) 
 	{
-		this.Drive.Stop();
-		this.TurningPID.reset();
-		this.TurningPID.setSetpoint(0);
-		System.out.println("We are done aligning with Speaker!");
+		RobotContainer.Drive.Stop();
+		// this.ProfiledPID.reset(0);
+		System.out.println("We are done aligning!");
 	}
 }

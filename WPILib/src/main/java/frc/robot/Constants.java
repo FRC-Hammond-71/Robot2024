@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
@@ -12,7 +14,7 @@ public final class Constants
 	/**
 	 * Weight of Robot in Lb
 	 */
-	public static double RobotWeight = 100;
+	public static double RobotWeight = 120;
 
 	public static class RedField
 	{
@@ -47,22 +49,22 @@ public final class Constants
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxForwardSpeed = 6;
+		public static double MaxForwardSpeed = 2.5;
 
 		/**
 		 * The maximum rate-of-change of forward speeds in (M/s).
 		 */
-		public static double MaxForwardSpeedDelta = MaxForwardSpeed - 1;
+		public static double MaxForwardSpeedAcceleration = 1;
 
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(250);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(100);
 
 		/**
-		 * The maximum rate-of-change of forward speeds in (M/s).
+		 * The maximum rotational acceleration in a second.
 		 */
-		public static double MaxRotationalSpeedDelta = Math.PI;
+		public static Rotation2d MaxRotationalAcceleration = Rotation2d.fromDegrees(180);
 
 		/**
 		 * Wheel radius in Meters.
@@ -93,13 +95,7 @@ public final class Constants
 
 	public static class GroundIntake
 	{
-		public static class Motor
-		{
-			public static int Port = 5;
-	
-			public static double Speed = 0.8;
-		}
-
+		public static int CANPort = 5;
 	}
 
 	public static class Arm
@@ -139,13 +135,9 @@ public final class Constants
 		 */
 		public static double WheelDiameter = Units.inchesToMeters(3.965079); 
 
-		public static class LaunchMotor
-		{
-			/**
-			 * The desired CANSPARKMAX port of the Launch motor.
-			 */
-			public static int CANPort = 7;
-		}
+		public static int CANPort = 8;
+
+		public static double Speed = 0.8;
 
 		public static class IntakeMotor
 		{

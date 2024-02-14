@@ -26,7 +26,7 @@ public class RampLauncherCommand extends Command
     {
         if (RobotBase.isReal()) 
         {
-            this.LaunchMotor = new CANSparkMax(Constants.Launcher.LaunchMotor.CANPort, MotorType.kBrushless);
+            this.LaunchMotor = new CANSparkMax(Constants.Launcher.CANPort, MotorType.kBrushless);
         }
 
         this.SpinUpDuration = spinUpDuration;

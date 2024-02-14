@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.DifferentialDriveAccelerationLimiter;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -21,10 +23,12 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.RobotContainer;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
 
@@ -97,19 +101,34 @@ public class DriveSubsystem extends SubsystemBase
                 Units.lbsToKilograms(Constants.RobotWeight),
                 Constants.Drivetrain.WheelRadius,
                 Constants.Drivetrain.TrackWidth,
-                VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005));
+                null
+                // VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
+            );
         }
 
         setDefaultCommand(Commands.run(() -> 
         {
-            // if (Controllers.DriverController.getXButtonPressed())
-            // {
-            //     GameCommands.GotoSpeakerAndLaunch().schedule();
-            //     return;
-            // }
+            // if (Controllers.DriverController.getXButtonPressed() && RobotContainer.Launcher.IsLoaded())
+            if (Controllers.DriverController.getXButtonPressed())
+            {
+                // Wait until a note is loaded.
+                // Commands
+                //     .parallel(
+                //         RobotContainer.Launcher.RunGroundIntake(),
+                //         RobotContainer.Arm.RunIntake()
+                //     ).until(() -> RobotContainer.Launcher.IsLoaded())
+                //     .andThen(GameCommands.AutoRotateAndLaunch())
+                //     .schedule();
+
+                GameCommands.GotoSpeakerAndLaunch().schedule();
+                return;
+            }
+            if (Controllers.DriverController.getAButtonPressed())
+            {
+                GameCommands.AutoRotateAndLaunch().schedule();
+            }
 
             double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
-
             forward = Math.copySign(Math.pow(forward, 2), forward);
 
             double rotation = Controllers.ApplyDeadzone(Controllers.DriverController.getRightX());
@@ -145,6 +164,9 @@ public class DriveSubsystem extends SubsystemBase
      */
     public void Stop()
     {
+        // Bypass Set()
+        this.Speeds = new ChassisSpeeds(0, 0, 0);
+        
         if (RobotBase.isReal())
         {
             this.LeftLeadMotor.stopMotor();
@@ -158,8 +180,6 @@ public class DriveSubsystem extends SubsystemBase
             this.SimulatedDrive.setInputs(0, 0);
         }
         
-        // Bypass Set()
-        this.Speeds = new ChassisSpeeds(0, 0, 0);
     }
 
     public ChassisSpeeds GetWheelSpeeds()
@@ -232,5 +252,8 @@ public class DriveSubsystem extends SubsystemBase
         builder.addDoubleProperty("FEED Ks", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(v, this.FeedForward.kv, this.FeedForward.ka));
         builder.addDoubleProperty("FEED Kv", () -> this.FeedForward.kv, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, v, this.FeedForward.ka));
         builder.addDoubleProperty("FEED Ka", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, this.FeedForward.kv, v));
+    
+        // TODO: Ignore default command! this.getDefaultCommand()
+        builder.addStringProperty("Blocking Command", () -> CommandScheduler.getInstance().requiring(this) == null ? "None" : CommandScheduler.getInstance().requiring(this).getName(), null);
     }
 }

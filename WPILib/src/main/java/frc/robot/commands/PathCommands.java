@@ -22,6 +22,7 @@ public class PathCommands
 
     public static Command PathToSpeaker()
     {
-        return AutoBuilder.pathfindToPose(new Pose2d(14.751869, 5.557090, Rotation2d.fromDegrees(90)), PathFindingConstraints);
+        return AutoBuilder.pathfindToPose(new Pose2d(12.96, 6.286, Rotation2d.fromDegrees(90)), PathFindingConstraints);
+        // return AutoBuilder.pathfindToPose(new Pose2d(14.751869, 5.557090, Rotation2d.fromDegrees(90)), PathFindingConstraints);
     }    
 }

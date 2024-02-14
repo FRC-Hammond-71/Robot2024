@@ -48,7 +48,8 @@
     "windows": {
       "/SmartDashboard/Field": {
         "Target": {
-          "arrows": false
+          "arrows": false,
+          "style": "Box/Image"
         },
         "bottom": 1476,
         "height": 8.210550308227539,
@@ -81,6 +82,7 @@
           "arrows": false,
           "style": "Track"
         },
+        "units": "meters",
         "width": 16.541748046875,
         "window": {
           "visible": true

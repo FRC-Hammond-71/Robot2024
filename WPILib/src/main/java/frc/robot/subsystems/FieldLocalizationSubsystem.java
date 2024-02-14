@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import java.time.Duration;
 
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -68,7 +70,9 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
     public Pose2d GetEstimatedPose()
     {
-        return RobotBase.isReal() ? this.PoseEstimator.getEstimatedPosition() : RobotContainer.Drive.SimulatedDrive.getPose();
+        var pose = RobotBase.isReal() ? this.PoseEstimator.getEstimatedPosition() : RobotContainer.Drive.SimulatedDrive.getPose();
+        
+        return new Pose2d(pose.getTranslation(), new Rotation2d(MathUtil.inputModulus(pose.getRotation().getRadians(), -Math.PI, Math.PI)));
     }
 
     public void ResetPosition(Pose2d initialPosition)
@@ -170,7 +174,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         builder.addStringProperty("Estimated Position", () -> {
 
             var estimatedPose = this.GetEstimatedPose();
-            return String.format("X: %.2f Y: %.2f Heading: %.2f", estimatedPose.getX(), estimatedPose.getY(), estimatedPose.getRotation().getDegrees());
+            return String.format("X: %.2f Y: %.2f Heading: %.2f", estimatedPose.getX(), estimatedPose.getY(), estimatedPose.getRotation().getRadians());
 
         }, null);
     }
