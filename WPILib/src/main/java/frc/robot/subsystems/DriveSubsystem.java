@@ -120,12 +120,12 @@ public class DriveSubsystem extends SubsystemBase
                 //     .andThen(GameCommands.AutoRotateAndLaunch())
                 //     .schedule();
 
-                GameCommands.GotoSpeakerAndLaunch().schedule();
-                return;
+                // GameCommands.GotoSpeakerAndLaunch().schedule();
+                // return;
             }
             if (Controllers.DriverController.getAButtonPressed())
             {
-                GameCommands.AutoRotateAndLaunch().schedule();
+                // GameCommands.AutoRotateAndLaunch().schedule();
             }
 
             double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
@@ -137,7 +137,7 @@ public class DriveSubsystem extends SubsystemBase
             (
                 forward * Constants.Drivetrain.MaxForwardSpeed,
                 0,
-                Rotation2d.fromDegrees(rotation * 200).getRadians()
+                Rotation2d.fromDegrees(rotation * 360).getRadians()
             ));
         }, this));
     }

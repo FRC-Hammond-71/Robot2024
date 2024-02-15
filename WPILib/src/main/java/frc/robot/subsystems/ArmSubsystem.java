@@ -44,7 +44,7 @@ public class ArmSubsystem extends SubsystemBase
     {
         if (RobotBase.isReal())
         {
-            this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
+            // this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
             this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
             this.LimitSwitch = new DigitalInput(Constants.Arm.RotationLimitSwitchChannel);
@@ -74,9 +74,10 @@ public class ArmSubsystem extends SubsystemBase
             // }
             // this.IntakeMotor.set(Controllers.ShooterController.getAButton() ? 1 : 0);
 
-            double forward = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 10;
+            // double forward = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 10;
             // Will move the target angle by 10 or so.
-            this.SetAngle(this.TargetAngle.plus(Rotation2d.fromDegrees(forward)));
+            // this.SetAngle(this.TargetAngle.plus(Rotation2d.fromDegrees(forward)));
+        
         }, this));
     }
 
@@ -119,8 +120,8 @@ public class ArmSubsystem extends SubsystemBase
 
     public void Stop()
     {
-        if (RobotBase.isReal()) this.Motor.stopMotor();
-        else this.SimulatedArm.setInputVoltage(0);
+        // if (RobotBase.isReal()) this.Motor.stopMotor();
+        // else this.SimulatedArm.setInputVoltage(0);
 
         this.TargetAngle = this.GetActualAngle();
     }
@@ -143,22 +144,22 @@ public class ArmSubsystem extends SubsystemBase
         // }
 
         // Update motors to reach goal.
-        var error = this.GetAngleError();
+        // var error = this.GetAngleError();
 
-        double velocity = 0;
-        if (Math.abs(error.getDegrees()) > Constants.Arm.AllowedAngleError.getDegrees())
-        {
-            // Note sure if ChainDiameter should be multiplied because gearing should include it.
-            // velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 1 : -1)) * Constants.Arm.ChainDiameter * Constants.Arm.Gearing;
-            velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 5 : -5)) * Constants.Arm.Gearing * 6.25;
-        }
+        // double velocity = 0;
+        // if (Math.abs(error.getDegrees()) > Constants.Arm.AllowedAngleError.getDegrees())
+        // {
+        //     // Note sure if ChainDiameter should be multiplied because gearing should include it.
+        //     // velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 1 : -1)) * Constants.Arm.ChainDiameter * Constants.Arm.Gearing;
+        //     velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 5 : -5)) * Constants.Arm.Gearing * 6.25;
+        // }
 
-        double voltage = this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), velocity);
+        // double voltage = this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), velocity);
 
-        // System.out.printf("Actual Angle: %s\n", this.GetActualAngle());
+        // // System.out.printf("Actual Angle: %s\n", this.GetActualAngle());
 
-        if (RobotBase.isReal()) this.Motor.setVoltage(voltage);
-        else this.SimulatedArm.setInputVoltage(voltage);
+        // if (RobotBase.isReal()) this.Motor.setVoltage(voltage);
+        // else this.SimulatedArm.setInputVoltage(voltage);
     }
 
     @Override

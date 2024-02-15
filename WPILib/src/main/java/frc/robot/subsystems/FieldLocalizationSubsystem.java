@@ -46,6 +46,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         if (RobotBase.isReal())
         {
             this.IMU = new AHRS(SPI.Port.kMXP);
+
             this.IMUTimer = new ElapsedTimer(Duration.ofSeconds(1 / this.IMU.getActualUpdateRate()));
             System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
             
@@ -128,7 +129,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
         if (this.IMUTimer.hasElapsed()) 
         {
-            System.out.printf("Updating IMU Measurements at %d ...", this.IMU.getLastSensorTimestamp());
+            // System.out.printf("Updating IMU Measurements at %d ...", this.IMU.getLastSensorTimestamp());
 
             // TODO: Use the difference between the current time and getLastSensorTimestamp() to interpolate veleocity. 
 
@@ -137,6 +138,10 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             double deltaX = this.IMU.getVelocityX() * this.IMUTimer.Timer.get();
             double deltaY = this.IMU.getVelocityY() * this.IMUTimer.Timer.get();
             double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get() / Constants.Drivetrain.TrackCircumference;
+
+            System.out.printf("DeltaX: %.2f DeltaY: %.2f DeltaR: %.2f", deltaX, deltaY, deltaRotation);
+
+            System.out.println(this.IMU.isMoving());
             // For the Robot to do a full rotation it must rotate 3.42917278846 meters.
 
             this.IMUAccumulatedPose = new Pose2d(
@@ -151,7 +156,7 @@ public class FieldLocalizationSubsystem extends SubsystemBase
 
             // TODO: Contribute IMU Accumulated Position to PoseEstimator!
 
-            Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
+            Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);  
         }
 
         Constants.Field.setRobotPose(this.GetEstimatedPose());
@@ -169,6 +174,8 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         if (RobotBase.isReal())
         {
             builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
+
+            builder.addBooleanProperty("Is IMU Connected", () -> this.IMU.isConnected(), null);
         }
 
         builder.addStringProperty("Estimated Position", () -> {
