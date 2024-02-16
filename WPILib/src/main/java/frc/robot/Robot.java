@@ -1,17 +1,24 @@
 package frc.robot;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.RampLauncherCommand;
 
@@ -33,12 +40,10 @@ public class Robot extends TimedRobot
 		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Drive);
 		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Launcher);
 		CommandScheduler.getInstance().registerSubsystem(RobotContainer.FieldLocalization);
-		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Arm);
+		// CommandScheduler.getInstance().registerSubsystem(RobotContainer.Arm);
 
 		SmartDashboard.putData(Constants.Field);
-
-		SmartDashboard.putData(Constants.Field);
-		SmartDashboard.putData(RobotContainer.Arm);
+		// SmartDashboard.putData(RobotContainer.Arm);
 		SmartDashboard.putData(RobotContainer.Drive);
 		SmartDashboard.putData(RobotContainer.Launcher);
 		SmartDashboard.putData(RobotContainer.FieldLocalization);
@@ -121,5 +126,24 @@ public class Robot extends TimedRobot
 		var selectedAuto = this.m_chooser.getSelected();
 		
 		if (selectedAuto == null) return;
+	}
+
+	@Override
+	public void testInit() 
+	{
+		var sysId = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(
+			(voltage) -> {
+				RobotContainer.Drive.OverrideVoltages = Optional.of(new DifferentialDriveWheelVoltages(voltage.baseUnitMagnitude(), voltage.baseUnitMagnitude()));
+			}, 
+			(log) -> 
+			{
+				log.motor("lead-left")
+					.voltage(Units.Volts.of(RobotContainer.Drive.LeftLeadMotor.getBusVoltage()))
+					.linearVelocity(Units.MetersPerSecond.of(RobotContainer.Drive.LeftLeadMotor.getEncoder().getVelocity() / 60))
+					.linearPosition(Units.Meters.of(RobotContainer.Drive.RightLeadMotor.getEncoder().getPosition()));
+
+
+			},
+			RobotContainer.Drive));
 	}
 }

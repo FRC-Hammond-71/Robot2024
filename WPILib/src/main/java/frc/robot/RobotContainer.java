@@ -21,7 +21,7 @@ import frc.robot.commands.GameCommands;
 import frc.robot.commands.RampLauncherCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.FieldLocalizationSubsystem;
+import frc.robot.subsystems.LocalizationSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 
 /**
@@ -39,7 +39,7 @@ public class RobotContainer
 	public final static ArmSubsystem Arm = new ArmSubsystem();
 	public final static DriveSubsystem Drive = new DriveSubsystem();
 	public final static LaunchSubsystem Launcher = new LaunchSubsystem();
-	public final static FieldLocalizationSubsystem FieldLocalization = new FieldLocalizationSubsystem();
+	public final static LocalizationSubsystem FieldLocalization = new LocalizationSubsystem();
 
 	public RobotContainer()
 	{

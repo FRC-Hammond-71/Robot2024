@@ -12,24 +12,19 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.RobotContainer;
 
 public class PathUntilNoteCommand extends FollowPathCommand
 {
-
-    public final Supplier<Boolean> hasNote; 
-
     public PathUntilNoteCommand(
         PathPlannerPath path, Supplier<Pose2d> poseSupplier,
         Supplier<ChassisSpeeds> speedsSupplier,
-        Supplier<Boolean> hasNote,
         Consumer<ChassisSpeeds> outputRobotRelative,
         PathFollowingController controller, ReplanningConfig replanningConfig, BooleanSupplier shouldFlipPath,
         Subsystem... requirements) 
     {
         super(path, poseSupplier, speedsSupplier, outputRobotRelative, controller, replanningConfig, shouldFlipPath,
                 requirements);
-
-        this.hasNote = hasNote;
     }
 
     @Override
@@ -43,6 +38,6 @@ public class PathUntilNoteCommand extends FollowPathCommand
     public boolean isFinished() 
     {
         // Continue path until Robot has note or path has been finished!
-        return this.hasNote.get() || super.isFinished();
+        return RobotContainer.Launcher.IsLoaded() || super.isFinished();
     }   
 }

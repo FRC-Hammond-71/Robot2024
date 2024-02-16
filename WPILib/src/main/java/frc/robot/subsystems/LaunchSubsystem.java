@@ -29,7 +29,7 @@ public class LaunchSubsystem extends SubsystemBase {
 
     private SlewRateLimiter LaunchMotorRateLimiter =  new SlewRateLimiter(1, 1, 0);
 
-    private PIDController GroundIntakePID = new PIDController(0.1, 0, 0.05);
+    // private PIDController GroundIntakePID = new PIDController(0.1, 0, 0.05);
 
     // private PIDController LaunchMotorPID = new PIDController(0, 0, 0);
 
@@ -43,7 +43,7 @@ public class LaunchSubsystem extends SubsystemBase {
     {
         super();
 
-        SmartDashboard.putData("Launch Ground PID", GroundIntakePID);
+        // SmartDashboard.putData("Launch Ground PID", GroundIntakePID);
 
         if (RobotBase.isReal()) 
         {
@@ -62,7 +62,11 @@ public class LaunchSubsystem extends SubsystemBase {
 
         setDefaultCommand(Commands.run(() -> 
         {
-            this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
+
+            if (RobotBase.isReal())
+            {
+                this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
+            }
 
         }, this));
     }
@@ -86,17 +90,17 @@ public class LaunchSubsystem extends SubsystemBase {
         if (RobotBase.isReal())
         {
             this.GroundIntakeMotor.stopMotor();
-            // this.LaunchMotor.stopMotor();
             // this.IntakeMotor.stopMotor();
+            // this.LaunchMotor.stopMotor();
         }
     }
 
     @Override
     public void periodic() 
     {
-        if (RobotBase.isReal())
+        if (RobotBase.isSimulation())
         {
-            // this.GroundIntakeMotor.set(this.GroundIntakePID.calculate(this.GroundIntakeMotor.get(), this.GroundIntakeSpeed));
+            return;
         }
     }
     

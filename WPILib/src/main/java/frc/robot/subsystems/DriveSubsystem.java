@@ -1,11 +1,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import java.util.Optional;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.DifferentialDriveAccelerationLimiter;
+import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -62,6 +66,8 @@ public class DriveSubsystem extends SubsystemBase
 
     private ChassisSpeeds Speeds = new ChassisSpeeds();
 
+    public Optional<DifferentialDriveWheelVoltages> OverrideVoltages =  Optional.empty();
+
     public DriveSubsystem()
     {
         super();
@@ -108,21 +114,6 @@ public class DriveSubsystem extends SubsystemBase
 
         setDefaultCommand(Commands.run(() -> 
         {
-            // if (Controllers.DriverController.getXButtonPressed() && RobotContainer.Launcher.IsLoaded())
-            if (Controllers.DriverController.getXButtonPressed())
-            {
-                // Wait until a note is loaded.
-                // Commands
-                //     .parallel(
-                //         RobotContainer.Launcher.RunGroundIntake(),
-                //         RobotContainer.Arm.RunIntake()
-                //     ).until(() -> RobotContainer.Launcher.IsLoaded())
-                //     .andThen(GameCommands.AutoRotateAndLaunch())
-                //     .schedule();
-
-                // GameCommands.GotoSpeakerAndLaunch().schedule();
-                // return;
-            }
             if (Controllers.DriverController.getAButtonPressed())
             {
                 // GameCommands.AutoRotateAndLaunch().schedule();
@@ -191,6 +182,7 @@ public class DriveSubsystem extends SubsystemBase
     }
 
     public ChassisSpeeds GetSpeeds() { return this.Speeds; }
+
     /**
      * Sets the Drivetrain to move at the specified rate.
      * @return The clamped or rate-limited speeds.
@@ -203,6 +195,13 @@ public class DriveSubsystem extends SubsystemBase
     
     protected void UpdateMotors()
     {
+        if (this.OverrideVoltages.isPresent())
+        {
+            this.LeftLeadMotor.set(this.OverrideVoltages.get().left);
+            this.RightLeadMotor.set(this.OverrideVoltages.get().right);
+            return;
+        }
+
         // Apply rate-limits
         var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
             this.Speeds.vxMetersPerSecond,
@@ -239,21 +238,27 @@ public class DriveSubsystem extends SubsystemBase
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("Left Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
-            builder.addDoubleProperty("Right Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
+            // builder.addDoubleProperty("Left Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
+            // builder.addDoubleProperty("Right Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
         }
 
-        builder.addDoubleProperty("Desired Wheel Speed", () -> this.Speeds.vxMetersPerSecond, null);
-        builder.addDoubleProperty("Desired Wheel Rotation", () -> this.Speeds.omegaRadiansPerSecond, null);
+        builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
+        builder.addDoubleProperty("Desired Rotation", () -> Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond), null);
 
-        builder.addDoubleProperty("Actual Wheel Speed", () -> this.GetWheelSpeeds().vxMetersPerSecond, null);
-        builder.addDoubleProperty("Actual Wheel Rotation", () -> Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
+        builder.addDoubleProperty("Actual Speed", () -> this.GetWheelSpeeds().vxMetersPerSecond, null);
+        builder.addDoubleProperty("Actual Rotation", () -> Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
 
-        builder.addDoubleProperty("FEED Ks", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(v, this.FeedForward.kv, this.FeedForward.ka));
-        builder.addDoubleProperty("FEED Kv", () -> this.FeedForward.kv, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, v, this.FeedForward.ka));
-        builder.addDoubleProperty("FEED Ka", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, this.FeedForward.kv, v));
+        // builder.addDoubleProperty("FEED Ks", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(v, this.FeedForward.kv, this.FeedForward.ka));
+        // builder.addDoubleProperty("FEED Kv", () -> this.FeedForward.kv, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, v, this.FeedForward.ka));
+        // builder.addDoubleProperty("FEED Ka", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(this.FeedForward.ks, this.FeedForward.kv, v));
     
-        // TODO: Ignore default command! this.getDefaultCommand()
-        builder.addStringProperty("Blocking Command", () -> CommandScheduler.getInstance().requiring(this) == null ? "None" : CommandScheduler.getInstance().requiring(this).getName(), null);
+        builder.addStringProperty("Blocking Command", () -> {
+
+            var requiredCommand = CommandScheduler.getInstance().requiring(this);
+            boolean isDefault = requiredCommand == this.getDefaultCommand();
+           
+            return requiredCommand != null && !isDefault ? requiredCommand.getName() :  "None";
+
+        }, null);
     }
 }

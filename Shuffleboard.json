@@ -11,147 +11,134 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "3,0": {
+          "3,4": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Blocking Command",
+              "_title": "Blocking Command",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LocalizationSubsystem/Estimated Position",
+              "_title": "LocalizationSubsystem/Estimated Position",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,0": {
             "size": [
               3,
               3
             ],
             "content": {
               "_type": "Graph",
-              "_source0": "network_table:///SmartDashboard/Right Motor RPS",
-              "_source1": "network_table:///SmartDashboard/PID LEFT ERROR",
-              "_source2": "network_table:///SmartDashboard/PID RIGHT ERROR",
-              "_title": "PID Adjustment",
-              "_glyph": 148,
-              "_showGlyph": false,
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Speed",
+              "_source1": "network_table:///SmartDashboard/DriveSubsystem/Desired Speed",
+              "_title": "Speed",
+              "_glyph": 17,
+              "_showGlyph": true,
               "Graph/Visible time": 30.0,
               "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": true,
-              "Y-axis/Upper bound": 1.0,
-              "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul"
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 3.0,
+              "Y-axis/Lower bound": -3.0,
+              "Y-axis/Unit": "M/s",
+              "Visible data/SmartDashboard/DriveSubsystem/Actual Speed": true,
+              "Visible data/SmartDashboard/DriveSubsystem/Desired Speed": true
             }
           },
-          "0,0": {
+          "3,0": {
             "size": [
-              3,
-              6
+              2,
+              3
             ],
             "content": {
-              "_type": "Subsystem Layout",
-              "_title": "Movement",
-              "_glyph": 538,
+              "_type": "List Layout",
+              "_title": "IMU",
+              "_glyph": 149,
               "_showGlyph": true,
               "Layout/Label position": "BOTTOM",
               "_children": [
                 {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Estimated Position",
-                  "_title": "Estimated Position",
+                  "_type": "Number Bar",
+                  "_source0": "network_table:///SmartDashboard/IMU - DeltaX",
+                  "_title": "Delta X",
                   "_glyph": 148,
-                  "_showGlyph": false
-                },
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/IMU",
-                  "_title": "IMU",
-                  "_glyph": 148,
-                  "_showGlyph": false
-                },
-                {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Desired Movement",
-                  "_title": "Desired Movement",
-                  "_glyph": 148,
-                  "_showGlyph": false
-                },
-                {
-                  "_type": "Grid Layout",
-                  "_title": "Motor Usage",
-                  "_glyph": 149,
                   "_showGlyph": false,
-                  "Layout/Number of columns": 2,
-                  "Layout/Number of rows": 2,
-                  "Layout/Label position": "BOTTOM",
-                  "_children": {
-                    "0,0": {
-                      "_type": "Grid Layout",
-                      "_title": "Left",
-                      "_glyph": 149,
-                      "_showGlyph": false,
-                      "Layout/Number of columns": 1,
-                      "Layout/Number of rows": 3,
-                      "Layout/Label position": "BOTTOM",
-                      "_children": {
-                        "0,0": {
-                          "_type": "Simple Dial",
-                          "_source0": "network_table:///SmartDashboard/Left Speed (M/s)",
-                          "_title": "Actual Speed (M/s)",
-                          "_glyph": 148,
-                          "_showGlyph": false,
-                          "Range/Min": -10.0,
-                          "Range/Max": 10.0,
-                          "Visuals/Show value": true
-                        },
-                        "0,1": {
-                          "_type": "Simple Dial",
-                          "_source0": "network_table:///SmartDashboard/Left Desired Speed (M/s)",
-                          "_title": "Desired Speed (M/s)",
-                          "_glyph": 148,
-                          "_showGlyph": false,
-                          "Range/Min": -10.0,
-                          "Range/Max": 10.0,
-                          "Visuals/Show value": true
-                        }
-                      }
-                    },
-                    "1,0": {
-                      "_type": "Grid Layout",
-                      "_title": "Right",
-                      "_glyph": 149,
-                      "_showGlyph": false,
-                      "Layout/Number of columns": 1,
-                      "Layout/Number of rows": 3,
-                      "Layout/Label position": "BOTTOM",
-                      "_children": {
-                        "0,0": {
-                          "_type": "Simple Dial",
-                          "_source0": "network_table:///SmartDashboard/Right Speed (M/s)",
-                          "_title": "Actual Speed (M/s)",
-                          "_glyph": 148,
-                          "_showGlyph": false,
-                          "Range/Min": -10.0,
-                          "Range/Max": 10.0,
-                          "Visuals/Show value": true
-                        },
-                        "0,1": {
-                          "_type": "Simple Dial",
-                          "_source0": "network_table:///SmartDashboard/Right Desired Speed (M/s)",
-                          "_title": "Desired Speed (M/s)",
-                          "_glyph": 148,
-                          "_showGlyph": false,
-                          "Range/Min": -10.0,
-                          "Range/Max": 10.0,
-                          "Visuals/Show value": true
-                        }
-                      }
-                    }
-                  }
+                  "Range/Min": -3.0,
+                  "Range/Max": 3.0,
+                  "Range/Center": 0.0,
+                  "Visuals/Num tick marks": 5,
+                  "Visuals/Show text": true,
+                  "Visuals/Orientation": "HORIZONTAL"
                 },
                 {
-                  "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/Input Blocking Command",
-                  "_title": "Input Blocking Command",
+                  "_type": "Number Bar",
+                  "_source0": "network_table:///SmartDashboard/IMU - DeltaY",
+                  "_title": "Delta Y",
                   "_glyph": 148,
-                  "_showGlyph": false
+                  "_showGlyph": false,
+                  "Range/Min": -3.0,
+                  "Range/Max": 3.0,
+                  "Range/Center": 0.0,
+                  "Visuals/Num tick marks": 5,
+                  "Visuals/Show text": true,
+                  "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Number Bar",
+                  "_source0": "network_table:///SmartDashboard/IMU - Delta Rotation",
+                  "_title": "Delta Rotation",
+                  "_glyph": 148,
+                  "_showGlyph": false,
+                  "Range/Min": -360.0,
+                  "Range/Max": 360.0,
+                  "Range/Center": 0.0,
+                  "Visuals/Num tick marks": 5,
+                  "Visuals/Show text": true,
+                  "Visuals/Orientation": "HORIZONTAL"
                 }
               ]
             }
           },
-          "6,0": {
+          "0,3": {
             "size": [
-              5,
+              3,
               3
+            ],
+            "content": {
+              "_type": "Graph",
+              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Rotation",
+              "_source1": "network_table:///SmartDashboard/DriveSubsystem/Actual Rotation",
+              "_title": "Rotation",
+              "_glyph": 31,
+              "_showGlyph": true,
+              "Graph/Visible time": 5.0,
+              "Graph/X-axis auto scrolling": true,
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 360.0,
+              "Y-axis/Lower bound": -360.0,
+              "Y-axis/Unit": "Degrees",
+              "Visible data/SmartDashboard/DriveSubsystem/Actual Rotation": true,
+              "Visible data/SmartDashboard/DriveSubsystem/Desired Rotation": true
+            }
+          },
+          "8,0": {
+            "size": [
+              2,
+              1
             ],
             "content": {
               "_type": "Field",
@@ -161,42 +148,18 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false,
-              "Colors/path": "#FFFFFFFF",
-              "Colors/Target": "#FFFFFFFF",
-              "Colors/robot path pose": "#FFFFFFFF",
-              "Colors/target pose": "#FFFFFFFF"
+              "Visuals/Show Outside Circles": false
             }
           },
-          "3,3": {
+          "10,0": {
             "size": [
-              3,
-              3
-            ],
-            "content": {
-              "_type": "Graph",
-              "_source0": "network_table:///SmartDashboard/Left Motor Inaccuracy",
-              "_source1": "network_table:///SmartDashboard/Right Motor Inaccuracy",
-              "_title": "Following Fault",
-              "_glyph": 148,
-              "_showGlyph": true,
-              "Graph/Visible time": 5.0,
-              "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": false,
-              "Y-axis/Upper bound": 20.0,
-              "Y-axis/Lower bound": 0.0,
-              "Y-axis/Unit": "ul"
-            }
-          },
-          "7,3": {
-            "size": [
-              3,
-              3
+              1,
+              1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Desired Speeds",
-              "_title": "Desired Speeds",
+              "_source0": "network_table:///SmartDashboard/LaunchSubsystem/Launcher Speed",
+              "_title": "LaunchSubsystem/Launcher Speed",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -208,244 +171,8 @@
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/limelight_PipelineName",
-              "_title": "limelight_PipelineName",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/limelight_Interface",
-              "_title": "limelight_Interface",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/limelight_Stream",
-              "_title": "limelight_Stream",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Target Angle",
-              "_title": "ArmSubsystem/Target Angle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "10,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Actual Angle",
-              "_title": "ArmSubsystem/Actual Angle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Holding",
-              "_title": "ArmSubsystem/Holding",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "6,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/ArmSubsystem/Error",
-              "_title": "ArmSubsystem/Error",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "10,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Speed",
-              "_title": "DriveSubsystem/Desired Speed",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Rotation",
-              "_title": "DriveSubsystem/Desired Rotation",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/LauncherSubsystem/Launcher Speed",
-              "_title": "LauncherSubsystem/Launcher Speed",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "6,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/FieldLocalizationSubsystem/Estimated Position",
-              "_title": "FieldLocalizationSubsystem/Estimated Position",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ks",
-              "_title": "DriveSubsystem/FEED Ks",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Kv",
-              "_title": "DriveSubsystem/FEED Kv",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/FEED Ka",
-              "_title": "DriveSubsystem/FEED Ka",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "10,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Wheel Speed",
-              "_title": "DriveSubsystem/Desired Wheel Speed",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Desired Wheel Rotation",
-              "_title": "DriveSubsystem/Desired Wheel Rotation",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Speed",
-              "_title": "DriveSubsystem/Actual Wheel Speed",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "6,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/DriveSubsystem/Actual Wheel Rotation",
-              "_title": "DriveSubsystem/Actual Wheel Rotation",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,6": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/New Auto",
-              "_title": "New Auto",
+              "_source0": "network_table:///SmartDashboard/LaunchSubsystem/Intake Speed",
+              "_title": "LaunchSubsystem/Intake Speed",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -615,9 +342,9 @@
     }
   ],
   "windowGeometry": {
-    "x": 953.0,
-    "y": 0.0,
-    "width": 974.0,
-    "height": 1159.0
+    "x": -8.0,
+    "y": -8.0,
+    "width": 1936.0,
+    "height": 1168.0
   }
 }

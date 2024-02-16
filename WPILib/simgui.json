@@ -41,6 +41,7 @@
       "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
       "/SmartDashboard/Auto choices": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Launch Ground PID": "PIDController",
       "/SmartDashboard/New Auto": "Command",
       "/SmartDashboard/Note 1": "Command",
       "/SmartDashboard/Speaker Auto": "Command"
@@ -131,6 +132,19 @@
       "window": {
         "visible": false
       }
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "height": 338
+        }
+      ]
     }
   }
 }

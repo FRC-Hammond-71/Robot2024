@@ -2,18 +2,26 @@ package frc.robot.subsystems;
 
 import java.time.Duration;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -27,7 +35,7 @@ import frc.robot.RobotContainer;
  * 
  * <p>The <code>LocalizationSubsystem</code> is required to be updated after the <code>DriveSubsystem</code>!</p>
  */
-public class FieldLocalizationSubsystem extends SubsystemBase 
+public class LocalizationSubsystem extends SubsystemBase 
 {    
     // https://www.chiefdelphi.com/t/considering-the-intricacies-of-autonomous-pathfinding-algorithms-and-the-myriad-of-sensor-fusion-techniques-in-frc-how-might-one-harmonize-the-celestial-dance-of-encoder-ticks-and-gyroscopic-precession/441692/28
     private DifferentialDrivePoseEstimator PoseEstimator;
@@ -39,7 +47,17 @@ public class FieldLocalizationSubsystem extends SubsystemBase
     private ElapsedTimer IMUTimer;
     private Pose2d IMUAccumulatedPose = new Pose2d();
 
-    public FieldLocalizationSubsystem()
+    // -------
+    // Cameras
+    // -------
+    private PhotonCamera LauncherCamera;
+    // private PhotonCamera LauncherCamera, IntakeCamera;
+
+    // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
+    private PhotonPoseEstimator LauncherCameraPoseEstimator;
+    // private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
+
+    public LocalizationSubsystem()
     {
         super();
         
@@ -56,6 +74,21 @@ public class FieldLocalizationSubsystem extends SubsystemBase
                 new Pose2d(),
                 VecBuilder.fill(0.02, 0.02, 0.01),
                 VecBuilder.fill(0.1, 0.1, 0.1));
+
+            this.LauncherCamera = new PhotonCamera("launcher");
+            // this.IntakeCamera = new PhotonCamera("intake");
+
+            // TODO: Update offsets.
+            // this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
+            //     AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(), 
+            //     PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+            //     this.IntakeCamera,
+            //     new Transform3d());
+
+            this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(), 
+                PoseStrategy.MULTI_TAG_PNP_ON_RIO, 
+                this.LauncherCamera,
+                new Transform3d());
         }
 
         setDefaultCommand(Commands.run(() -> 
@@ -88,27 +121,12 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         }
     }
 
-    public boolean HasVisionPosition()
-    {
-        return LimelightHelpers.getTV("limelight");
-    }
-    public VisionPoseMeasurement GetVisionPosition()
-    {
-        if (!this.HasVisionPosition()) return null;
-
-        var pose = LimelightHelpers.getBotPose2d_wpiBlue("limelight");
-
-        return pose.getX() == 0 && pose.getY() == 0 && pose.getRotation().getDegrees() == 0 ? null : new VisionPoseMeasurement(
-            pose,
-            Timer.getFPGATimestamp() - LimelightHelpers.getLatency_Capture("limelight") - LimelightHelpers.getLatency_Pipeline("limelight")
-        );
-    }
-
     @Override
     public void periodic() 
     {        
         if (!RobotBase.isReal()) 
         {
+            // If Robot is being simulated, do not do actual calculations and exit.
             Constants.Field.setRobotPose(this.GetEstimatedPose());
             return;
         };
@@ -116,16 +134,20 @@ public class FieldLocalizationSubsystem extends SubsystemBase
         var wheelPositions = RobotContainer.Drive.GetWheelPositions();
         this.PoseEstimator.update(Rotation2d.fromDegrees(this.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
         
-        if (HasVisionPosition())
+        //#region Vision Measurements
+        var optionalFieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+        if (optionalFieldPoseFromLauncher.isPresent())
         {
-            System.out.println("Updating Vision Measurements...");
+            var fieldPoseResult = optionalFieldPoseFromLauncher.get();
+            var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
 
-            var visionMeasurement = this.GetVisionPosition();
-            
-            this.PoseEstimator.addVisionMeasurement(visionMeasurement.Pose, visionMeasurement.BeganComputingAt);
+            this.PoseEstimator.addVisionMeasurement(
+                fieldPose2d, 
+                fieldPoseResult.timestampSeconds);
 
-            Constants.Field.getObject("Robot - Vision").setPose(visionMeasurement.Pose);
+            Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPose2d);
         }
+        //#endregion
 
         if (this.IMUTimer.hasElapsed()) 
         {
@@ -139,10 +161,9 @@ public class FieldLocalizationSubsystem extends SubsystemBase
             double deltaY = this.IMU.getVelocityY() * this.IMUTimer.Timer.get();
             double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get() / Constants.Drivetrain.TrackCircumference;
 
-            System.out.printf("DeltaX: %.2f DeltaY: %.2f DeltaR: %.2f", deltaX, deltaY, deltaRotation);
-
-            System.out.println(this.IMU.isMoving());
-            // For the Robot to do a full rotation it must rotate 3.42917278846 meters.
+            SmartDashboard.putNumber("IMU - DeltaX", deltaX);
+            SmartDashboard.putNumber("IMU - DeltaY", deltaY);
+            SmartDashboard.putNumber("IMU - Delta Rotation", deltaRotation);
 
             this.IMUAccumulatedPose = new Pose2d(
                 this.IMUAccumulatedPose.getX() + deltaX,
