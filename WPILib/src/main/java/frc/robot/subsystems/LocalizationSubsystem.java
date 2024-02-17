@@ -40,6 +40,9 @@ public class LocalizationSubsystem extends SubsystemBase
     // https://www.chiefdelphi.com/t/considering-the-intricacies-of-autonomous-pathfinding-algorithms-and-the-myriad-of-sensor-fusion-techniques-in-frc-how-might-one-harmonize-the-celestial-dance-of-encoder-ticks-and-gyroscopic-precession/441692/28
     private DifferentialDrivePoseEstimator PoseEstimator;
 
+    // https://www.team254.com/resources/
+    // https://drive.google.com/drive/folders/1tZ6xdn-xzFpcAzW3VB5ttzQwuhUmvPJB
+
     // -------
     // Sensors
     // -------
@@ -50,12 +53,10 @@ public class LocalizationSubsystem extends SubsystemBase
     // -------
     // Cameras
     // -------
-    private PhotonCamera LauncherCamera;
-    // private PhotonCamera LauncherCamera, IntakeCamera;
+    private PhotonCamera LauncherCamera, IntakeCamera;
 
     // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
-    private PhotonPoseEstimator LauncherCameraPoseEstimator;
-    // private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
+    private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
 
     public LocalizationSubsystem()
     {
@@ -76,7 +77,7 @@ public class LocalizationSubsystem extends SubsystemBase
                 VecBuilder.fill(0.1, 0.1, 0.1));
 
             this.LauncherCamera = new PhotonCamera("Sauron");
-            // this.IntakeCamera = new PhotonCamera("intake");
+            this.IntakeCamera = new PhotonCamera("Roz");
 
             // TODO: Update offsets.
             // this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
@@ -146,6 +147,19 @@ public class LocalizationSubsystem extends SubsystemBase
                 fieldPoseResult.timestampSeconds);
 
             Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPose2d);
+        }
+
+        var optionalFieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+        if (optionalFieldPoseFromIntake.isPresent())
+        {
+            var fieldPoseResult = optionalFieldPoseFromIntake.get();
+            var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
+
+            this.PoseEstimator.addVisionMeasurement(
+                fieldPose2d, 
+                fieldPoseResult.timestampSeconds);
+
+            Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPose2d);
         }
         //#endregion
 

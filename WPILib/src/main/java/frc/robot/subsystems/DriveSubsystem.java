@@ -50,7 +50,7 @@ public class DriveSubsystem extends SubsystemBase
 
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
-    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
+    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 0.4, 0.53799);
 
     private MedianFilter InputFilter = new MedianFilter(5);
 
