@@ -31,7 +31,7 @@ public class FaceAtCommand extends Command {
 		this.Target = position;
 
 		addRequirements(RobotContainer.Drive);
-		addRequirements(RobotContainer.FieldLocalization);
+		addRequirements(RobotContainer.Localization);
 	}
 
 	/**
@@ -39,12 +39,12 @@ public class FaceAtCommand extends Command {
 	 */
 	public Rotation2d GetTargetHeading()
 	{
-		return Target.minus(RobotContainer.FieldLocalization.GetEstimatedPose().getTranslation()).getAngle();
+		return Target.minus(RobotContainer.Localization.GetEstimatedPose().getTranslation()).getAngle();
 	}
 
 	public Rotation2d GetHeadingError()
 	{
-		return this.GetTargetHeading().minus(RobotContainer.FieldLocalization.GetEstimatedPose().getRotation());
+		return this.GetTargetHeading().minus(RobotContainer.Localization.GetEstimatedPose().getRotation());
 	}
 
 	@Override
@@ -64,11 +64,11 @@ public class FaceAtCommand extends Command {
 	@Override
 	public void execute()
 	{		
-		var output = this.OutputController.calculate(RobotContainer.FieldLocalization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());		
+		var output = this.OutputController.calculate(RobotContainer.Localization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());		
 		// Hard-limit, just in case something goes wrong with the calculation! 
 		output = Math.max(Math.min(Math.PI, output), -Math.PI);
 		
-		System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output, RobotContainer.FieldLocalization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());
+		System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output, RobotContainer.Localization.GetEstimatedPose().getRotation().getRadians(), this.GetTargetHeading().getRadians());
 
 		RobotContainer.Drive.Set(
 			new ChassisSpeeds(0, 0, output));

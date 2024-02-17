@@ -136,31 +136,31 @@ public class LocalizationSubsystem extends SubsystemBase
         this.PoseEstimator.update(Rotation2d.fromDegrees(this.IMU.getAngle()), wheelPositions.leftMeters, wheelPositions.rightMeters);
         
         //#region Vision Measurements
-        var optionalFieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
-        if (optionalFieldPoseFromLauncher.isPresent())
-        {
-            var fieldPoseResult = optionalFieldPoseFromLauncher.get();
-            var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
+        // var optionalFieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+        // if (optionalFieldPoseFromLauncher.isPresent())
+        // {
+        //     var fieldPoseResult = optionalFieldPoseFromLauncher.get();
+        //     var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
 
-            this.PoseEstimator.addVisionMeasurement(
-                fieldPose2d, 
-                fieldPoseResult.timestampSeconds);
+        //     this.PoseEstimator.addVisionMeasurement(
+        //         fieldPose2d, 
+        //         fieldPoseResult.timestampSeconds);
 
-            Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPose2d);
-        }
+        //     Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPose2d);
+        // }
 
-        var optionalFieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
-        if (optionalFieldPoseFromIntake.isPresent())
-        {
-            var fieldPoseResult = optionalFieldPoseFromIntake.get();
-            var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
+        // var optionalFieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+        // if (optionalFieldPoseFromIntake.isPresent())
+        // {
+        //     var fieldPoseResult = optionalFieldPoseFromIntake.get();
+        //     var fieldPose2d = fieldPoseResult.estimatedPose.toPose2d();
 
-            this.PoseEstimator.addVisionMeasurement(
-                fieldPose2d, 
-                fieldPoseResult.timestampSeconds);
+        //     this.PoseEstimator.addVisionMeasurement(
+        //         fieldPose2d, 
+        //         fieldPoseResult.timestampSeconds);
 
-            Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPose2d);
-        }
+        //     Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPose2d);
+        // }
         //#endregion
 
         if (this.IMUTimer.hasElapsed()) 

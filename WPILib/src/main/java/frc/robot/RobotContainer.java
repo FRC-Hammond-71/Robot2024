@@ -39,7 +39,7 @@ public class RobotContainer
 	public final static ArmSubsystem Arm = new ArmSubsystem();
 	public final static DriveSubsystem Drive = new DriveSubsystem();
 	public final static LaunchSubsystem Launcher = new LaunchSubsystem();
-	public final static LocalizationSubsystem FieldLocalization = new LocalizationSubsystem();
+	public final static LocalizationSubsystem Localization = new LocalizationSubsystem();
 
 	public RobotContainer()
 	{

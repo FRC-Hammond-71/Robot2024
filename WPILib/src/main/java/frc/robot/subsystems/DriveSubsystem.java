@@ -23,6 +23,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -50,7 +51,7 @@ public class DriveSubsystem extends SubsystemBase
 
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
-    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 0.4, 0.53799);
+    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
 
     private MedianFilter InputFilter = new MedianFilter(5);
 
@@ -92,14 +93,13 @@ public class DriveSubsystem extends SubsystemBase
             
             this.LeftLeadMotor.getEncoder().setPosition(0);
             this.RightLeadMotor.getEncoder().setPosition(0);
-            this.LeftLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-            this.RightLeadMotor.getEncoder().setPositionConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-            this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-            this.RightLeadMotor.getEncoder().setVelocityConversionFactor(Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.LeftLeadMotor.getEncoder().setPositionConversionFactor(-Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.RightLeadMotor.getEncoder().setPositionConversionFactor(-Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(-Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+            this.RightLeadMotor.getEncoder().setVelocityConversionFactor(-Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
         }
         else
         {
-            // this.SimulatedLeftEncoder = new EncoderSim(this.Left)
             this.SimulatedDrive = new DifferentialDrivetrainSim(
                 DCMotor.getNEO(2),
                 Constants.Drivetrain.WheelGearing,
@@ -140,6 +140,36 @@ public class DriveSubsystem extends SubsystemBase
             RobotBase.isReal() ? this.RightLeadMotor.getEncoder().getPosition() : this.SimulatedDrive.getRightPositionMeters());
     }
 
+    /**
+     * @return Left wheel velocity in M/s
+     */
+    public double GetLeftWheelVelocity()
+    {
+        return (this.LeftLeadMotor.getEncoder().getVelocity() + this.LeftFollowMotor.getEncoder().getVelocity()) / 2 / 60;
+    }
+    /**
+     * @return Right wheel velocity in M/s
+     */
+    public double GetRightWheelVelocity()
+    {
+        return (this.RightLeadMotor.getEncoder().getVelocity() + this.RightFollowMotor.getEncoder().getVelocity()) / 2 / 60;
+    }
+
+    /**
+     * @return Left wheel velocity in M/s
+     */
+    public double GetLeftWheelPosition()
+    {
+        return (this.LeftLeadMotor.getEncoder().getPosition() + this.LeftFollowMotor.getEncoder().getPosition()) / 2;
+    }
+    /**
+     * @return Right wheel velocity in M/s
+     */
+    public double GetRightWheelPosition()
+    {
+        return (this.RightLeadMotor.getEncoder().getPosition() + this.RightFollowMotor.getEncoder().getPosition()) / 2;
+    }
+
     public void ResetEncoders()
     {
         if (RobotBase.isReal())
@@ -157,6 +187,7 @@ public class DriveSubsystem extends SubsystemBase
     {
         // Bypass Set()
         this.Speeds = new ChassisSpeeds(0, 0, 0);
+        this.OverrideVoltages = Optional.empty();
         
         if (RobotBase.isReal())
         {
@@ -176,8 +207,8 @@ public class DriveSubsystem extends SubsystemBase
     public ChassisSpeeds GetWheelSpeeds()
     {
         return this.Kinematics.toChassisSpeeds(new DifferentialDriveWheelSpeeds(
-            RobotBase.isReal() ? this.LeftLeadMotor.getEncoder().getVelocity() / 60 : this.SimulatedDrive.getLeftVelocityMetersPerSecond(),
-            RobotBase.isReal() ? this.RightLeadMotor.getEncoder().getVelocity() / 60 : this.SimulatedDrive.getRightVelocityMetersPerSecond()
+            RobotBase.isReal() ? this.GetLeftWheelVelocity() : this.SimulatedDrive.getLeftVelocityMetersPerSecond(),
+            RobotBase.isReal() ? this.GetRightWheelVelocity() : this.SimulatedDrive.getRightVelocityMetersPerSecond()
         ));
     }
 
@@ -190,6 +221,11 @@ public class DriveSubsystem extends SubsystemBase
     public void Set(ChassisSpeeds speeds)
     {
         this.Speeds = speeds;
+        this.UpdateMotors();
+    }
+    public void Set(Optional<DifferentialDriveWheelVoltages> voltages)
+    {
+        this.OverrideVoltages = voltages;
         this.UpdateMotors();
     }
     
@@ -238,14 +274,15 @@ public class DriveSubsystem extends SubsystemBase
     {
         if (RobotBase.isReal())
         {
-            // builder.addDoubleProperty("Left Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
-            // builder.addDoubleProperty("Right Encoder Position", () -> this.LeftLeadMotor.getEncoder().getPosition(), null);
+            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
+            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
         }
 
         builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
         builder.addDoubleProperty("Desired Rotation", () -> Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond), null);
 
-        builder.addDoubleProperty("Actual Speed", () -> this.GetWheelSpeeds().vxMetersPerSecond, null);
+        // builder.addDoubleProperty("Actual Speed", () -> this.GetWheelSpeeds().vxMetersPerSecond, null);
+        // builder.addDoubleProperty("Actual Speed", () -> this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation", () -> Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
 
         // builder.addDoubleProperty("FEED Ks", () -> this.FeedForward.ks, (v) -> this.FeedForward = new SimpleMotorFeedforward(v, this.FeedForward.kv, this.FeedForward.ka));

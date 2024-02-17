@@ -18,7 +18,7 @@ public class GameCommands
 
     public static Command AutoRotateAndLaunch()
     {
-        var firingSolution = LauncherFiringSolution.CalculateToSpeaker(RobotContainer.FieldLocalization.GetEstimatedPose());
+        var firingSolution = LauncherFiringSolution.CalculateToSpeaker(RobotContainer.Localization.GetEstimatedPose());
 
         System.out.printf("Firing at %.2f Degrees\n", firingSolution.ArmAngle.getDegrees());
 
