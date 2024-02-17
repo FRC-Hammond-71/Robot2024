@@ -75,7 +75,7 @@ public class LocalizationSubsystem extends SubsystemBase
                 VecBuilder.fill(0.02, 0.02, 0.01),
                 VecBuilder.fill(0.1, 0.1, 0.1));
 
-            this.LauncherCamera = new PhotonCamera("launcher");
+            this.LauncherCamera = new PhotonCamera("Sauron");
             // this.IntakeCamera = new PhotonCamera("intake");
 
             // TODO: Update offsets.

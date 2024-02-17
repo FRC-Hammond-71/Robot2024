@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.RampLauncherCommand;
 
@@ -132,18 +134,26 @@ public class Robot extends TimedRobot
 	public void testInit() 
 	{
 		var sysId = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism(
-			(voltage) -> {
-				RobotContainer.Drive.OverrideVoltages = Optional.of(new DifferentialDriveWheelVoltages(voltage.baseUnitMagnitude(), voltage.baseUnitMagnitude()));
-			}, 
+			(voltage) -> 
+			{
+				// Apply voltages to motors.
+				RobotContainer.Drive.OverrideVoltages = 
+					Optional.of(new DifferentialDriveWheelVoltages(voltage.baseUnitMagnitude(), voltage.baseUnitMagnitude()));
+			},
 			(log) -> 
 			{
-				log.motor("lead-left")
+				log.motor("left")
 					.voltage(Units.Volts.of(RobotContainer.Drive.LeftLeadMotor.getBusVoltage()))
 					.linearVelocity(Units.MetersPerSecond.of(RobotContainer.Drive.LeftLeadMotor.getEncoder().getVelocity() / 60))
+					.linearPosition(Units.Meters.of(RobotContainer.Drive.LeftLeadMotor.getEncoder().getPosition()));
+
+				log.motor("right")
+					.voltage(Units.Volts.of(RobotContainer.Drive.RightLeadMotor.getBusVoltage()))
+					.linearVelocity(Units.MetersPerSecond.of(RobotContainer.Drive.RightLeadMotor.getEncoder().getVelocity() / 60))
 					.linearPosition(Units.Meters.of(RobotContainer.Drive.RightLeadMotor.getEncoder().getPosition()));
-
-
 			},
 			RobotContainer.Drive));
+
+		sysId.dynamic(Direction.kForward).andThen(Commands.run(() -> System.out.println("Finished!"))).schedule();
 	}
 }
