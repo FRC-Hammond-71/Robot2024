@@ -48,9 +48,28 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "Speaker Left": {
+          "arrows": false,
+          "length": 0.38100001215934753,
+          "weight": 2.0,
+          "width": 0.38100001215934753
+        },
+        "Speaker Right": {
+          "arrows": false,
+          "length": 0.38100001215934753,
+          "selectable": false,
+          "weight": 2.0,
+          "width": 0.38100001215934753
+        },
         "Target": {
           "arrows": false,
-          "style": "Box/Image"
+          "color": [
+            0.022539416328072548,
+            0.3284313678741455,
+            0.20247581601142883,
+            255.0
+          ],
+          "style": "Hidden"
         },
         "bottom": 1476,
         "height": 8.210550308227539,
@@ -109,6 +128,9 @@
       "open": true
     },
     "Server": {
+      "Publishers": {
+        "open": true
+      },
       "open": true
     },
     "visible": true
@@ -142,9 +164,13 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 338
+          "height": 295,
+          "viewTime": 8.999996185302734
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

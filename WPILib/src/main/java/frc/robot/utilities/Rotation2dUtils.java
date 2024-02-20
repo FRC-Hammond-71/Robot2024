@@ -8,4 +8,8 @@ public class Rotation2dUtils
     {
         return rotation.getDegrees() > lower.getDegrees() && rotation.getDegrees() < upper.getDegrees();
     }
+    public static boolean InBounds(Rotation2d rotation, Rotation2d bound)
+    {
+        return InBounds(rotation, bound.times(-1), bound);
+    }
 }

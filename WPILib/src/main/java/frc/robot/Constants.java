@@ -24,24 +24,6 @@ public final class Constants
 		public static Translation3d SpeakerPosition = new Translation3d(16.194929, 5.517298, 0);
 	}
 
-	public static class Controllers
-	{
-		/**
-		 * The driver port to be used when instantiating a controller.
-		 */
-		public static final int DriverPort = 0;
-
-		/**
-		 * The arm operator port to be used when instantiating a controller.
-		 */
-		public static final int ArmOperatorPort = 1;
-
-		/**
-		 * The required distance before any input will be registered.
-		 */
-		public static final double Deadzone = 0.08;
-	}
-
 	public static class Drivetrain 
 	{
 		// https://www.revrobotics.com/rev-21-1650/

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -9,64 +10,68 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.KalmanFilterLatencyCompensator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
-import frc.robot.LauncherFiringSolution;
 import frc.robot.Robot;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
+import frc.robot.math.LauncherFiringSolution;
 
-public class LaunchSubsystem extends SubsystemBase {
+public class LaunchSubsystem extends RobotSubsystem<Robot>
+{
 
     // https://www.revrobotics.com/rev-21-1650/
     private CANSparkMax GroundIntakeMotor, IntakeMotor, LaunchMotor;
 
-    private SlewRateLimiter LaunchMotorRateLimiter =  new SlewRateLimiter(1, 1, 0);
+    // private SlewRateLimiter LaunchMotorRateLimiter =  new SlewRateLimiter(1, 1, 0);
 
     // private PIDController GroundIntakePID = new PIDController(0.1, 0, 0.05);
 
     // private PIDController LaunchMotorPID = new PIDController(0, 0, 0);
 
-
-
     public double LaunchSpeed = 0;
     
     public double GroundIntakeSpeed = 0;
 
-    public LaunchSubsystem() 
+    @Override
+    protected void initializeReal()
     {
-        super();
+        // this.LaunchMotor = new CANSparkMax(Constants.Launcher.CANPort, MotorType.kBrushless);
+        this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
+        // this.IntakeMotor = new CANSparkMax(Constants.Launcher.IntakeMotor.CANPort, MotorType.kBrushless);
 
-        // SmartDashboard.putData("Launch Ground PID", GroundIntakePID);
+        // this.LaunchMotor.setInverted(false);
+        // this.IntakeMotor.setInverted(false);
+        this.GroundIntakeMotor.setInverted(true);
 
-        if (RobotBase.isReal()) 
-        {
-            // this.LaunchMotor = new CANSparkMax(Constants.Launcher.CANPort, MotorType.kBrushless);
-            this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
-            // this.IntakeMotor = new CANSparkMax(Constants.Launcher.IntakeMotor.CANPort, MotorType.kBrushless);
+        // this.LaunchMotor.setIdleMode(IdleMode.kCoast);
+        // this.IntakeMotor.setIdleMode(IdleMode.kCoast);
+        this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
+    }
 
-            // this.LaunchMotor.setInverted(false);
-            // this.IntakeMotor.setInverted(false);
-            this.GroundIntakeMotor.setInverted(true);
-
-            // this.LaunchMotor.setIdleMode(IdleMode.kCoast);
-            // this.IntakeMotor.setIdleMode(IdleMode.kCoast);
-            this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
-        }
+    public LaunchSubsystem(Robot robot) 
+    {
+        super(robot);
 
         setDefaultCommand(Commands.run(() -> 
         {
-
-            if (RobotBase.isReal())
+            if (Controllers.DriverController.getYButtonPressed())
             {
-                this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
+                GameCommands.AutoRotateAndLaunch().schedule();
             }
+
+            // User-interactions should only occur in Teleop mode! 
+            if (!DriverStation.isTeleop() || RobotBase.isSimulation()) return;
+
+            this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
 
         }, this));
     }
@@ -92,15 +97,6 @@ public class LaunchSubsystem extends SubsystemBase {
             this.GroundIntakeMotor.stopMotor();
             // this.IntakeMotor.stopMotor();
             // this.LaunchMotor.stopMotor();
-        }
-    }
-
-    @Override
-    public void periodic() 
-    {
-        if (RobotBase.isSimulation())
-        {
-            return;
         }
     }
     
@@ -132,7 +128,6 @@ public class LaunchSubsystem extends SubsystemBase {
     public void initSendable(SendableBuilder builder) 
     {
         builder.addDoubleProperty("Launcher Speed", () -> this.Speed(), null);
-        
         builder.addDoubleProperty("Intake Speed", () -> RobotBase.isReal() ? this.GroundIntakeMotor.get() : 0, null);
     }
 }

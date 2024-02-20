@@ -8,9 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class ControllerCommands 
+public class ControllerCommands
 {
-    public static Command RumbleController(XboxController controller, RumbleType rumbleType, double intensity, Duration duration)
+    public static Command RumbleController(XboxController controller, RumbleType rumbleType, double intensity,
+            Duration duration)
     {
         return Commands
             .runOnce(() -> controller.setRumble(rumbleType, intensity))

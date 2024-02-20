@@ -9,6 +9,8 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -18,12 +20,39 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.IPeriodic;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.RampLauncherCommand;
+import frc.robot.commands.UntilNoteLoadedCommand;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LaunchSubsystem;
+import frc.robot.subsystems.LocalizationSubsystem;
 
 public class Robot extends TimedRobot 
-{	
-	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
+{		
+	public final SendableChooser<Boolean> UseAssistedNoteIntake = new SendableChooser<>();
+
+	public static ArmSubsystem Arm;
+	public static DriveSubsystem Drive;
+	public static LaunchSubsystem Launcher;
+	public static LocalizationSubsystem Localization;
+
+	public Robot()
+	{
+		System.out.println("Waiting for connection to Driver Station...");
+		
+		while (!DriverStation.waitForDsConnection(10))
+		{
+			System.out.println("Retrying connection to Driver Station...");
+		}
+		System.out.println("Connected to Driver Station!");
+		
+		Arm = new ArmSubsystem(this);
+		Drive = new DriveSubsystem(this);
+		Launcher = new LaunchSubsystem(this);
+		Localization = new LocalizationSubsystem(this);
+	}
 
 	@Override
 	public void simulationInit() 
@@ -36,29 +65,30 @@ public class Robot extends TimedRobot
 	{
 		System.out.println("Robot has initialized!");	
 
-		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Drive);
-		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Launcher);
-		CommandScheduler.getInstance().registerSubsystem(RobotContainer.Localization);
-		// CommandScheduler.getInstance().registerSubsystem(RobotContainer.Arm);
+		IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
+		IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
 		SmartDashboard.putData(Constants.Field);
-		// SmartDashboard.putData(RobotContainer.Arm);
-		SmartDashboard.putData(RobotContainer.Drive);
-		SmartDashboard.putData(RobotContainer.Launcher);
-		SmartDashboard.putData(RobotContainer.Localization);
+		// SmartDashboard.putData(Arm);
+		SmartDashboard.putData(Drive);
+		SmartDashboard.putData(Launcher);
+		SmartDashboard.putData(Localization);
+
+		SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
 		
 		AutoBuilder.configureRamsete(
-			RobotContainer.Localization::GetEstimatedPose,
-			(pose) -> RobotContainer.Localization.ResetPosition(pose),
-			() -> RobotContainer.Drive.GetSpeeds(),
-			(targetSpeeds) -> RobotContainer.Drive.Set(targetSpeeds),
+			Localization::GetEstimatedPose,
+			(pose) -> Localization.ResetPosition(pose),
+			() -> Drive.GetSpeeds(),
+			(targetSpeeds) -> Drive.Set(targetSpeeds),
 			new ReplanningConfig(true, false),
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
-			RobotContainer.Drive);
+			Drive);
 			
 		NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
 		NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
+		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
 
 		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
 			// Do whatever you want with the pose here
@@ -78,13 +108,21 @@ public class Robot extends TimedRobot
 		});
 	}
 
+	public void Stop()
+	{
+		CommandScheduler.getInstance().cancelAll();
+		Drive.Stop();
+		Arm.Stop();
+		Launcher.Stop();
+	}
+
 	@Override
 	public void robotPeriodic() 
 	{
 		// Emergency stop on Driver Controller.
 		if (Controllers.DriverController.getPOV() == 180 || Controllers.ShooterController.getPOV() == 180) 
 		{
-			this.EmergencyStop();
+			this.Stop();
 			return;
 		}
 
@@ -92,39 +130,38 @@ public class Robot extends TimedRobot
 		CommandScheduler.getInstance().run();
 	}
 
-	public void EmergencyStop()
-	{
-		CommandScheduler.getInstance().cancelAll();
-
-		RobotContainer.Drive.Stop();
-	}
-
 	@Override
-	public void teleopInit() 
+	public void teleopInit()
 	{
+		Drive.setDefaultCommand(Commands.run(() -> 
+		{
+            // if (Controllers.DriverController.getAButtonPressed())
+            // {
+            //     System.out.println("Path finding to Speaker!");
+            //     PathCommands.PathToSpeaker().schedule();
+            // }
+            // if (Controllers.DriverController.getBButtonPressed())
+            // {
+            //     System.out.println("Path finding to Amp!");
+            //     PathCommands.PathToAmplifier().schedule();
+            // }
+            // if (Controllers.DriverController.getXButtonPressed())
+            // {
+            //     System.out.println("Path finding to Stage!");
+            //     PathCommands.PathToStage().schedule();
+            // }
+
+            Drive.SetArcade(
+				Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY()), 
+				Controllers.ApplyDeadzone(Controllers.DriverController.getRightX()));
+		}));	
 	}
-
 	@Override
-	public void teleopPeriodic() 
+	public void teleopExit()
 	{
-		// double forward = Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY());
-
-		// RobotContainer.Drive.LeftLeadMotor.set(forward);
-		// RobotContainer.Drive.RightLeadMotor.set(forward);
-	}
-
-	@Override
-	public void teleopExit() 
-	{
-
-	}
-
-	@Override
-	public void autonomousPeriodic() 
-	{
-		var selectedAuto = this.m_chooser.getSelected();
-		
-		if (selectedAuto == null) return;
+		Drive.removeDefaultCommand();
+		// removeDefaultCommand() does not unschedule / cancel the command.
+		CommandScheduler.getInstance().cancel(Drive.getDefaultCommand());
 	}
 
 	@Override
@@ -142,32 +179,33 @@ public class Robot extends TimedRobot
 				System.out.println(voltage);
 
 				// Apply voltages to motors.
-				RobotContainer.Drive.Set(Optional.of(new DifferentialDriveWheelVoltages(-voltage.magnitude(), -voltage.magnitude())));
+				Drive.Set(Optional.of(new DifferentialDriveWheelVoltages(-voltage.magnitude(), -voltage.magnitude())));
 			},
 			(log) ->
 			{
 				log.motor("flywheel")
-					.voltage(Units.Volts.of(RobotContainer.Drive.LeftLeadMotor.getBusVoltage()))
-					.linearVelocity(Units.MetersPerSecond.of(RobotContainer.Drive.LeftLeadMotor.getEncoder().getVelocity() / 60))
-					.linearPosition(Units.Meters.of(RobotContainer.Drive.LeftLeadMotor.getEncoder().getPosition()));
+					.voltage(Units.Volts.of(Drive.LeftLeadMotor.getBusVoltage()))
+					.linearVelocity(Units.MetersPerSecond.of(Drive.LeftLeadMotor.getEncoder().getVelocity() / 60))
+					.linearPosition(Units.Meters.of(Drive.LeftLeadMotor.getEncoder().getPosition()));
 			},
-			RobotContainer.Drive));
+			this.Drive));
 
 		sysId
 			.quasistatic(Direction.kForward)
 			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
 			.andThen(sysId.quasistatic(Direction.kReverse))
-			.andThen(Commands.runOnce(() -> System.out.println("Going Forward!")))
+			.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
 			.andThen(sysId.dynamic(Direction.kForward))
 			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
 			.andThen(sysId.dynamic(Direction.kReverse))
-			.finallyDo(() -> RobotContainer.Drive.Stop())
+			.finallyDo(() -> Drive.Stop())
 			.schedule();
 	}
 
+	
 	@Override
-	public void testExit() 
+	public void disabledInit()
 	{
-		CommandScheduler.getInstance().cancelAll();
+		this.Stop();
 	}
 }

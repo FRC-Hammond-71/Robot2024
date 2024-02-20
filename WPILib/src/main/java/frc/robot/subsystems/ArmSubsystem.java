@@ -17,22 +17,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.Robot;
 
-public class ArmSubsystem extends SubsystemBase 
+public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot> 
 {
-    // ----------
-    // Simulation
-    // ----------
     private SingleJointedArmSim SimulatedArm;
 
     // https://www.revrobotics.com/rev-21-1651/
     private CANSparkMax Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
-    
     private DutyCycleEncoder Encoder;
+
     private DigitalInput LimitSwitch;
 
     private ArmFeedforward PitchFeedForward = new ArmFeedforward(0.1, 0.2833340973, 0.1);
@@ -40,45 +39,32 @@ public class ArmSubsystem extends SubsystemBase
     public boolean PitchLimitsEnabled = true;
     private Rotation2d TargetAngle = Constants.Arm.MaxAngle;
 
-    public ArmSubsystem() 
+    public ArmSubsystem(Robot robot) 
     {
-        if (RobotBase.isReal())
-        {
-            // this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
+        super(robot);
+    }
 
-            this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
-            this.LimitSwitch = new DigitalInput(Constants.Arm.RotationLimitSwitchChannel);
-        } 
-        else 
-        {
-            this.SimulatedArm = new SingleJointedArmSim(
-                DCMotor.getNEO(1),
-                Constants.Arm.Gearing, 
-                Constants.Arm.MomentOfInertia, 
-                Units.inchesToMeters(11), 
-                0, 
-                Constants.Arm.MaxAngle.getRadians(), 
-                true, 
-                Constants.Arm.MaxAngle.getRadians());
-        }
+    @Override
+    protected void initializeReal()
+    {
+        this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
-        setDefaultCommand(Commands.run(() -> 
-        {
-            // if (Controllers.ShooterController.getBButtonPressed())
-            // {
-            //     // Debugging
-            //     System.out.println("Beginning Arm Calibration!");
+        this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
+        this.LimitSwitch = new DigitalInput(Constants.Arm.RotationLimitSwitchChannel);
+    }
 
-            //     this.RunCalibration().schedule();
-            //     return;
-            // }
-            // this.IntakeMotor.set(Controllers.ShooterController.getAButton() ? 1 : 0);
-
-            // double forward = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 10;
-            // Will move the target angle by 10 or so.
-            // this.SetAngle(this.TargetAngle.plus(Rotation2d.fromDegrees(forward)));
-        
-        }, this));
+    @Override
+    protected void initializeSimulated()
+    {
+        this.SimulatedArm = new SingleJointedArmSim(
+            DCMotor.getNEO(1),
+            Constants.Arm.Gearing, 
+            Constants.Arm.MomentOfInertia, 
+            Units.inchesToMeters(11), 
+            0, 
+            Constants.Arm.MaxAngle.getRadians(), 
+            true, 
+            Constants.Arm.MaxAngle.getRadians());
     }
 
     public Rotation2d GetActualAngle() 
@@ -136,48 +122,24 @@ public class ArmSubsystem extends SubsystemBase
     {
         // https://www.chiefdelphi.com/t/understanding-feedforward-v-feedback-and-how-their-calculated/186889/10
 
-        // TODO: Allow directions which converge with the limits!
-        // if (this.PitchLimitsEnabled && this.GetActualAngle().getDegrees() <= 0
-        //         || this.GetActualAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees()) {
-        //     this.Stop();
-        //     // System.out.println("REACHED PITCH LIMIT!");
-        // }
+        var error = this.GetAngleError();
 
-        // Update motors to reach goal.
-        // var error = this.GetAngleError();
-
-        // double velocity = 0;
-        // if (Math.abs(error.getDegrees()) > Constants.Arm.AllowedAngleError.getDegrees())
-        // {
-        //     // Note sure if ChainDiameter should be multiplied because gearing should include it.
-        //     // velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 1 : -1)) * Constants.Arm.ChainDiameter * Constants.Arm.Gearing;
-        //     velocity = Units.degreesToRadians((error.getDegrees() > 0 ? 5 : -5)) * Constants.Arm.Gearing * 6.25;
-        // }
-
-        // double voltage = this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), velocity);
-
-        // // System.out.printf("Actual Angle: %s\n", this.GetActualAngle());
-
-        // if (RobotBase.isReal()) this.Motor.setVoltage(voltage);
-        // else this.SimulatedArm.setInputVoltage(voltage);
+        if (Math.abs(error.getDegrees()) > Constants.Arm.AllowedAngleError.getDegrees())
+        {
+            this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), error.getRadians() * 0.25));
+        }
+        else 
+        {
+            this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), 0));
+        }
     }
 
     @Override
-    public void periodic() 
+    protected void realPeriodic()
     {
-        // if (RobotBase.isReal() && this.LimitSwitch.get())
-        // {
-        //     // Limit switch is at the "forward-most" angle of the Robot.
-
-        //     this.Encoder.reset();
-        //     this.Encoder.setPositionOffset(360 / Constants.Arm.MaxAngle.getDegrees());
-        //     this.Stop();
-        // }
-        // else
-        // {
-        //     this.UpdateMotors();
-        // }
+        this.UpdateMotors();
     }
+
     @Override
     public void simulationPeriodic() 
     {
