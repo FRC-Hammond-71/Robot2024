@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,21 +29,22 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     private SingleJointedArmSim SimulatedArm;
 
     // https://www.revrobotics.com/rev-21-1651/
-    private CANSparkMax Motor;
+    public CANSparkMax Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
     private DutyCycleEncoder Encoder;
 
-    private DigitalInput LimitSwitch;
+    // private ArmFeedforward PitchFeedForward = new ArmFeedforward(0.1, 0.2833340973, 0.1);
+    private ArmFeedforward PitchFeedForward = new ArmFeedforward(0.1, 0, 0.1);
 
-    private ArmFeedforward PitchFeedForward = new ArmFeedforward(0.1, 0.2833340973, 0.1);
-
-    public boolean PitchLimitsEnabled = true;
     private Rotation2d TargetAngle = Constants.Arm.MaxAngle;
 
     public ArmSubsystem(Robot robot) 
     {
         super(robot);
+
+        this.Motor.setIdleMode(IdleMode.kBrake);
+        
     }
 
     @Override
@@ -50,7 +53,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
         this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
-        this.LimitSwitch = new DigitalInput(Constants.Arm.RotationLimitSwitchChannel);
+
+        this.Encoder.reset();
     }
 
     @Override
@@ -106,8 +110,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public void Stop()
     {
-        // if (RobotBase.isReal()) this.Motor.stopMotor();
-        // else this.SimulatedArm.setInputVoltage(0);
+        if (RobotBase.isReal()) this.Motor.stopMotor();
+        else this.SimulatedArm.setInputVoltage(0);
 
         this.TargetAngle = this.GetActualAngle();
     }
@@ -137,7 +141,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void realPeriodic()
     {
-        this.UpdateMotors();
+        System.out.println(this.Encoder.get());
+        // this.UpdateMotors();
     }
 
     @Override
@@ -150,38 +155,17 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     public void initSendable(SendableBuilder builder) 
     {
-        builder.addDoubleProperty("Target Angle", 
-            () -> this.TargetAngle.getDegrees(), 
-            (deg) -> this.SetAngle(Rotation2d.fromDegrees(deg)));
+        // builder.addDoubleProperty("Target Angle", 
+        //     () -> this.TargetAngle.getDegrees(), 
+        //     (deg) -> this.SetAngle(Rotation2d.fromDegrees(deg)));
 
-        builder.addDoubleProperty("Actual Angle", () -> this.GetActualAngle().getDegrees(), null);
+        builder.addDoubleProperty("Angle", () -> this.GetActualAngle().getDegrees(), null);
 
         builder.addBooleanProperty("Holding", this::IsHolding, null);
         
-        builder.addDoubleProperty("Error", 
-            () -> Constants.Arm.AllowedAngleError.getDegrees(), 
-            (deg) -> Constants.Arm.AllowedAngleError = Rotation2d.fromDegrees(deg));
-
-    }
-
-    public Command RunCalibration() 
-    {
-        return new FunctionalCommand(
-            // Initialize
-            () -> this.PitchLimitsEnabled = false,
-            // Execute
-            () -> this.SetAngle(Constants.Arm.MaxAngle),
-            // On End
-            (interrupted) ->
-            {
-                this.PitchLimitsEnabled = true;
-
-                // For debugging
-                System.out.println("Arm calibration complete!");
-            },
-            // Is Finished
-            () -> this.LimitSwitch.get(),
-            this);
+        // builder.addDoubleProperty("Error", 
+        //     () -> Constants.Arm.AllowedAngleError.getDegrees(), 
+        //     (deg) -> Constants.Arm.AllowedAngleError = Rotation2d.fromDegrees(deg));
     }
 
     /**

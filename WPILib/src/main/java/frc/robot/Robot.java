@@ -5,14 +5,17 @@ import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.IPeriodic;
 import frc.robot.commands.GameCommands;
-import frc.robot.commands.RampLauncherCommand;
+import frc.robot.commands.PathCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -69,7 +72,7 @@ public class Robot extends TimedRobot
 		IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
 		SmartDashboard.putData(Constants.Field);
-		// SmartDashboard.putData(Arm);
+		SmartDashboard.putData(Arm);
 		SmartDashboard.putData(Drive);
 		SmartDashboard.putData(Launcher);
 		SmartDashboard.putData(Localization);
@@ -87,7 +90,7 @@ public class Robot extends TimedRobot
 			
 		NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
-		NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
+		// NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
 		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
 
 		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
@@ -119,6 +122,16 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotPeriodic() 
 	{
+		if (Controllers.DriverController.getBackButtonPressed())
+		{
+			var driveCommand = CommandScheduler.getInstance().requiring(Drive);
+
+			if (driveCommand != null && driveCommand != Drive.getDefaultCommand())
+			{
+				CommandScheduler.getInstance().cancel(driveCommand);
+			}
+		}
+
 		// Emergency stop on Driver Controller.
 		if (Controllers.DriverController.getPOV() == 180 || Controllers.ShooterController.getPOV() == 180) 
 		{
@@ -135,6 +148,11 @@ public class Robot extends TimedRobot
 	{
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
+			if (Controllers.DriverController.getLeftBumperPressed() && RobotBase.isSimulation())
+			{
+				Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
+			}
+ 
             // if (Controllers.DriverController.getAButtonPressed())
             // {
             //     System.out.println("Path finding to Speaker!");
@@ -145,23 +163,35 @@ public class Robot extends TimedRobot
             //     System.out.println("Path finding to Amp!");
             //     PathCommands.PathToAmplifier().schedule();
             // }
-            // if (Controllers.DriverController.getXButtonPressed())
-            // {
-            //     System.out.println("Path finding to Stage!");
-            //     PathCommands.PathToStage().schedule();
-            // }
 
-            Drive.SetArcade(
-				Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY()), 
-				Controllers.ApplyDeadzone(Controllers.DriverController.getRightX()));
-		}));	
+            // Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
+		}, Drive));
+		
+		Launcher.setDefaultCommand(Commands.run(() -> 
+		{
+			if (RobotBase.isSimulation()) return;
+
+			Launcher.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.35 : 0);
+			// Launcher.LaunchMotor.set(Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY() * 0.5));
+		}, Launcher));
+
+		Arm.setDefaultCommand(Commands.run(() ->
+		{
+			if (RobotBase.isSimulation()) return;
+
+			Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY() * 0.1));
+		}, Arm));
 	}
 	@Override
 	public void teleopExit()
 	{
-		Drive.removeDefaultCommand();
-		// removeDefaultCommand() does not unschedule / cancel the command.
+		CommandScheduler.getInstance().cancel(Launcher.getDefaultCommand());
 		CommandScheduler.getInstance().cancel(Drive.getDefaultCommand());
+		CommandScheduler.getInstance().cancel(Arm.getDefaultCommand());
+		// removeDefaultCommand() does not unschedule / cancel the command.
+		Launcher.removeDefaultCommand();
+		Drive.removeDefaultCommand();
+		Arm.removeDefaultCommand();
 	}
 
 	@Override

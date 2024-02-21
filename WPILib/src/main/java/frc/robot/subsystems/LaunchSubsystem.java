@@ -29,7 +29,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 {
 
     // https://www.revrobotics.com/rev-21-1650/
-    private CANSparkMax GroundIntakeMotor, IntakeMotor, LaunchMotor;
+    public CANSparkMax GroundIntakeMotor, IntakeMotor, LaunchMotor;
 
     // private SlewRateLimiter LaunchMotorRateLimiter =  new SlewRateLimiter(1, 1, 0);
 
@@ -60,20 +60,6 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     public LaunchSubsystem(Robot robot) 
     {
         super(robot);
-
-        setDefaultCommand(Commands.run(() -> 
-        {
-            if (Controllers.DriverController.getYButtonPressed())
-            {
-                GameCommands.AutoRotateAndLaunch().schedule();
-            }
-
-            // User-interactions should only occur in Teleop mode! 
-            if (!DriverStation.isTeleop() || RobotBase.isSimulation()) return;
-
-            this.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.40 : 0);
-
-        }, this));
     }
 
     /**

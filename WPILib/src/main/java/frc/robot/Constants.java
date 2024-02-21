@@ -77,16 +77,14 @@ public final class Constants
 
 	public static class GroundIntake
 	{
-		public static int CANPort = 5;
+		public static int CANPort = 6;
 	}
 
 	public static class Arm
 	{
-		public static int PitchMotorCANPort = 8;
+		public static int PitchMotorCANPort = 5;
 
 		public static int PitchEncoderChannel = 0;
-
-		public static int RotationLimitSwitchChannel = 1;
 
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(110); 
 

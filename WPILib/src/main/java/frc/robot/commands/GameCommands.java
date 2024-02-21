@@ -27,8 +27,8 @@ public class GameCommands
 
 		// Consider checking if a note is loaded? If not, command will end?
 		return new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError)
-				// .andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
-				// .andThen(Robot.Launcher.Launch())
+				.andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
+				.andThen(Robot.Launcher.Launch())
 				.withName("AutoRotateAndLaunch");
 	}
 

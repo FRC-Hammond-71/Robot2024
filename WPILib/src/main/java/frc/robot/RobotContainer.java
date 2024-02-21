@@ -4,25 +4,8 @@
 
 package frc.robot;
 
-import java.time.Duration;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.GameCommands;
-import frc.robot.commands.RampLauncherCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.LaunchSubsystem;
-import frc.robot.subsystems.LocalizationSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since

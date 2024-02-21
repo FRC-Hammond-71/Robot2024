@@ -232,9 +232,10 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     }
     public void SetArcade(double xSpeed, double zRotation)
     {
-        xSpeed = Controllers.ApplyDeadzone(xSpeed);
         xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+        xSpeed = Controllers.ApplyDeadzone(xSpeed);
 
+        zRotation = Math.copySign(zRotation * zRotation, zRotation);
         zRotation = Controllers.ApplyDeadzone(zRotation);
 
         this.Set(new ChassisSpeeds(

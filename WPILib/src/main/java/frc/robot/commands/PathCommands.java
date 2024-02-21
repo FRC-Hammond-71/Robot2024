@@ -45,14 +45,14 @@ public class PathCommands
         // return AutoBuilder.pathfindToPose(Field.GetAllianceAmplifierPose().plus(new Transform2d(-2, 0, new Rotation2d())), PathFindingConstraints);
     }
 
-    public static Command PathToStage()
-    {
-        return AutoBuilder.pathfindThenFollowPath(
-                new PathPlannerPath(
-                        PathPlannerPath.bezierFromPoses(
-                                FieldGeometry.GetStageLineupPose(),
-                                FieldGeometry.GetStagePose()),
-                        new PathConstraints(0.7, 2, Constants.Drivetrain.MaxRotationalSpeed.getRadians(), Constants.Drivetrain.MaxRotationalSpeed.getRadians()), new GoalEndState(0, FieldGeometry.GetStagePose().getRotation())),
-                PathFindingConstraints);
-    }
+//     public static Command PathToStage()
+//     {
+//         return AutoBuilder.pathfindThenFollowPath(
+//                 new PathPlannerPath(
+//                         PathPlannerPath.bezierFromPoses(
+//                                 FieldGeometry.GetStageLineupPose(),
+//                                 FieldGeometry.GetStagePose()),
+//                         new PathConstraints(0.7, 2, Constants.Drivetrain.MaxRotationalSpeed.getRadians(), Constants.Drivetrain.MaxRotationalSpeed.getRadians()), new GoalEndState(0, FieldGeometry.GetStagePose().getRotation())),
+//                 PathFindingConstraints);
+//     }
 }

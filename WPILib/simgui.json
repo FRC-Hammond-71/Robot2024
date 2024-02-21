@@ -39,6 +39,7 @@
       "/Shuffleboard/Movement/PIDController[1]": "PIDController",
       "/Shuffleboard/Movement/PIDController[2]": "PIDController",
       "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
+      "/SmartDashboard/Assisted Note Intake": "String Chooser",
       "/SmartDashboard/Auto choices": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Launch Ground PID": "PIDController",
@@ -132,8 +133,7 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   },
   "NetworkTables View": {
     "visible": false
