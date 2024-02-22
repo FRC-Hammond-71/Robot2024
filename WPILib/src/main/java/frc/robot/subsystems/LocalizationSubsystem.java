@@ -237,21 +237,21 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
     protected void UpdatePoseEstimationUsingVision()
     {
-        var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
-        if (fieldPoseFromLauncher.isPresent())
-        {
-            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+        // var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+        // if (fieldPoseFromLauncher.isPresent())
+        // {
+        //     this.ApplyVisionMeasurement(fieldPoseFromLauncher);
 
-            Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
-        }
+        //     Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
+        // }
 
-        var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
-        if (fieldPoseFromIntake.isPresent())
-        {
-            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+        // var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+        // if (fieldPoseFromIntake.isPresent())
+        // {
+        //     this.ApplyVisionMeasurement(fieldPoseFromLauncher);
 
-            Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
-        }
+        //     Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
+        // }
     }
 
     @Override

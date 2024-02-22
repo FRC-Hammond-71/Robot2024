@@ -153,33 +153,38 @@ public class Robot extends TimedRobot
 				Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
 			}
  
-            // if (Controllers.DriverController.getAButtonPressed())
-            // {
-            //     System.out.println("Path finding to Speaker!");
-            //     PathCommands.PathToSpeaker().schedule();
-            // }
-            // if (Controllers.DriverController.getBButtonPressed())
-            // {
-            //     System.out.println("Path finding to Amp!");
-            //     PathCommands.PathToAmplifier().schedule();
-            // }
+            if (Controllers.DriverController.getAButtonPressed())
+            {
+                System.out.println("Path finding to Speaker!");
+                PathCommands.PathToSpeaker().schedule();
+            }
+            if (Controllers.DriverController.getBButtonPressed())
+            {
+                System.out.println("Path finding to Amp!");
+                PathCommands.PathToAmplifier().schedule();
+            }
 
-            // Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
+            Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
+
 		}, Drive));
 		
 		Launcher.setDefaultCommand(Commands.run(() -> 
 		{
 			if (RobotBase.isSimulation()) return;
 
-			Launcher.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.35 : 0);
-			// Launcher.LaunchMotor.set(Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY() * 0.5));
+			Launcher.SetLaunchSpeed(Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()));
+
+			// Launcher.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.3 : 0);
+			// Launcher.IntakeMotor.set(Controllers.DriverController.getYButton() ? 0.3 : 0);
+
 		}, Launcher));
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
 			if (RobotBase.isSimulation()) return;
 
-			Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.DriverController.getLeftY() * 0.1));
+			Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()) * 0.2);
+
 		}, Arm));
 	}
 	@Override

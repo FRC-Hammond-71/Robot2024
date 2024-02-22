@@ -41,10 +41,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public ArmSubsystem(Robot robot) 
     {
-        super(robot);
-
-        this.Motor.setIdleMode(IdleMode.kBrake);
-        
+        super(robot);        
     }
 
     @Override
@@ -53,6 +50,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
         this.Encoder = new DutyCycleEncoder(Constants.Arm.PitchEncoderChannel);
+
+        this.Motor.setIdleMode(IdleMode.kBrake);
 
         this.Encoder.reset();
     }
@@ -141,7 +140,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void realPeriodic()
     {
-        System.out.println(this.Encoder.get());
+        System.out.println(this.Encoder.getAbsolutePosition());
         // this.UpdateMotors();
     }
 

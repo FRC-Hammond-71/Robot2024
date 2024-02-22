@@ -31,7 +31,7 @@ public final class Constants
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxForwardSpeed = 2.5;
+		public static double MaxForwardSpeed = 1;
 
 		/**
 		 * The maximum rate-of-change of forward speeds in (M/s).
