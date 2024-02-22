@@ -77,7 +77,11 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData(Launcher);
 		SmartDashboard.putData(Localization);
 
+		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
+
 		SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
+
+		SmartDashboard.putData("Arm PID", Arm.ArmPID);
 		
 		AutoBuilder.configureRamsete(
 			Localization::GetEstimatedPose,
@@ -153,16 +157,21 @@ public class Robot extends TimedRobot
 				Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
 			}
  
-            if (Controllers.DriverController.getAButtonPressed())
-            {
-                System.out.println("Path finding to Speaker!");
-                PathCommands.PathToSpeaker().schedule();
-            }
-            if (Controllers.DriverController.getBButtonPressed())
-            {
-                System.out.println("Path finding to Amp!");
-                PathCommands.PathToAmplifier().schedule();
-            }
+            // if (Controllers.DriverController.getAButtonPressed())
+            // {
+            //     System.out.println("Path finding to Speaker!");
+            //     PathCommands.PathToSpeaker().schedule();
+            // }
+            // if (Controllers.DriverController.getBButtonPressed())
+            // {
+            //     System.out.println("Path finding to Amp!");
+            //     PathCommands.PathToAmplifier().schedule();
+            // }
+
+			if (Controllers.DriverController.getAButtonPressed())
+			{
+				GameCommands.GotoSpeakerAndLaunch().schedule();
+			}
 
             Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
 
@@ -171,6 +180,11 @@ public class Robot extends TimedRobot
 		Launcher.setDefaultCommand(Commands.run(() -> 
 		{
 			if (RobotBase.isSimulation()) return;
+
+			if (Controllers.ShooterController.getAButtonPressed())
+			{
+				GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(10).schedule();
+			}
 
 			Launcher.SetLaunchSpeed(Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()));
 

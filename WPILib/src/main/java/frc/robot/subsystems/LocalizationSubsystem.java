@@ -102,8 +102,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         {
             if (RobotBase.isSimulation()) return;
 
-            // Update field-position vision at 60 Hz
-            this.UpdatePoseEstimationUsingVision();
+            // Update field-position vision at 16 Hz
+            this.UpdatePoseEstimationUsingVision(); 
 
         }, Duration.ofMillis(60));
     }
@@ -271,7 +271,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         if (RobotBase.isReal())
         {
             builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
-
             builder.addBooleanProperty("Is IMU Connected", () -> this.IMU.isConnected(), null);
         }
 

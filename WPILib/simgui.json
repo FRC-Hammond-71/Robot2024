@@ -39,6 +39,8 @@
       "/Shuffleboard/Movement/PIDController[1]": "PIDController",
       "/Shuffleboard/Movement/PIDController[2]": "PIDController",
       "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
+      "/SmartDashboard/Arm PID": "PIDController",
+      "/SmartDashboard/Arm Visualization": "Mechanism2d",
       "/SmartDashboard/Assisted Note Intake": "String Chooser",
       "/SmartDashboard/Auto choices": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
@@ -48,6 +50,12 @@
       "/SmartDashboard/Speaker Auto": "Command"
     },
     "windows": {
+      "/SmartDashboard/Arm Visualization": {
+        "window": {
+          "name": "Arm",
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "Speaker Left": {
           "arrows": false,

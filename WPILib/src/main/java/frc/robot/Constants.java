@@ -86,14 +86,14 @@ public final class Constants
 
 		public static int PitchEncoderChannel = 0;
 
-		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(110); 
+		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(90); 
 
 		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(60); 
 
 		// Shooting from further would require a 0.5 degree inaccuracy
 		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1.5);
 
-		public static double MomentOfInertia = 5;
+		public static double MomentOfInertia = 30;
 
 		/**
 		 * To rotate the Arm a full rotation, the motor must rotate 414.285714 times.
@@ -115,9 +115,9 @@ public final class Constants
 		 */
 		public static double WheelDiameter = Units.inchesToMeters(3.965079); 
 
-		public static int CANPort = 8;
+		public static double WheelCircumference = WheelDiameter * Math.PI;
 
-		public static double Speed = 0.8;
+		public static int CANPort = 8;
 
 		public static class IntakeMotor
 		{
