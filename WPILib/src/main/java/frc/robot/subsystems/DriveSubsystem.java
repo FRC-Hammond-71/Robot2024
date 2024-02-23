@@ -206,11 +206,10 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         return this.Kinematics.toChassisSpeeds(new DifferentialDriveWheelSpeeds(
             RobotBase.isReal() ? this.GetLeftWheelVelocity() : this.SimulatedDrive.getLeftVelocityMetersPerSecond(),
-            RobotBase.isReal() ? this.GetRightWheelVelocity()
-                : this.SimulatedDrive.getRightVelocityMetersPerSecond()));
+            RobotBase.isReal() ? this.GetRightWheelVelocity() : this.SimulatedDrive.getRightVelocityMetersPerSecond()));
     }
 
-    public ChassisSpeeds GetSpeeds()
+    public ChassisSpeeds GetSpeeds() 
     {
         return this.Speeds;
     }

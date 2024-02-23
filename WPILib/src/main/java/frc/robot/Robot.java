@@ -82,7 +82,7 @@ public class Robot extends TimedRobot
 
 		SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
 
-		SmartDashboard.putData("Arm PID", Arm.ArmPID);
+		SmartDashboard.putData("Arm PID", Arm.PID);
 		
 		AutoBuilder.configureRamsete(
 			Localization::GetEstimatedPose,

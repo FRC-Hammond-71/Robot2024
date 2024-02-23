@@ -36,8 +36,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     // https://www.revrobotics.com/rev-11-1271/
     public DutyCycleEncoder Encoder;
 
-    private final ArmFeedforward PitchFeedForward = new ArmFeedforward(0.5, 0.15, 0.1);
-    public final PIDController ArmPID = new PIDController(Math.PI / 2, Math.PI / 2, Math.PI / 4);
+    private final ArmFeedforward FeedForward = new ArmFeedforward(0.5, 0.15, 0.1);
+    public final PIDController PID = new PIDController(Math.PI / 2, Math.PI / 2, Math.PI / 4);
 
     public final ArmVisualization Visualization = new ArmVisualization();
 
@@ -45,17 +45,16 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         super(robot);        
 
-        this.ArmPID.setTolerance(Constants.Arm.AllowedAngleError.getRadians());
+        this.PID.setTolerance(Constants.Arm.AllowedAngleError.getRadians());
     }
 
     @Override
     protected void initializeReal()
     {
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
+        this.Motor.setIdleMode(IdleMode.kBrake);
 
         this.Encoder = new DutyCycleEncoder(new DigitalInput(1));
-
-        this.Motor.setIdleMode(IdleMode.kBrake);
     }
 
     @Override
@@ -80,8 +79,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetTargetAngle()
     {
-        return Rotation2d.fromRadians(this.ArmPID.getSetpoint());
-        // return this.TargetAngle;
+        return Rotation2d.fromRadians(this.PID.getSetpoint());
     }
 
     public Rotation2d GetAngleError()
@@ -100,7 +98,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public boolean IsHolding()
     {
-        return this.IsAt(Rotation2d.fromRadians(ArmPID.getSetpoint()));
+        return this.IsAt(Rotation2d.fromRadians(PID.getSetpoint()));
     }
 
     /**
@@ -117,12 +115,12 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         else this.SimulatedArm.setInputVoltage(0);
 
         // this.TargetAngle = this.GetActualAngle();
-        this.ArmPID.setSetpoint(this.GetActualAngle().getRadians());
+        this.PID.setSetpoint(this.GetActualAngle().getRadians());
     }
 
     public void SetAngle(Rotation2d rotation)
     {
-        this.ArmPID.setSetpoint(Math.max(Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
+        this.PID.setSetpoint(Math.max(Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
         this.UpdateMotors();
     }
 
@@ -134,24 +132,24 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         {
             if (RobotBase.isReal())
             {
-                this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), 0));
+                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), 0));
             }
             else
             {
-                this.SimulatedArm.setInput(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), 0));
+                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), 0));
             }
         }
         else 
         {
-            var vel = this.ArmPID.calculate(this.GetActualAngle().getRadians());
+            var vel = this.PID.calculate(this.GetActualAngle().getRadians());
 
             if (RobotBase.isReal())
             {
-                this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), vel * 0.2));
+                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), vel * 0.2));
             }
             else
             {
-                this.SimulatedArm.setInput(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), vel * 60));
+                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), vel * 60));
             }
         }
     }
@@ -191,7 +189,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         builder.addBooleanProperty("Holding", this::IsHolding, null);
 
         this.addChild("Visualization", this.Visualization);
-        this.addChild("PID", this.ArmPID);
+        this.addChild("PID", this.PID);
     }
 
     /**

@@ -180,10 +180,13 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Launcher Speed", () -> this.Speed(), null);
         // builder.addDoubleProperty("Intake Speed", () -> RobotBase.isReal() ?
         // this.GroundIntakeMotor.get() : 0, null);
-        builder.addDoubleProperty("Note Proximity", () ->
-        this.NoteSensor.getProximity(), null);
 
-        builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+        if (RobotBase.isReal())
+        {
+            builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
+            
+            builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+        }
     }
 
     public Command PerformSysID()

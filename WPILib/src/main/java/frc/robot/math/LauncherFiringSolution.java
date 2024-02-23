@@ -50,11 +50,10 @@ public class LauncherFiringSolution implements Sendable
         // Launch Speed (M/s)
         double launchSpeed = Units.feetToMeters(Math.sqrt(Math.pow(vy, 2) + Math.pow(vx, 2)));
 
-        var toLeft = FieldGeometry.GetSpeakerIntakeLeftMostPosition().minus(robotPose.getTranslation());
-        var toRight = FieldGeometry.GetSpeakerIntakeRightMostPosition().minus(robotPose.getTranslation());
-
-        var allowedError = Rotation2d.fromRadians(Math.abs(toLeft.getAngle().minus(toRight.getAngle()).getRadians()));
-        allowedError = Rotation2d.fromDegrees(1);
+        // var toLeft = FieldGeometry.GetSpeakerIntakeLeftMostPosition().minus(robotPose.getTranslation());
+        // var toRight = FieldGeometry.GetSpeakerIntakeRightMostPosition().minus(robotPose.getTranslation());
+        // var allowedError = Rotation2d.fromRadians(Math.abs(toLeft.getAngle().minus(toRight.getAngle()).getRadians()));
+        var allowedError = Rotation2d.fromDegrees(1);
 
         // Use distance to magnify uncertainty
         
