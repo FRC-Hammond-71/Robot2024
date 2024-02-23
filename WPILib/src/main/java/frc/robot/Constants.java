@@ -31,7 +31,7 @@ public final class Constants
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxForwardSpeed = 1;
+		public static double MaxForwardSpeed = 3;
 
 		/**
 		 * The maximum rate-of-change of forward speeds in (M/s).
@@ -41,7 +41,7 @@ public final class Constants
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(360);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(360 * 2);
 
 		/**
 		 * The maximum rotational acceleration in a second.
@@ -86,9 +86,11 @@ public final class Constants
 
 		public static int PitchEncoderChannel = 0;
 
-		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(90); 
+		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(102);
 
-		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(60); 
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(60);
+
+		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(75); 
 
 		// Shooting from further would require a 0.5 degree inaccuracy
 		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1.5);

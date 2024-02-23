@@ -34,7 +34,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     public CANSparkMax Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
-    private DutyCycleEncoder Encoder;
+    public DutyCycleEncoder Encoder;
 
     private final ArmFeedforward PitchFeedForward = new ArmFeedforward(0.5, 0.15, 0.1);
     public final PIDController ArmPID = new PIDController(Math.PI / 2, Math.PI / 2, Math.PI / 4);
@@ -53,11 +53,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
 
-        this.Encoder = new DutyCycleEncoder(new DigitalInput(0));
+        this.Encoder = new DutyCycleEncoder(new DigitalInput(1));
 
         this.Motor.setIdleMode(IdleMode.kBrake);
-
-        this.Encoder.reset();
     }
 
     @Override
@@ -76,7 +74,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetActualAngle() 
     {
-        return Rotation2d.fromRadians(RobotBase.isReal() ? this.Encoder.get() * 2 * Math.PI : this.SimulatedArm.getAngleRads());
+        return Constants.Arm.MaxAngle.plus(
+                Rotation2d.fromRadians(RobotBase.isReal() ? this.Encoder.get() * 2 * Math.PI : this.SimulatedArm.getAngleRads()));
     }
 
     public Rotation2d GetTargetAngle()
@@ -123,8 +122,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public void SetAngle(Rotation2d rotation)
     {
-        // this.TargetAngle = rotation;
-        this.ArmPID.setSetpoint(rotation.getRadians());
+        this.ArmPID.setSetpoint(Math.max(Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
         this.UpdateMotors();
     }
 
@@ -149,7 +147,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
             if (RobotBase.isReal())
             {
-                this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), vel));
+                this.Motor.setVoltage(this.PitchFeedForward.calculate(this.GetActualAngle().getRadians(), vel * 0.2));
             }
             else
             {
@@ -169,7 +167,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void realPeriodic()
     {
-        System.out.println(this.Encoder.getAbsolutePosition());
+    //    System.out.println(this.Encoder.getAbsolutePosition());
         // this.UpdateMotors();
     }
 

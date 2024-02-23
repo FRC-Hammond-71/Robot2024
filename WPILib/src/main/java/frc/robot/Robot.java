@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.proto.Controller;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -168,10 +169,10 @@ public class Robot extends TimedRobot
             //     PathCommands.PathToAmplifier().schedule();
             // }
 
-			if (Controllers.DriverController.getAButtonPressed())
-			{
-				GameCommands.GotoSpeakerAndLaunch().schedule();
-			}
+			// if (Controllers.DriverController.getAButtonPressed())
+			// {
+			// 	GameCommands.GotoSpeakerAndLaunch().schedule();
+			// }
 
             Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
 
@@ -181,15 +182,20 @@ public class Robot extends TimedRobot
 		{
 			if (RobotBase.isSimulation()) return;
 
-			if (Controllers.ShooterController.getAButtonPressed())
-			{
-				GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(10).schedule();
-			}
+			// if (Controllers.ShooterController.getAButtonPressed())
+			// {
+			// 	GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(10).schedule();
+			// }
 
-			Launcher.SetLaunchSpeed(Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()));
+			var speedY = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.7;
 
-			// Launcher.GroundIntakeMotor.set(Controllers.DriverController.getYButton() ? 0.3 : 0);
-			// Launcher.IntakeMotor.set(Controllers.DriverController.getYButton() ? 0.3 : 0);
+			Launcher.SetLaunchSpeed(Math.copySign(speedY * speedY, speedY));
+
+			Launcher.GroundIntakeMotor.set(Controllers.ShooterController.getYButton() ? 0.4 : 0);
+			Launcher.IntakeMotor.set(Controllers.ShooterController.getYButton() 
+				? 0.4 : Controllers.ShooterController.getAButton() 
+				? -0.1 : 0
+				);
 
 		}, Launcher));
 
@@ -197,7 +203,22 @@ public class Robot extends TimedRobot
 		{
 			if (RobotBase.isSimulation()) return;
 
-			Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()) * 0.2);
+			if (Controllers.ShooterController.getBackButtonPressed())
+			{
+				System.out.println("Arm Encoder Pos Reset");
+				Arm.Encoder.reset();
+			}
+
+			if (Controllers.ShooterController.getXButtonPressed())
+			{
+				Arm.SetAngle(Constants.Arm.LoadingAngle);
+			}
+			else
+			{
+				// Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * )));
+				Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()) * 0.2);
+			}
+
 
 		}, Arm));
 	}

@@ -12,9 +12,9 @@ public class GameCommands
 {
 	public static Command IntakeNoteAndLoadIntoLauncher()
 	{
-		return Robot.Arm.RunRotate(Constants.Arm.LoadingAngle)
-				.andThen(Commands
-						.parallel(Robot.Launcher.RunGroundIntake(), Robot.Launcher.RunIntake()))
+		// return Robot.Arm.RunRotate(Constants.Arm.LoadingAngle)
+		return Commands
+				.parallel(Robot.Launcher.RunGroundIntake(), Robot.Launcher.RunIntake())
 				.onlyWhile(() -> !Robot.Launcher.IsLoaded())
 				.withName("IntakeNoteAndLoadIntoLauncher");
 	}

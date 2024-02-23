@@ -303,10 +303,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Desired Rotation", () -> Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
                 null);
 
-        // builder.addDoubleProperty("Actual Speed", () ->
-        // this.GetWheelSpeeds().vxMetersPerSecond, null);
-        // builder.addDoubleProperty("Actual Speed", () ->
-        // this.GetWheelSpeeds().vxMetersPerSecond, null);
+        builder.addDoubleProperty("Actual Speed", () ->this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation",
                 () -> Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
 

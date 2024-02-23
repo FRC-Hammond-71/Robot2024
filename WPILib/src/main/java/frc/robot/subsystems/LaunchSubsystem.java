@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Optional;
 
+import javax.swing.plaf.TreeUI;
+
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
@@ -41,8 +43,13 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
 
+
     public ColorSensorV3 NoteSensor;
 
+    private int NoteCount = 0;
+    private boolean NoteLastDetected = false; 
+    public boolean NoteDetected = false;
+    //last note detection
     // private SlewRateLimiter LaunchMotorRateLimiter = new SlewRateLimiter(1, 1,
     // 0);
 
@@ -60,6 +67,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.TopLaunchMotor.setInverted(true);
         this.BottomLaunchMotor.setInverted(true);
         this.GroundIntakeMotor.setInverted(true);
+        this.IntakeMotor.setInverted(true);
 
         this.TopLaunchMotor.setIdleMode(IdleMode.kCoast);
         this.BottomLaunchMotor.setIdleMode(IdleMode.kCoast);
@@ -79,7 +87,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
      */
     public boolean IsLoaded()
     {
-        return RobotBase.isSimulation() ? false : this.NoteSensor.getProximity() > 1535.25;
+       return this.NoteDetected;
     }
 
     /**
@@ -109,9 +117,41 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         }
     }
 
+    @Override
+    protected void realPeriodic()
+    {
+        boolean isDetected = this.NoteSensor.getProximity() > 700;
+
+        if (isDetected) 
+        {
+            System.out.println("Detected Note!");
+        } 
+
+        if (!NoteLastDetected && isDetected)
+        {
+            NoteCount += 1;
+            NoteDetected = true;
+        }
+
+        if (NoteCount >= 2 && !isDetected)
+        {
+            NoteDetected = false;
+            NoteCount = 0;
+        }
+        
+        NoteLastDetected = NoteDetected;
+    }
+
+
     public Command RunGroundIntake()
     {
-        return Commands.runEnd(() -> this.GroundIntakeMotor.set(1), () -> this.GroundIntakeMotor.stopMotor(), this);
+        return Commands.runEnd(() -> this.GroundIntakeMotor.set(0.3), () -> this.GroundIntakeMotor.stopMotor(), this);
+    }
+
+    
+    public Command RunIntake()
+    {
+        return Commands.runEnd(() -> this.IntakeMotor.set(0.3), () -> this.IntakeMotor.stopMotor(), this);
     }
 
     public Command Launch()
@@ -134,19 +174,16 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         return Commands.none();
     }
 
-    public Command RunIntake()
-    {
-        return Commands.runEnd(() -> this.IntakeMotor.set(1), () -> this.IntakeMotor.stopMotor(), this);
-    }
-
     @Override
     public void initSendable(SendableBuilder builder)
     {
         builder.addDoubleProperty("Launcher Speed", () -> this.Speed(), null);
         // builder.addDoubleProperty("Intake Speed", () -> RobotBase.isReal() ?
         // this.GroundIntakeMotor.get() : 0, null);
-        // builder.addDoubleProperty("Note Proximity", () ->
-        // this.NoteSensor.getProximity(), null);
+        builder.addDoubleProperty("Note Proximity", () ->
+        this.NoteSensor.getProximity(), null);
+
+        builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
     }
 
     public Command PerformSysID()
@@ -193,4 +230,6 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
             .andThen(bottomSysId.dynamic(Direction.kReverse))
             .finallyDo(() -> this.Stop());
     }
+
+
 }
