@@ -63,7 +63,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.SimulatedArm = new SingleJointedArmSim(
             DCMotor.getNEO(1),
             Constants.Arm.Gearing, 
-            Constants.Arm.MomentOfInertia, 
+            Constants.Arm.MomentOfInertia,
             Units.inchesToMeters(11), 
             0, 
             Constants.Arm.MaxAngle.getRadians(), 
@@ -73,8 +73,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetActualAngle() 
     {
-        return Constants.Arm.MaxAngle.plus(
-                Rotation2d.fromRadians(RobotBase.isReal() ? this.Encoder.get() * 2 * Math.PI : this.SimulatedArm.getAngleRads()));
+        return Rotation2d.fromRadians(RobotBase.isReal() ? this.Encoder.getAbsolutePosition() * 2 * Math.PI - Units.degreesToRadians(54) : this.SimulatedArm.getAngleRads());
     }
 
     public Rotation2d GetTargetAngle()
@@ -121,6 +120,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     public void SetAngle(Rotation2d rotation)
     {
         this.PID.setSetpoint(Math.max(Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
+        
         this.UpdateMotors();
     }
 
@@ -165,7 +165,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void realPeriodic()
     {
-    //    System.out.println(this.Encoder.getAbsolutePosition());
+        // System.out.println(this.Encoder.getAbsolutePosition());
         // this.UpdateMotors();
     }
 

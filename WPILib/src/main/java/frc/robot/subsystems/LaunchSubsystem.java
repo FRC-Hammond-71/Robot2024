@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import javax.swing.plaf.TreeUI;
@@ -14,6 +16,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
+import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.PIDController;
@@ -29,6 +33,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.FunctionalPeriodic;
+import frc.IPeriodic;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
@@ -55,6 +61,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
     // private PIDController LaunchMotorPID = new PIDController(0, 0, 0);
 
+    // public IPeriodic NoteDetectionPeriodic;
+    public Notifier NoteDetectorNotifier;
+
+    public LaunchSubsystem(Robot robot)
+    {
+        super(robot);
+    }
+
     @Override
     protected void initializeReal()
     {
@@ -64,8 +78,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
         this.IntakeMotor = new CANSparkMax(7, MotorType.kBrushless);
 
-        this.TopLaunchMotor.setInverted(true);
-        this.BottomLaunchMotor.setInverted(true);
+        this.TopLaunchMotor.setInverted(false);
+        this.BottomLaunchMotor.setInverted(false);
         this.GroundIntakeMotor.setInverted(true);
         this.IntakeMotor.setInverted(true);
 
@@ -75,11 +89,28 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
 
         this.NoteSensor = new ColorSensorV3(Port.kOnboard);
-    }
+        this.NoteSensor.configureProximitySensor(ProximitySensorResolution.kProxRes8bit, ProximitySensorMeasurementRate.kProxRate6ms);
 
-    public LaunchSubsystem(Robot robot)
-    {
-        super(robot);
+        this.NoteDetectorNotifier = new Notifier(() -> 
+        {
+            boolean isDetected = this.NoteSensor.getProximity() > 100;
+
+            SmartDashboard.putBoolean("Is Note Detected", isDetected);
+
+            if (!NoteLastDetected && isDetected)
+            {
+                NoteCount += 1;
+                NoteDetected = true;
+            }
+            else if (NoteCount >= 2 && !isDetected)
+            {
+                NoteDetected = false;
+                NoteCount = 0;
+            }
+        
+            NoteLastDetected = isDetected;
+        });
+        this.NoteDetectorNotifier.startPeriodic(0.006);
     }
 
     /**
@@ -120,26 +151,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     @Override
     protected void realPeriodic()
     {
-        boolean isDetected = this.NoteSensor.getProximity() > 700;
-
-        if (isDetected) 
-        {
-            System.out.println("Detected Note!");
-        } 
-
-        if (!NoteLastDetected && isDetected)
-        {
-            NoteCount += 1;
-            NoteDetected = true;
-        }
-
-        if (NoteCount >= 2 && !isDetected)
-        {
-            NoteDetected = false;
-            NoteCount = 0;
-        }
         
-        NoteLastDetected = NoteDetected;
     }
 
 
@@ -183,7 +195,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
+            // builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
             
             builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
         }

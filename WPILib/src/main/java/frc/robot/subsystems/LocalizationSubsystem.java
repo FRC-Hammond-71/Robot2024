@@ -18,6 +18,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
@@ -72,7 +74,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     private PhotonCamera LauncherCamera, IntakeCamera;
     
     // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
-    private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
+    // private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
+    private PhotonPoseEstimator LauncherCameraPoseEstimator;
     
     /**
      * Wether or not vision has contributed to the absolute position.
@@ -81,31 +84,33 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
      */
     private boolean HasAbsolutePositionFixed = false;
 
-    public IPeriodic RelativeSensorUpdatePeriodic;
-    public IPeriodic VisionUpdatePeriodic;
+    public Notifier RelativeSensorUpdateNotifier;
+    public Notifier VisionUpdateNotifier;
 
     public LocalizationSubsystem(Robot robot)
     {
         super(robot);
 
-        this.RelativeSensorUpdatePeriodic = new FunctionalPeriodic(() -> 
-        {
-            if (RobotBase.isSimulation()) return;
+        // this.RelativeSensorUpdateNotifier = new Notifier(() -> 
+        // {
+        //     if (RobotBase.isSimulation()) return;
 
-            // Read sensors such as the drive encoders and IMU at 200 Hz
-            this.UpdatePoseEstimationUsingWheels();
-            this.UpdatePoseEstimationUsingIMU();
+        //     // Read sensors such as the drive encoders and IMU at 200 Hz
+        //     this.UpdatePoseEstimationUsingWheels();
+        //     this.UpdatePoseEstimationUsingIMU();
 
-        }, Duration.ofMillis(5));
+        // });
+        // this.RelativeSensorUpdateNotifier.startPeriodic(0.005);
 
-        this.VisionUpdatePeriodic = new FunctionalPeriodic(() ->
-        {
-            if (RobotBase.isSimulation()) return;
+        // this.VisionUpdateNotifier = new Notifier(() ->
+        // {
+        //     if (RobotBase.isSimulation()) return;
 
-            // Update field-position vision at 16 Hz
-            this.UpdatePoseEstimationUsingVision(); 
+        //     // Update field-position vision at 16 Hz
+        //     this.UpdatePoseEstimationUsingVision(); 
 
-        }, Duration.ofMillis(60));
+        // });
+        // this.VisionUpdateNotifier.startPeriodic(0.06);
     }
     
     @Override
@@ -126,17 +131,17 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         this.LauncherCamera = new PhotonCamera("Sauron");
         this.IntakeCamera = new PhotonCamera("Roz");
 
-        this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
-                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-                PoseStrategy.MULTI_TAG_PNP_ON_RIO,
-                this.IntakeCamera,
-                new Transform3d());
+        // this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
+        //         AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+        //         PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+        //         this.IntakeCamera,
+        //         new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, 0, Math.PI)));
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
                 PoseStrategy.MULTI_TAG_PNP_ON_RIO,
                 this.LauncherCamera,
-                new Transform3d());
+                new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
     }
 
     public Pose2d GetEstimatedPose()
@@ -237,13 +242,13 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
     protected void UpdatePoseEstimationUsingVision()
     {
-        // var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
-        // if (fieldPoseFromLauncher.isPresent())
-        // {
-        //     this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+        var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+        if (fieldPoseFromLauncher.isPresent())
+        {
+            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
 
-        //     Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
-        // }
+            Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
+        }
 
         // var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
         // if (fieldPoseFromIntake.isPresent())

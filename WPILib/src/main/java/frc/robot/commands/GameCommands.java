@@ -14,9 +14,9 @@ public class GameCommands
 	{
 		// return Robot.Arm.RunRotate(Constants.Arm.LoadingAngle)
 		return Commands
-				.parallel(Robot.Launcher.RunGroundIntake(), Robot.Launcher.RunIntake())
-				.onlyWhile(() -> !Robot.Launcher.IsLoaded())
-				.withName("IntakeNoteAndLoadIntoLauncher");
+			.parallel(Robot.Launcher.RunGroundIntake(), Robot.Launcher.RunIntake())
+			.onlyWhile(() -> !Robot.Launcher.IsLoaded())
+			.withName("IntakeNoteAndLoadIntoLauncher");
 	}
 
 	public static Command AutoRotateAndLaunch()

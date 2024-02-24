@@ -56,6 +56,10 @@ public class Robot extends TimedRobot
 		Drive = new DriveSubsystem(this);
 		Launcher = new LaunchSubsystem(this);
 		Localization = new LocalizationSubsystem(this);
+
+		// addPeriodic(() -> {
+        //     // m_motor.set(m_controller.calculate(m_encoder.getRate()));
+        // }, 0.01, 0.005);
 	}
 
 	@Override
@@ -69,8 +73,8 @@ public class Robot extends TimedRobot
 	{
 		System.out.println("Robot has initialized!");	
 
-		IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
-		IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
+		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
+		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData(Arm);
@@ -79,9 +83,7 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData(Localization);
 
 		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
-
-		SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
-
+		// SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
 		SmartDashboard.putData("Arm PID", Arm.PID);
 		
 		AutoBuilder.configureRamsete(
@@ -182,20 +184,41 @@ public class Robot extends TimedRobot
 		{
 			if (RobotBase.isSimulation()) return;
 
-			// if (Controllers.ShooterController.getAButtonPressed())
-			// {
-			// 	GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(10).schedule();
-			// }
+			if (Controllers.ShooterController.getRightBumperPressed())
+			{
+				// GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(5).schedule();
+			}
 
-			var speedY = Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.7;
+			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
+			speed = Math.copySign(speed * speed, speed);
 
-			Launcher.SetLaunchSpeed(Math.copySign(speedY * speedY, speedY));
+			if (Controllers.ShooterController.getLeftBumper())
+			{
+				// Commands.run(() -> Launcher.SetLaunchSpeed(0.14)).withTimeout(2).schedule();
 
-			Launcher.GroundIntakeMotor.set(Controllers.ShooterController.getYButton() ? 0.4 : 0);
-			Launcher.IntakeMotor.set(Controllers.ShooterController.getYButton() 
-				? 0.4 : Controllers.ShooterController.getAButton() 
-				? -0.1 : 0
-				);
+				// Launcher.SetLaunchSpeed(0.14);
+				speed = 0.14;
+			}
+			else if (Controllers.ShooterController.getAButton())
+			{
+				speed = -0.2;
+				Launcher.GroundIntakeMotor.set(-0.2);
+				Launcher.IntakeMotor.set(-0.2);
+			}
+			else if (Controllers.ShooterController.getYButton())
+			{
+				Launcher.GroundIntakeMotor.set(0.4);
+				Launcher.IntakeMotor.set(0.4);
+			}
+			else 
+			{
+				Launcher.GroundIntakeMotor.set(0);
+				Launcher.IntakeMotor.set(0);	
+			}
+
+			System.out.println(speed);
+			
+			Launcher.SetLaunchSpeed(speed);
 
 		}, Launcher));
 
@@ -237,39 +260,7 @@ public class Robot extends TimedRobot
 	@Override
 	public void testInit() 
 	{
-		var sysId = new SysIdRoutine(new SysIdRoutine.Config(
-
-			Units.Volts.of(0.25).per(Units.Seconds.of(1)),
-			Units.Volts.of(0.5),
-			Units.Seconds.of(3.6)
-
-		), new SysIdRoutine.Mechanism(
-			(voltage) -> 
-			{
-				System.out.println(voltage);
-
-				// Apply voltages to motors.
-				Drive.Set(Optional.of(new DifferentialDriveWheelVoltages(-voltage.magnitude(), -voltage.magnitude())));
-			},
-			(log) ->
-			{
-				log.motor("flywheel")
-					.voltage(Units.Volts.of(Drive.LeftLeadMotor.getBusVoltage()))
-					.linearVelocity(Units.MetersPerSecond.of(Drive.LeftLeadMotor.getEncoder().getVelocity() / 60))
-					.linearPosition(Units.Meters.of(Drive.LeftLeadMotor.getEncoder().getPosition()));
-			},
-			this.Drive));
-
-		sysId
-			.quasistatic(Direction.kForward)
-			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-			.andThen(sysId.quasistatic(Direction.kReverse))
-			.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
-			.andThen(sysId.dynamic(Direction.kForward))
-			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-			.andThen(sysId.dynamic(Direction.kReverse))
-			.finallyDo(() -> Drive.Stop())
-			.schedule();
+		// Launcher.PerformSysID().schedule();
 	}
 
 	

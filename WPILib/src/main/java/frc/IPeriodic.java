@@ -10,10 +10,13 @@ public interface IPeriodic
 {
     // TimedRobot.Callback is private! Womp womp.
     Runnable getCallback();
-    Duration getCallbackPeriod();
+    /**
+     * @return Period in seconds.
+     */
+    double getCallbackPeriod();
 
     static void ApplyPeriodic(IPeriodic periodic, TimedRobot timedRobot)
     {
-        timedRobot.addPeriodic(periodic.getCallback(), periodic.getCallbackPeriod().getSeconds());
+        timedRobot.addPeriodic(periodic.getCallback(), periodic.getCallbackPeriod());
     }
 }

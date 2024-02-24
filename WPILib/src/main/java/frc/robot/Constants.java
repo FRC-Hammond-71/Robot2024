@@ -88,7 +88,7 @@ public final class Constants
 
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(102);
 
-		public static Rotation2d MinAngle = Rotation2d.fromDegrees(60);
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(50);
 
 		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(75); 
 

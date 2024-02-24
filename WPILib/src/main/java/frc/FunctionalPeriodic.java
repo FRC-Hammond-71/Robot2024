@@ -5,9 +5,9 @@ import java.time.Duration;
 public class FunctionalPeriodic implements IPeriodic
 {
     public final Runnable Callback;
-    public final Duration Period;
+    public final double Period;
 
-    public FunctionalPeriodic(Runnable callback, Duration period)
+    public FunctionalPeriodic(Runnable callback, double period)
     {
         this.Callback = callback;
         this.Period = period;
@@ -20,7 +20,7 @@ public class FunctionalPeriodic implements IPeriodic
     }
 
     @Override
-    public Duration getCallbackPeriod()
+    public double getCallbackPeriod()
     {
         return this.Period;
     }

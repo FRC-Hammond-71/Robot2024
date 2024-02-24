@@ -22,16 +22,19 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
@@ -47,31 +50,22 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     public DifferentialDrivetrainSim SimulatedDrive;
 
     // https://www.revrobotics.com/rev-21-1650/
-    public CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
+    private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
 
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
 
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
 
-    private MedianFilter InputFilter = new MedianFilter(5);
-
-    // private TrapezoidProfile VelocityProfile = new TrapezoidProfile(new
-    // Constraints(Constants.Drivetrain.MaxForwardSpeed, 5));
+    private MedianFilter InputFilter = new MedianFilter(3);
 
     // private SimpleMotorFeedforward FeedForward = new
     // SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
-
-    // private SlewRateLimiter ForwardRateLimiter = new
-    // SlewRateLimiter(Constants.Drivetrain.MaxForwardSpeedDelta);
-    // private SlewRateLimiter RotationRateLimiter = new
-    // SlewRateLimiter(Constants.Drivetrain.MaxRotationalSpeedDelta);
 
     // private PIDController LeftMotorsPID = new PIDController(.05, 0, 0);
     // private PIDController RightMotorsPID = new PIDController(.05,0,0);
 
     private ChassisSpeeds Speeds = new ChassisSpeeds();
-
-    public Optional<DifferentialDriveWheelVoltages> OverrideVoltages = Optional.empty();
+    private Optional<DifferentialDriveWheelVoltages> OverrideVoltages = Optional.empty();
 
     public DriveSubsystem(Robot robot)
     {
@@ -116,7 +110,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             DCMotor.getNEO(2),
             Constants.Drivetrain.WheelGearing,
             8,
-            Units.lbsToKilograms(Constants.RobotWeight),
+            edu.wpi.first.math.util.Units.lbsToKilograms(Constants.RobotWeight),
             Constants.Drivetrain.WheelRadius,
             Constants.Drivetrain.TrackWidth,
             null
@@ -261,8 +255,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.15));
-            this.RightLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.15));
+            this.LeftLeadMotor.setVoltage(InputFilter.calculate(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.15)));
+            this.RightLeadMotor.setVoltage(InputFilter.calculate(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.15)));
         } 
         else
         {
@@ -299,12 +293,12 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         }
 
         builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
-        builder.addDoubleProperty("Desired Rotation", () -> Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
+        builder.addDoubleProperty("Desired Rotation", () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
                 null);
 
         builder.addDoubleProperty("Actual Speed", () ->this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation",
-                () -> Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
+                () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
 
         builder.addStringProperty("Blocking Command", () ->
         {
@@ -313,5 +307,41 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
             return requiredCommand != null && !isDefault ? requiredCommand.getName() : "None";
         }, null);
+    }
+
+    public Command PerformSysID()
+    {
+        var sysId = new SysIdRoutine(new SysIdRoutine.Config(
+
+			Units.Volts.of(0.25).per(Units.Seconds.of(1)),
+			Units.Volts.of(0.5),
+			Units.Seconds.of(3.4)
+
+		), new SysIdRoutine.Mechanism(
+			(voltage) -> 
+			{
+				System.out.println(voltage);
+
+				// Apply voltages to motors.
+				this.Set(Optional.of(new DifferentialDriveWheelVoltages(-voltage.magnitude(), -voltage.magnitude())));
+			},
+			(log) ->
+			{
+				log.motor("flywheel")
+					.voltage(Units.Volts.of(this.LeftLeadMotor.getBusVoltage()))
+					.linearVelocity(Units.MetersPerSecond.of(this.LeftLeadMotor.getEncoder().getVelocity() / 60))
+					.linearPosition(Units.Meters.of(this.LeftLeadMotor.getEncoder().getPosition()));
+			},
+			this));
+
+		return sysId
+			.quasistatic(Direction.kForward)
+			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
+			.andThen(sysId.quasistatic(Direction.kReverse))
+			.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
+			.andThen(sysId.dynamic(Direction.kForward))
+			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
+			.andThen(sysId.dynamic(Direction.kReverse))
+			.finallyDo(() -> this.Stop());
     }
 }
