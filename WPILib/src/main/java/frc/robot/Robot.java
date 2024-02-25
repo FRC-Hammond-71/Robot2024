@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.IPeriodic;
@@ -56,10 +57,6 @@ public class Robot extends TimedRobot
 		Drive = new DriveSubsystem(this);
 		Launcher = new LaunchSubsystem(this);
 		Localization = new LocalizationSubsystem(this);
-
-		// addPeriodic(() -> {
-        //     // m_motor.set(m_controller.calculate(m_encoder.getRate()));
-        // }, 0.01, 0.005);
 	}
 
 	@Override
@@ -176,7 +173,7 @@ public class Robot extends TimedRobot
 			// 	GameCommands.GotoSpeakerAndLaunch().schedule();
 			// }
 
-            Drive.SetArcade(Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
+            Drive.SetArcade(-Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
 
 		}, Drive));
 		
@@ -197,53 +194,54 @@ public class Robot extends TimedRobot
 				// Commands.run(() -> Launcher.SetLaunchSpeed(0.14)).withTimeout(2).schedule();
 
 				// Launcher.SetLaunchSpeed(0.14);
-				speed = 0.14;
+				speed = 0.15;
 			}
-			else if (Controllers.ShooterController.getAButton())
+
+			if (Controllers.ShooterController.getAButton())
 			{
-				speed = -0.2;
-				Launcher.GroundIntakeMotor.set(-0.2);
-				Launcher.IntakeMotor.set(-0.2);
+				speed = -0.1;
+				Launcher.GroundIntakeMotor.set(-0.1);
+				Launcher.IntakeMotor.set(-0.1);
 			}
 			else if (Controllers.ShooterController.getYButton())
 			{
-				Launcher.GroundIntakeMotor.set(0.4);
-				Launcher.IntakeMotor.set(0.4);
+				Launcher.GroundIntakeMotor.set(0.5);
+				Launcher.IntakeMotor.set(0.5);
 			}
 			else 
 			{
 				Launcher.GroundIntakeMotor.set(0);
 				Launcher.IntakeMotor.set(0);	
 			}
-
-			System.out.println(speed);
 			
 			Launcher.SetLaunchSpeed(speed);
 
 		}, Launcher));
 
-		Arm.setDefaultCommand(Commands.run(() ->
-		{
-			if (RobotBase.isSimulation()) return;
+		// Arm.setDefaultCommand(Commands.run(() ->
+		// {
+		// 	if (Controllers.ShooterController.getXButtonPressed())
+		// 	{
+		// 		Arm.RunRotate(Constants.Arm.LoadingAngle).schedule();	
+		// 	}
+		// 	else
+		// 	{
+		// 		Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+		// 	}
 
-			if (Controllers.ShooterController.getBackButtonPressed())
-			{
-				System.out.println("Arm Encoder Pos Reset");
-				Arm.Encoder.reset();
-			}
+		// 	if (RobotBase.isSimulation()) return;
 
-			if (Controllers.ShooterController.getXButtonPressed())
-			{
-				Arm.SetAngle(Constants.Arm.LoadingAngle);
-			}
-			else
-			{
-				// Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * )));
-				Arm.Motor.set(Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()) * 0.2);
-			}
+		// 	// if (Controllers.ShooterController.getBackButtonPressed())
+		// 	// {
+		// 	// 	System.out.println("Arm Encoder Pos Reset");
+		// 	// 	Arm.Encoder.reset();
+		// 	// }
 
 
-		}, Arm));
+		// 	// Arm.Motor.set(Controllers.ShooterController.getRightY() * 0.4);
+		// 	// System.out.println(Controllers.ShooterController.getRightY() * 0.4);
+
+		// }, Arm));
 	}
 	@Override
 	public void teleopExit()

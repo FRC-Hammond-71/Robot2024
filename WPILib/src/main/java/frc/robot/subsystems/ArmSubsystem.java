@@ -5,22 +5,31 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.util.Color;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+
+import java.util.Optional;
+
+import javax.swing.text.html.Option;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
@@ -34,18 +43,25 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     public CANSparkMax Motor;
     
     // https://www.revrobotics.com/rev-11-1271/
-    public DutyCycleEncoder Encoder;
+    public DutyCycleEncoder AbsoluteEncoder;
+    public RelativeEncoder relativeEncoder;
+
 
     private final ArmFeedforward FeedForward = new ArmFeedforward(0.5, 0.15, 0.1);
-    public final PIDController PID = new PIDController(Math.PI / 2, Math.PI / 2, Math.PI / 4);
+    // public final PIDController PID = new PIDController(Math.PI / 2, Math.PI / 2, Math.PI / 4);
+    public final PIDController PID = new PIDController(1, 0.1, 0.1);
+
 
     public final ArmVisualization Visualization = new ArmVisualization();
+    
+    private Optional<Double> OverrideRotation = Optional.empty() ;
 
     public ArmSubsystem(Robot robot) 
     {
         super(robot);        
 
         this.PID.setTolerance(Constants.Arm.AllowedAngleError.getRadians());
+        this.PID.setSetpoint(Rotation2d.fromDegrees(90).getRadians());
     }
 
     @Override
@@ -53,8 +69,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setIdleMode(IdleMode.kBrake);
+        this.Motor.setInverted(false);
 
-        this.Encoder = new DutyCycleEncoder(new DigitalInput(1));
+        this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
     }
 
     @Override
@@ -64,7 +81,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             DCMotor.getNEO(1),
             Constants.Arm.Gearing, 
             Constants.Arm.MomentOfInertia,
-            Units.inchesToMeters(11), 
+            edu.wpi.first.math.util.Units.inchesToMeters(11), 
             0, 
             Constants.Arm.MaxAngle.getRadians(), 
             false, 
@@ -73,7 +90,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetActualAngle() 
     {
-        return Rotation2d.fromRadians(RobotBase.isReal() ? this.Encoder.getAbsolutePosition() * 2 * Math.PI - Units.degreesToRadians(54) : this.SimulatedArm.getAngleRads());
+        return Rotation2d.fromRadians(RobotBase.isReal() ? this.AbsoluteEncoder.getAbsolutePosition() * 2 * Math.PI -edu.wpi.first.math.util.Units.degreesToRadians(54) : this.SimulatedArm.getAngleRads());
     }
 
     public Rotation2d GetTargetAngle()
@@ -113,21 +130,34 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         if (RobotBase.isReal()) this.Motor.stopMotor();
         else this.SimulatedArm.setInputVoltage(0);
 
-        // this.TargetAngle = this.GetActualAngle();
-        this.PID.setSetpoint(this.GetActualAngle().getRadians());
+        // this.PID.setSetpoint(this.GetActualAngle().getRadians());
     }
 
     public void SetAngle(Rotation2d rotation)
     {
-        this.PID.setSetpoint(Math.max(Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
+        rotation = Rotation2d.fromRadians(Math.max(
+            Constants.Arm.MinAngle.getRadians(), Math.min(rotation.getRadians(), Constants.Arm.MaxAngle.getRadians())));
+
+        this.PID.setSetpoint(rotation.getRadians());
         
+        System.out.printf("Set rotation: %.2f\n", rotation.getDegrees());
+
         this.UpdateMotors();
     }
+
+    private void SetAngle(Optional<Double> voltage)
+    {
+        this.OverrideRotation = voltage;
+        this.UpdateMotors();
+    }
+
 
     protected void UpdateMotors()
     {
         // https://www.chiefdelphi.com/t/understanding-feedforward-v-feedback-and-how-their-calculated/186889/10
 
+
+        
         if (this.IsHolding())
         {
             if (RobotBase.isReal())
@@ -145,7 +175,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
             if (RobotBase.isReal())
             {
-                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), vel * 0.2));
+                System.out.println(this.FeedForward.calculate(this.GetActualAngle().getRadians(), vel));
+                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), vel));
             }
             else
             {
@@ -165,8 +196,10 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void realPeriodic()
     {
-        // System.out.println(this.Encoder.getAbsolutePosition());
-        // this.UpdateMotors();
+        if (!DriverStation.isDisabled())
+        {
+            this.UpdateMotors();
+        }
     }
 
     @Override
@@ -199,6 +232,45 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         return Commands
             .startEnd(() -> this.SetAngle(rotation), () -> {}, this)
-            .onlyWhile(() -> !this.IsHolding());
+            .onlyWhile(() -> !this.IsAt(rotation));
+    }
+
+    public Command PerformSysID()
+    {
+        // var sysId = new SysIdRoutine(new SysIdRoutine.Config(
+
+		// 	edu.wpi.first.units.Units.Volts.of(0.25).per(edu.wpi.first.units.Units.Seconds.of(1)),
+		// 	edu.wpi.first.units.Units.Volts.of(0.5),
+		// 	edu.wpi.first.units.Units.Seconds.of(3.4)
+
+		// ), new SysIdRoutine.Mechanism(
+		// 	(voltage) -> 
+		// 	{
+		// 		System.out.println(voltage);
+
+		// 		// Apply voltages to motors.
+		// 		this.Set(Optional.of(Motor.)));
+		// 	},
+		// 	(log) ->
+		// 	{
+		// 		log.motor("arm")
+                
+		// 			.voltage(edu.wpi.first.units.Units.Volts.of(this.Motor.getBusVoltage()))
+		// 			.angularVelocity(edu.wpi.first.units.Units.Radians.of(this.relativeEncoder.getVelocity()).per(edu.wpi.first.units.Units.Minutes.of(1)))
+        //             .angularPosition(edu.wpi.first.units.Units.Radians.of(this.GetActualAngle().getRadians()));
+        //     },  
+		// 	this));
+
+		// return sysId
+		// 	.quasistatic(Direction.kForward)
+		// 	.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
+		// 	.andThen(sysId.quasistatic(Direction.kReverse))
+		// 	.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
+		// 	.andThen(sysId.dynamic(Direction.kForward))
+		// 	.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
+		// 	.andThen(sysId.dynamic(Direction.kReverse))
+		// 	.finallyDo(() -> this.Stop());
+
+        return Commands.none();
     }
 }

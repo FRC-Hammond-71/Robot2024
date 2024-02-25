@@ -80,13 +80,13 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         this.LeftFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
         this.RightFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
 
-        this.LeftLeadMotor.setInverted(true);
-        this.RightLeadMotor.setInverted(false);
+        this.LeftLeadMotor.setInverted(false);
+        this.RightLeadMotor.setInverted(true);
 
         this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
-        this.RightLeadMotor.setIdleMode(IdleMode.kBrake);
+        this.RightLeadMotor.setIdleMode(IdleMode.kCoast);
         this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
-        this.LeftLeadMotor.setIdleMode(IdleMode.kBrake);
+        this.LeftLeadMotor.setIdleMode(IdleMode.kCoast);
 
         this.LeftFollowMotor.follow(this.LeftLeadMotor);
         this.RightFollowMotor.follow(this.RightLeadMotor);
@@ -251,7 +251,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
                 this.Speeds.vxMetersPerSecond,
                 0,
-                this.Speeds.omegaRadiansPerSecond));
+                -this.Speeds.omegaRadiansPerSecond));
 
         if (RobotBase.isReal())
         {
@@ -274,7 +274,10 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     @Override
     public void periodic()
     {
-        this.UpdateMotors();
+        if (!DriverStation.isDisabled())
+        {
+            this.UpdateMotors();
+        }
     }
 
     @Override
