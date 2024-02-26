@@ -74,8 +74,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     private PhotonCamera LauncherCamera, IntakeCamera;
     
     // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
-    // private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
-    private PhotonPoseEstimator LauncherCameraPoseEstimator;
+    private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
     
     /**
      * Wether or not vision has contributed to the absolute position.
@@ -91,26 +90,40 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super(robot);
 
-        // this.RelativeSensorUpdateNotifier = new Notifier(() -> 
-        // {
-        //     if (RobotBase.isSimulation()) return;
+        this.RelativeSensorUpdateNotifier = new Notifier(() -> 
+        {
+            if (RobotBase.isSimulation()) return;
 
-        //     // Read sensors such as the drive encoders and IMU at 200 Hz
-        //     this.UpdatePoseEstimationUsingWheels();
-        //     this.UpdatePoseEstimationUsingIMU();
+            // Read sensors such as the drive encoders and IMU at 200 Hz
 
-        // });
-        // this.RelativeSensorUpdateNotifier.startPeriodic(0.005);
+            try
+            {
+                this.UpdatePoseEstimationUsingWheels();
+            }
+            catch (Exception ex)
+            {
+                DataLogManager.log("Exception raised during UpdatePoseEstimationUsingWheels:\n" + ex.toString());
+            }
 
-        // this.VisionUpdateNotifier = new Notifier(() ->
-        // {
-        //     if (RobotBase.isSimulation()) return;
+            // this.UpdatePoseEstimationUsingIMU();
+        });
+        this.RelativeSensorUpdateNotifier.startPeriodic(0.005);
 
-        //     // Update field-position vision at 16 Hz
-        //     this.UpdatePoseEstimationUsingVision(); 
+        this.VisionUpdateNotifier = new Notifier(() ->
+        {
+            if (RobotBase.isSimulation()) return;
 
-        // });
-        // this.VisionUpdateNotifier.startPeriodic(0.06);
+            try
+            {
+                // Update field-position vision at 16 Hz
+                this.UpdatePoseEstimationUsingVision(); 
+            }
+            catch (Exception ex)
+            {
+                DataLogManager.log("Exception raised during VisionUpdateNotifier:\n" + ex.toString());
+            }
+        });
+        this.VisionUpdateNotifier.startPeriodic(0.06);
     }
     
     @Override
@@ -131,11 +144,11 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         this.LauncherCamera = new PhotonCamera("Sauron");
         this.IntakeCamera = new PhotonCamera("Roz");
 
-        // this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
-        //         AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-        //         PoseStrategy.MULTI_TAG_PNP_ON_RIO,
-        //         this.IntakeCamera,
-        //         new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, 0, Math.PI)));
+        this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
+                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+                PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+                this.IntakeCamera,
+                new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, 0, Math.PI)));
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
@@ -193,9 +206,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super.periodic();
 
-        Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
-        Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
-        // System.out.println(allowedError);
+        // Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
+        // Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
     }
 
     @Override
@@ -238,6 +250,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         // TODO: Contribute IMU Accumulated Position to PoseEstimator!
 
         Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
+
+        this.IMUTimer.Timer.reset();
     }
 
     protected void UpdatePoseEstimationUsingVision()
@@ -250,13 +264,13 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
         }
 
-        // var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
-        // if (fieldPoseFromIntake.isPresent())
-        // {
-        //     this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+        var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+        if (fieldPoseFromIntake.isPresent())
+        {
+            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
 
-        //     Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
-        // }
+            Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
+        }
     }
 
     @Override
