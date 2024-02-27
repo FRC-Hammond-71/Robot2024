@@ -21,6 +21,7 @@ import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.KalmanFilterLatencyCompensator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.Units;
@@ -49,8 +50,12 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
 
-
     public ColorSensorV3 NoteSensor;
+
+    public LaunchSpeeds TargetSpeeds = new LaunchSpeeds();
+
+    // private SimpleMotorFeedforward TopLaunchFeedforward = new SimpleMotorFeedforward(0, 0, 0);
+    // private SimpleMotorFeedforward BottomLaunchFeedforward = new SimpleMotorFeedforward(0, 0, 0);
 
     private int NoteCount = 0;
     private boolean NoteLastDetected = false; 
@@ -74,6 +79,11 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         this.TopLaunchMotor = new CANSparkMax(8, MotorType.kBrushless);
         this.BottomLaunchMotor = new CANSparkMax(9, MotorType.kBrushless);
+
+        this.TopLaunchMotor.getEncoder().setPositionConversionFactor(Constants.Launcher.WheelCircumference);
+        this.TopLaunchMotor.getEncoder().setVelocityConversionFactor(Constants.Launcher.WheelCircumference);
+        this.BottomLaunchMotor.getEncoder().setPositionConversionFactor(Constants.Launcher.WheelCircumference);
+        this.BottomLaunchMotor.getEncoder().setVelocityConversionFactor(Constants.Launcher.WheelCircumference);
 
         this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
         this.IntakeMotor = new CANSparkMax(7, MotorType.kBrushless);
@@ -121,18 +131,27 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
        return this.NoteDetected;
     }
 
-    /**
-     * Rotational speed of Launch motors in M/s
-     * 
-     * @return
-     */
-    public double Speed()
+    public void SetLoaded(boolean loaded)
     {
-        return RobotBase.isReal() ? this.TopLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference : 0;
+        this.NoteCount = loaded ? 1 : 0;
+        this.NoteLastDetected = this.NoteSensor.getProximity() > 100;
+        this.NoteDetected = loaded;
+    }
+
+    public LaunchSpeeds GetSpeeds()
+    {
+        if (RobotBase.isSimulation()) return new LaunchSpeeds();
+
+        return new LaunchSpeeds(
+            this.TopLaunchMotor.getEncoder().getVelocity() / 60,
+            this.BottomLaunchMotor.getEncoder().getVelocity() / 60
+        );
     }
 
     public void SetLaunchSpeed(double percentage)
     {
+        if (RobotBase.isSimulation()) return;
+
         this.TopLaunchMotor.set(percentage);
         this.BottomLaunchMotor.set(percentage);
     }
@@ -148,6 +167,11 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         }
     }
 
+    private void UpdateMotors()
+    {
+
+    }
+
     @Override
     protected void realPeriodic()
     {
@@ -160,10 +184,15 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
 
+    // public Command RunLaunchSpeed(double percentage)
+    // {
+    //     return Commands.run(() -> this.SetLaunchSpeed(percentage), this)
+    //         .onlyWhile();
+    // }
+
     public Command Launch()
     {
-        if (RobotBase.isSimulation())
-            return Commands.none();
+        if (RobotBase.isSimulation()) return Commands.none();
 
         // Wind-up, spin-up THEN start middle intake motors to push into launch motors
         // then END!
@@ -178,14 +207,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        builder.addDoubleProperty("Launcher Speed", () -> this.Speed(), null);
-        // builder.addDoubleProperty("Intake Speed", () -> RobotBase.isReal() ?
-        // this.GroundIntakeMotor.get() : 0, null);
+        builder.addStringProperty("Launcher Speed", () -> this.GetSpeeds().toString(), null);
 
         if (RobotBase.isReal())
-        {
-            // builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
-            
+        {            
             builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
         }
     }
@@ -200,7 +225,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
                     (voltage) -> this.TopLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
                     (log) ->
                     {
-                        log.motor("flywheel-top")
+                        log.motor("launch-flywheel-top")
                             .voltage(Units.Volts.of(this.TopLaunchMotor.getBusVoltage()))
                             .linearVelocity(Units.MetersPerSecond.of(this.TopLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference))
                             .linearPosition(Units.Meters.of(this.TopLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));
@@ -215,7 +240,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
                     (voltage) -> this.BottomLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
                     (log) ->
                     {
-                        log.motor("flywheel-bottom")
+                        log.motor("launch-flywheel-bottom")
                             .voltage(Units.Volts.of(this.BottomLaunchMotor.getBusVoltage()))
                             .linearVelocity(Units.MetersPerSecond.of(this.BottomLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference))
                             .linearPosition(Units.Meters.of(this.BottomLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));

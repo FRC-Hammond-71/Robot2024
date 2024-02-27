@@ -126,6 +126,13 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotPeriodic() 
 	{
+		// Emergency stop on Driver Controller.
+		if (Controllers.DriverController.getPOV() == 180 || Controllers.ShooterController.getPOV() == 180) 
+		{
+			this.Stop();
+			return;
+		}
+
 		if (Controllers.DriverController.getBackButtonPressed())
 		{
 			var driveCommand = CommandScheduler.getInstance().requiring(Drive);
@@ -134,13 +141,6 @@ public class Robot extends TimedRobot
 			{
 				CommandScheduler.getInstance().cancel(driveCommand);
 			}
-		}
-
-		// Emergency stop on Driver Controller.
-		if (Controllers.DriverController.getPOV() == 180 || Controllers.ShooterController.getPOV() == 180) 
-		{
-			this.Stop();
-			return;
 		}
 
 		// Execute / iterate all subsystems, then commands.
@@ -181,9 +181,20 @@ public class Robot extends TimedRobot
 		{
 			if (RobotBase.isSimulation()) return;
 
+			// Reset the logic which determines if a note is loaded if something goes wrong.
+			if (Controllers.ShooterController.getPOV() == 180)
+			{
+				Launcher.SetLoaded(false);
+			}
+			else if (Controllers.ShooterController.getPOV() == 0)
+			{
+				Launcher.SetLoaded(true);
+			}
+
 			if (Controllers.ShooterController.getRightBumperPressed())
 			{
 				GameCommands.AutoRotateAndLaunch().withTimeout(5).schedule();
+				return;
 			}
 
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
@@ -243,6 +254,7 @@ public class Robot extends TimedRobot
 
 		// }, Arm));
 	}
+	
 	@Override
 	public void teleopExit()
 	{

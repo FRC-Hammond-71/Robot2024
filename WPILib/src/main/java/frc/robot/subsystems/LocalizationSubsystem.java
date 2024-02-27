@@ -202,17 +202,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         }
     }
 
-    @Override
-    public void periodic()
-    {
-        super.periodic();
-
-        Constants.Field.setRobotPose(this.GetEstimatedPose());
-
-        // Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
-        // Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
-    }
-
     protected void UpdatePoseEstimationUsingWheels()
     {
         var wheelPositions = Robot.Drive.GetWheelPositions();
@@ -271,23 +260,22 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     }
 
     @Override
-    protected void realPeriodic()
+    public void periodic()
     {
-        // this.UpdatePoseEstimationUsingWheels();
-        // this.UpdatePoseEstimationUsingIMU();
-        // this.UpdatePoseEstimationUsingVision();
+        super.periodic();
 
         // Update smart-dashboard with Robot positioning at default 20 Hz
         Constants.Field.setRobotPose(this.GetEstimatedPose());
+
+        // Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
+        // Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
     }
 
     @Override
-    public void initSendable(SendableBuilder builder)
+    protected void realPeriodic()
     {
-        if (RobotBase.isReal())
-        {
-            // builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
-            // builder.addBooleanProperty("Is IMU Connected", () -> this.IMU.isConnected(), null);
-        }
+        this.UpdatePoseEstimationUsingWheels();
+        // this.UpdatePoseEstimationUsingIMU();
+        this.UpdatePoseEstimationUsingVision();
     }
 }

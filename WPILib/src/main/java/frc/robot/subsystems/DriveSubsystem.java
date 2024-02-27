@@ -51,11 +51,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
     // https://www.revrobotics.com/rev-21-1650/
     private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
-
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
-
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
-
     private MedianFilter InputFilter = new MedianFilter(3);
 
     // private SimpleMotorFeedforward FeedForward = new
@@ -76,9 +73,9 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     protected void initializeReal()
     {
         this.LeftLeadMotor = new CANSparkMax(1, MotorType.kBrushless);
-        this.RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
         this.LeftFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
         this.RightFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
+        this.RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
 
         this.LeftLeadMotor.setInverted(false);
         this.RightLeadMotor.setInverted(true);

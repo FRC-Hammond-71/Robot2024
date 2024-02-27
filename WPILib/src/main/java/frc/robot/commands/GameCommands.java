@@ -12,7 +12,6 @@ public class GameCommands
 {
 	public static Command IntakeNote()
 	{
-		// return Robot.Arm.RunRotate(Constants.Arm.LoadingAngle)
 		return Robot.Launcher.RunIntake()
 			.onlyWhile(() -> !Robot.Launcher.IsLoaded())
 			.withName("IntakeNote");
@@ -25,14 +24,11 @@ public class GameCommands
 		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
 
 		// Consider checking if a note is loaded? If not, command will end?
-		// return new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError)
-		// 		.andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
-		// 		.andThen(Robot.Launcher.Launch())
-		// 		.withName("AutoRotateAndLaunch");
-			
-		return Robot.Arm.RunRotate(firingSolution.ArmAngle)
-			.andThen(Robot.Launcher.Launch())
-			.withName("PitchRotateAndLaunch");
+		return Commands.runOnce(() -> Robot.Launcher.SetLaunchSpeed(0.6))
+			.andThen(new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError)
+				.andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
+				.andThen(Robot.Launcher.Launch())
+				.withName("AutoRotateAndLaunch"));
 	}
 
 	public static Command GotoSpeakerAndLaunch()

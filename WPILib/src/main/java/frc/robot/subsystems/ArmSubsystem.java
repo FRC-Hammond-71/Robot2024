@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -34,6 +35,7 @@ import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
 import frc.robot.Robot;
+import frc.robot.utilities.Rotation2dUtils;
 
 public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot> 
 {
@@ -103,6 +105,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         return this.GetTargetAngle().minus(this.GetActualAngle());
     }
 
+    public boolean InBounds()
+    {
+        return Rotation2dUtils.InBounds(this.GetActualAngle(), Constants.Arm.MinAngle, Constants.Arm.MaxAngle);
+    }
+
     /**
      * @param rotation The desired rotation.
      * @return Whether or not the launcher is in the desired pitch and within Constants.Arm.AllowedAngleError error. 
@@ -144,7 +151,6 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         this.UpdateMotors();
     }
-
     private void SetAngle(Optional<Double> voltage)
     {
         this.OverrideRotation = voltage;
@@ -155,8 +161,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     protected void UpdateMotors()
     {
         // https://www.chiefdelphi.com/t/understanding-feedforward-v-feedback-and-how-their-calculated/186889/10
-
-
+        if (this.OverrideRotation.isPresent())
+        {
+            this.Motor.setVoltage(this.OverrideRotation.get());
+            return;
+        }
         
         if (this.IsHolding())
         {
@@ -205,9 +214,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     public void simulationPeriodic() 
     {
-        this.UpdateMotors();
-
         this.SimulatedArm.update(0.02);
+        
+        this.UpdateMotors();
     }
 
     @Override
@@ -222,7 +231,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         builder.addBooleanProperty("Holding", this::IsHolding, null);
 
         this.addChild("Visualization", this.Visualization);
-        this.addChild("PID", this.PID);
+        // this.addChild("PID", this.PID);
     }
 
     /**
@@ -237,40 +246,36 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Command PerformSysID()
     {
-        // var sysId = new SysIdRoutine(new SysIdRoutine.Config(
+        var sysId = new SysIdRoutine(new SysIdRoutine.Config(
 
-		// 	edu.wpi.first.units.Units.Volts.of(0.25).per(edu.wpi.first.units.Units.Seconds.of(1)),
-		// 	edu.wpi.first.units.Units.Volts.of(0.5),
-		// 	edu.wpi.first.units.Units.Seconds.of(3.4)
+			edu.wpi.first.units.Units.Volts.of(0.25).per(edu.wpi.first.units.Units.Seconds.of(1)),
+			edu.wpi.first.units.Units.Volts.of(0.5),
+			edu.wpi.first.units.Units.Seconds.of(3.4)
 
-		// ), new SysIdRoutine.Mechanism(
-		// 	(voltage) -> 
-		// 	{
-		// 		System.out.println(voltage);
+		), new SysIdRoutine.Mechanism(
+			(voltage) -> 
+			{
+				System.out.println(voltage);
 
-		// 		// Apply voltages to motors.
-		// 		this.Set(Optional.of(Motor.)));
-		// 	},
-		// 	(log) ->
-		// 	{
-		// 		log.motor("arm")
-                
-		// 			.voltage(edu.wpi.first.units.Units.Volts.of(this.Motor.getBusVoltage()))
-		// 			.angularVelocity(edu.wpi.first.units.Units.Radians.of(this.relativeEncoder.getVelocity()).per(edu.wpi.first.units.Units.Minutes.of(1)))
-        //             .angularPosition(edu.wpi.first.units.Units.Radians.of(this.GetActualAngle().getRadians()));
-        //     },  
-		// 	this));
+				// Apply voltages to motors.
+				this.SetAngle(Optional.of(voltage.baseUnitMagnitude()));
+			},
+			(log) ->
+			{
+				log.motor("arm")
+					.voltage(edu.wpi.first.units.Units.Volts.of(this.Motor.getBusVoltage()))
+					.angularVelocity(edu.wpi.first.units.Units.Radians.of(this.relativeEncoder.getVelocity()).per(edu.wpi.first.units.Units.Minutes.of(1)))
+                    .angularPosition(edu.wpi.first.units.Units.Radians.of(this.GetActualAngle().getRadians()));
+            },  
+			this));
 
-		// return sysId
-		// 	.quasistatic(Direction.kForward)
-		// 	.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-		// 	.andThen(sysId.quasistatic(Direction.kReverse))
-		// 	.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
-		// 	.andThen(sysId.dynamic(Direction.kForward))
-		// 	.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-		// 	.andThen(sysId.dynamic(Direction.kReverse))
-		// 	.finallyDo(() -> this.Stop());
-
-        return Commands.none();
+		return this.RunRotate(Constants.Arm.MaxAngle.minus(Rotation2d.fromDegrees(5))) 
+            .andThen(sysId
+			.quasistatic(Direction.kForward)
+			.andThen(sysId.quasistatic(Direction.kReverse))
+			.andThen(sysId.dynamic(Direction.kForward))
+			.andThen(sysId.dynamic(Direction.kReverse))
+            .onlyWhile(this::InBounds)
+			.finallyDo(() -> this.Stop()));
     }
 }
