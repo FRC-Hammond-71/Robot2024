@@ -3,7 +3,9 @@
   "robotLength": 0.9,
   "holonomicMode": false,
   "pathFolders": [
-    "New Folder"
+    "P3-M",
+    "P1-M",
+    "P2-M"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

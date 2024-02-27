@@ -10,13 +10,12 @@ import frc.robot.math.LauncherFiringSolution;
 
 public class GameCommands
 {
-	public static Command IntakeNoteAndLoadIntoLauncher()
+	public static Command IntakeNote()
 	{
 		// return Robot.Arm.RunRotate(Constants.Arm.LoadingAngle)
-		return Commands
-			.parallel(Robot.Launcher.RunGroundIntake(), Robot.Launcher.RunIntake())
+		return Robot.Launcher.RunIntake()
 			.onlyWhile(() -> !Robot.Launcher.IsLoaded())
-			.withName("IntakeNoteAndLoadIntoLauncher");
+			.withName("IntakeNote");
 	}
 
 	public static Command AutoRotateAndLaunch()
@@ -26,10 +25,14 @@ public class GameCommands
 		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
 
 		// Consider checking if a note is loaded? If not, command will end?
-		return new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError)
-				.andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
-				.andThen(Robot.Launcher.Launch())
-				.withName("AutoRotateAndLaunch");
+		// return new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError)
+		// 		.andThen(Robot.Arm.RunRotate(firingSolution.ArmAngle))
+		// 		.andThen(Robot.Launcher.Launch())
+		// 		.withName("AutoRotateAndLaunch");
+			
+		return Robot.Arm.RunRotate(firingSolution.ArmAngle)
+			.andThen(Robot.Launcher.Launch())
+			.withName("PitchRotateAndLaunch");
 	}
 
 	public static Command GotoSpeakerAndLaunch()

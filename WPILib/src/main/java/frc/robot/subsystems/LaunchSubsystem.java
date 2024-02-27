@@ -154,16 +154,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         
     }
 
-
-    public Command RunGroundIntake()
-    {
-        return Commands.runEnd(() -> this.GroundIntakeMotor.set(0.3), () -> this.GroundIntakeMotor.stopMotor(), this);
-    }
-
     
     public Command RunIntake()
     {
-        return Commands.runEnd(() -> this.IntakeMotor.set(0.3), () -> this.IntakeMotor.stopMotor(), this);
+        return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
 
     public Command Launch()
@@ -173,17 +167,12 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         // Wind-up, spin-up THEN start middle intake motors to push into launch motors
         // then END!
-        // return Commands.run(() -> this.LaunchSpeed = 1, this).onlyWhile(() ->
-        // this.TopLaunchMotor.get() != 1)
-        // .andThen(Commands.runEnd(() -> this.IntakeMotor.set(0.3), () ->
-        // this.IntakeMotor.stopMotor(), this))
-        // .onlyWhile(() -> !this.IsLoaded())
-        // .finallyDo(() -> {
-        // this.LaunchSpeed = 0;
-        // this.IntakeMotor.stopMotor();
-        // });
 
-        return Commands.none();
+        return Commands.run(() -> this.SetLaunchSpeed(0.7))
+            .withTimeout(1)
+            .andThen(Commands.run(() -> this.IntakeMotor.set(0.3)))
+            .onlyWhile(() -> !this.IsLoaded())
+            .finallyDo(() -> this.Stop());
     }
 
     @Override

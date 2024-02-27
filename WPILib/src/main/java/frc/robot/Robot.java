@@ -92,11 +92,11 @@ public class Robot extends TimedRobot
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);
 			
-		NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
+		// NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
 		// NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
 		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
-
+		NamedCommands.registerCommand("IntakeNote", GameCommands.IntakeNote());
 		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
 			// Do whatever you want with the pose here
 			Constants.Field.setRobotPose(pose);
@@ -183,7 +183,7 @@ public class Robot extends TimedRobot
 
 			if (Controllers.ShooterController.getRightBumperPressed())
 			{
-				// GameCommands.IntakeNoteAndLoadIntoLauncher().withTimeout(5).schedule();
+				GameCommands.AutoRotateAndLaunch().withTimeout(5).schedule();
 			}
 
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;

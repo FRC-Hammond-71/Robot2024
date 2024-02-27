@@ -90,40 +90,41 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super(robot);
 
-        this.RelativeSensorUpdateNotifier = new Notifier(() -> 
-        {
-            if (RobotBase.isSimulation()) return;
+        // this.RelativeSensorUpdateNotifier = new Notifier(() -> 
+        // {
+        //     if (RobotBase.isSimulation()) return;
 
-            // Read sensors such as the drive encoders and IMU at 200 Hz
+        //     // Read sensors such as the drive encoders and IMU at 200 Hz
 
-            try
-            {
-                this.UpdatePoseEstimationUsingWheels();
-            }
-            catch (Exception ex)
-            {
-                DataLogManager.log("Exception raised during UpdatePoseEstimationUsingWheels:\n" + ex.toString());
-            }
+        //     try
+        //     {
+        //         this.UpdatePoseEstimationUsingWheels();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         DataLogManager.log("Exception raised during UpdatePoseEstimationUsingWheels:\n" + ex.toString());
+        //     }
 
-            // this.UpdatePoseEstimationUsingIMU();
-        });
-        this.RelativeSensorUpdateNotifier.startPeriodic(0.005);
+        //     // this.UpdatePoseEstimationUsingIMU();
+        // });
+        // this.RelativeSensorUpdateNotifier.startPeriodic(0.20);
+        // // this.RelativeSensorUpdateNotifier.startPeriodic(0.005);
 
-        this.VisionUpdateNotifier = new Notifier(() ->
-        {
-            if (RobotBase.isSimulation()) return;
+        // this.VisionUpdateNotifier = new Notifier(() ->
+        // {
+        //     if (RobotBase.isSimulation()) return;
 
-            try
-            {
-                // Update field-position vision at 16 Hz
-                this.UpdatePoseEstimationUsingVision(); 
-            }
-            catch (Exception ex)
-            {
-                DataLogManager.log("Exception raised during VisionUpdateNotifier:\n" + ex.toString());
-            }
-        });
-        this.VisionUpdateNotifier.startPeriodic(0.06);
+        //     try
+        //     {
+        //         // Update field-position vision at 16 Hz
+        //         this.UpdatePoseEstimationUsingVision(); 
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         DataLogManager.log("Exception raised during VisionUpdateNotifier:\n" + ex.toString());
+        //     }
+        // });
+        // this.VisionUpdateNotifier.startPeriodic(0.60);
     }
     
     @Override
@@ -206,14 +207,10 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super.periodic();
 
+        Constants.Field.setRobotPose(this.GetEstimatedPose());
+
         // Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
         // Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
-    }
-
-    @Override
-    public void simulationPeriodic()
-    {
-        Constants.Field.setRobotPose(this.GetEstimatedPose());
     }
 
     protected void UpdatePoseEstimationUsingWheels()
@@ -289,15 +286,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
-            builder.addBooleanProperty("Is IMU Connected", () -> this.IMU.isConnected(), null);
+            // builder.addDoubleProperty("IMU Update Rate", () -> this.IMUTimer.Period.toMillis(), null);
+            // builder.addBooleanProperty("Is IMU Connected", () -> this.IMU.isConnected(), null);
         }
-
-        builder.addStringProperty("Estimated Position", () ->
-        {
-            var estimatedPose = this.GetEstimatedPose();
-            return String.format("X: %.2f Y: %.2f Heading: %.2f", estimatedPose.getX(), estimatedPose.getY(),
-                    estimatedPose.getRotation().getRadians());
-        }, null);
     }
 }

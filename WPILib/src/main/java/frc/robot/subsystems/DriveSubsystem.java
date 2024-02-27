@@ -83,9 +83,9 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         this.LeftLeadMotor.setInverted(false);
         this.RightLeadMotor.setInverted(true);
 
-        this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
+        this.RightFollowMotor.setIdleMode(IdleMode.kBrake);
         this.RightLeadMotor.setIdleMode(IdleMode.kCoast);
-        this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
+        this.LeftFollowMotor.setIdleMode(IdleMode.kBrake);
         this.LeftLeadMotor.setIdleMode(IdleMode.kCoast);
 
         this.LeftFollowMotor.follow(this.LeftLeadMotor);
@@ -225,11 +225,11 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     }
     public void SetArcade(double xSpeed, double zRotation)
     {
-        xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
         xSpeed = Controllers.ApplyDeadzone(xSpeed);
+        xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
 
-        zRotation = Math.copySign(zRotation * zRotation, zRotation);
         zRotation = Controllers.ApplyDeadzone(zRotation);
+        zRotation = Math.copySign(zRotation * zRotation, zRotation);
 
         this.Set(new ChassisSpeeds(
             xSpeed * Constants.Drivetrain.MaxForwardSpeed,
