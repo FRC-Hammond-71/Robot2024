@@ -89,14 +89,6 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
         this.LeftLeadMotor.getEncoder().setPosition(0);
         this.RightLeadMotor.getEncoder().setPosition(0);
-        // this.LeftLeadMotor.getEncoder().setPositionConversionFactor(
-        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        // this.RightLeadMotor.getEncoder().setPositionConversionFactor(
-        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        // this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(
-        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        // this.RightLeadMotor.getEncoder().setVelocityConversionFactor(
-        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
     }
 
     @Override
@@ -118,10 +110,10 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         return new DifferentialDriveWheelPositions(
             RobotBase.isReal() 
-                ? this.LeftLeadMotor.getEncoder().getPosition()
+                ? this.GetLeftWheelPosition()
                 : this.SimulatedDrive.getLeftPositionMeters(),
             RobotBase.isReal() 
-                ? this.RightLeadMotor.getEncoder().getPosition()
+                ? this.GetRightWheelPosition()
                 : this.SimulatedDrive.getRightPositionMeters());
     }
 
@@ -163,8 +155,11 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         {
             this.LeftLeadMotor.getEncoder().setPosition(0);
             this.RightLeadMotor.getEncoder().setPosition(0);
-        } else
+        } 
+        else
+        {
             this.SimulatedDrive.setPose(new Pose2d());
+        }
     }
 
     /**

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
@@ -156,10 +157,10 @@ public class Robot extends TimedRobot
 	{
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
-			if (Controllers.DriverController.getLeftBumperPressed() && RobotBase.isSimulation())
-			{
-				Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
-			}
+			// if (Controllers.DriverController.getLeftBumperPressed() && RobotBase.isSimulation())
+			// {
+			// 	Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
+			// }
  
             // if (Controllers.DriverController.getAButtonPressed())
             // {
@@ -172,22 +173,23 @@ public class Robot extends TimedRobot
             //     PathCommands.PathToAmplifier().schedule();
             // }
 
-			if (Controllers.ShooterController.getBButtonPressed())
-			{
-				GameCommands.GotoSpeakerAndLaunch().schedule();
-			}
-
             Drive.SetArcade(-Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
 
 		}, Drive));
 		
 		Launcher.setDefaultCommand(Commands.run(() -> 
 		{
-			// if (Controllers.ShooterController.getRightBumperPressed())
+			// if (Controllers.DriverController.getRightBumperPressed())
 			// {
 			// 	GameCommands.AutoRotateAndLaunch().schedule();
 			// 	return;
 			// }
+
+			if (Controllers.DriverController.getLeftBumperPressed())
+			{
+				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.21, 0.16)).schedule();
+				return;
+			}
 
 			if (RobotBase.isSimulation()) return;
 
@@ -203,35 +205,23 @@ public class Robot extends TimedRobot
 
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
 			speed = Math.copySign(speed * speed, speed);
-
-			if (Controllers.ShooterController.getLeftBumper())
-			{
-				// Commands.run(() -> Launcher.SetLaunchSpeed(0.14)).withTimeout(2).schedule();
-
-				// Launcher.SetLaunchSpeed(0.14);
-				
-				// speed = 0.15;
-
-				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.21, 0.16)).schedule();
-				return;
-			}
-
+			
 			if (Controllers.ShooterController.getAButton())
 			{
 				speed = -0.1;
 				Launcher.GroundIntakeMotor.set(-0.1);
 				Launcher.IntakeMotor.set(-0.1);
 			}
-			else if (Controllers.ShooterController.getYButton())
+			// else if (Controllers.ShooterController.getYButton())
+			// {
+			// 	Launcher.GroundIntakeMotor.set(0.5);
+			// 	Launcher.IntakeMotor.set(0.5);
+			// 	Arm.SetAngle(Rotation2d.fromDegrees(50));
+			// }
+			else if (Controllers.ShooterController.getYButtonPressed())
 			{
-				Launcher.GroundIntakeMotor.set(0.5);
-				Launcher.IntakeMotor.set(0.5);
-				Arm.SetAngle(Rotation2d.fromDegrees(50));
-			}
-			else 
-			{
-				Launcher.GroundIntakeMotor.set(0);
-				Launcher.IntakeMotor.set(0);	
+				System.out.println("Picking up a Note!");
+				GameCommands.IntakeNote().schedule();
 			}
 			
 			Launcher.SetLaunchSpeed(speed);
@@ -242,7 +232,7 @@ public class Robot extends TimedRobot
 		{
 			if (Controllers.ShooterController.getXButtonPressed())
 			{
-				Arm.RunRotate(Constants.Arm.LoadingAngle).schedule();
+				Arm.RunRotate(Rotation2d.fromDegrees(55)).schedule();
 			}
 			else
 			{
@@ -276,6 +266,8 @@ public class Robot extends TimedRobot
 	public void testInit() 
 	{
 		// Launcher.PerformSysID().schedule();
+
+		Arm.PerformSysID().schedule();
 	}
 
 	

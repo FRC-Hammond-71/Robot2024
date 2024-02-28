@@ -75,7 +75,6 @@ public class FaceAtCommand extends Command
 	public void end(boolean interrupted)
 	{
 		Robot.Drive.Stop();
-		// this.ProfiledPID.reset(0);
 		System.out.println("We are done aligning!");
 	}
 }

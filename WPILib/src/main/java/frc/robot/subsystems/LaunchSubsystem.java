@@ -186,10 +186,11 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     }
 
     
-    public Command RunIntake()
+    public Command Intake(double percentage)
     {
-        return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
+        return Commands.runEnd(() -> { this.IntakeMotor.set(percentage); this.GroundIntakeMotor.set(percentage); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
+    
 
     // public Command RunLaunchSpeed(double percentage)
     // {
@@ -226,7 +227,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         var topSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(4),
+                Units.Volts.of(6),
                 Units.Seconds.of(12)),
                 new SysIdRoutine.Mechanism(
                     (voltage) -> this.TopLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
@@ -241,7 +242,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         var bottomSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(4),
+                Units.Volts.of(6),
                 Units.Seconds.of(12)),
                 new SysIdRoutine.Mechanism(
                     (voltage) -> this.BottomLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
