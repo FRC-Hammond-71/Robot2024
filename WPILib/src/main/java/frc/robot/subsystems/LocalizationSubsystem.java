@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.HiddenAction;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -164,6 +166,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             ? this.PoseEstimator.getEstimatedPosition()
             : Robot.Drive.SimulatedDrive.getPose();
 
+        // return pose;
+
         return new Pose2d(
             pose.getTranslation(),
             Rotation2d.fromRadians(MathUtil.inputModulus(pose.getRotation().getRadians(), -Math.PI, Math.PI)));
@@ -276,6 +280,13 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         this.UpdatePoseEstimationUsingWheels();
         // this.UpdatePoseEstimationUsingIMU();
-        this.UpdatePoseEstimationUsingVision();
+        // this.UpdatePoseEstimationUsingVision();
+        
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder)
+    {
+        builder.addDoubleProperty("Yaw", () -> this.GetEstimatedPose().getRotation().getDegrees(), null);
     }
 }

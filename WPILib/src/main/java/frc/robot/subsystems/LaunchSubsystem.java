@@ -155,6 +155,13 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.TopLaunchMotor.set(percentage);
         this.BottomLaunchMotor.set(percentage);
     }
+    public void SetLaunchSpeed(double percentageTop, double percentageBottom)
+    {
+        if (RobotBase.isSimulation()) return;
+
+        this.TopLaunchMotor.set(percentageTop);
+        this.BottomLaunchMotor.set(percentageBottom);
+    }
 
     public void Stop()
     {
@@ -190,17 +197,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     //         .onlyWhile();
     // }
 
-    public Command Launch()
+    public Command Launch(double percentageTop, double percentageBottom)
     {
         if (RobotBase.isSimulation()) return Commands.none();
 
         // Wind-up, spin-up THEN start middle intake motors to push into launch motors
         // then END!
 
-        return Commands.run(() -> this.SetLaunchSpeed(0.7))
+        return Commands.run(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
             .withTimeout(1)
             .andThen(Commands.run(() -> this.IntakeMotor.set(0.3)))
-            .onlyWhile(() -> !this.IsLoaded())
+            .withTimeout(1.5)
             .finallyDo(() -> this.Stop());
     }
 

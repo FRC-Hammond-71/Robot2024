@@ -14,7 +14,7 @@ public final class Constants
 	/**
 	 * Weight of Robot in Lb
 	 */
-	public static double RobotWeight = 120;
+	public static double RobotWeight = 80;
 
 	public static class RedField
 	{
@@ -41,7 +41,7 @@ public final class Constants
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(360 * 2);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(300);
 
 		/**
 		 * The maximum rotational acceleration in a second.
@@ -88,7 +88,7 @@ public final class Constants
 
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(100);
 
-		public static Rotation2d MinAngle = Rotation2d.fromDegrees(60);
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(45);
 
 		public static Rotation2d LoadingAngle = Rotation2d.fromDegrees(70);
 

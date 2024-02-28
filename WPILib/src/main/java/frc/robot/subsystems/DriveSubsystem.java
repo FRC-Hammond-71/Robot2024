@@ -53,7 +53,6 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
-    private MedianFilter InputFilter = new MedianFilter(3);
 
     // private SimpleMotorFeedforward FeedForward = new
     // SimpleMotorFeedforward(0.10158, 2.161, 0.53799);
@@ -90,14 +89,14 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
         this.LeftLeadMotor.getEncoder().setPosition(0);
         this.RightLeadMotor.getEncoder().setPosition(0);
-        this.LeftLeadMotor.getEncoder().setPositionConversionFactor(
-            -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.RightLeadMotor.getEncoder().setPositionConversionFactor(
-            -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(
-            -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
-        this.RightLeadMotor.getEncoder().setVelocityConversionFactor(
-            -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+        // this.LeftLeadMotor.getEncoder().setPositionConversionFactor(
+        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+        // this.RightLeadMotor.getEncoder().setPositionConversionFactor(
+        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+        // this.LeftLeadMotor.getEncoder().setVelocityConversionFactor(
+        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
+        // this.RightLeadMotor.getEncoder().setVelocityConversionFactor(
+        //     -Constants.Drivetrain.WheelCircumference / Constants.Drivetrain.WheelGearing);
     }
 
     @Override
@@ -131,8 +130,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
      */
     public double GetLeftWheelVelocity()
     {
-        return (this.LeftLeadMotor.getEncoder().getVelocity() + this.LeftFollowMotor.getEncoder().getVelocity()) / 2
-                / 60;
+        return (this.LeftLeadMotor.getEncoder().getVelocity() / 60) / Constants.Drivetrain.WheelGearing * 2 * Math.PI * Constants.Drivetrain.WheelRadius;
     }
 
     /**
@@ -140,8 +138,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
      */
     public double GetRightWheelVelocity()
     {
-        return (this.RightLeadMotor.getEncoder().getVelocity() + this.RightFollowMotor.getEncoder().getVelocity()) / 2
-                / 60;
+        return (this.RightLeadMotor.getEncoder().getVelocity() / 60) / Constants.Drivetrain.WheelGearing * 2 * Math.PI * Constants.Drivetrain.WheelRadius;
     }
 
     /**
@@ -149,7 +146,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
      */
     public double GetLeftWheelPosition()
     {
-        return (this.LeftLeadMotor.getEncoder().getPosition() + this.LeftFollowMotor.getEncoder().getPosition()) / 2;
+        return this.LeftLeadMotor.getEncoder().getPosition() / Constants.Drivetrain.WheelGearing * 2 * Math.PI * Constants.Drivetrain.WheelRadius;
     }
 
     /**
@@ -157,7 +154,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
      */
     public double GetRightWheelPosition()
     {
-        return (this.RightLeadMotor.getEncoder().getPosition() + this.RightFollowMotor.getEncoder().getPosition()) / 2;
+        return this.RightLeadMotor.getEncoder().getPosition() / Constants.Drivetrain.WheelGearing * 2 * Math.PI * Constants.Drivetrain.WheelRadius;
     }
 
     public void ResetEncoders()
@@ -252,19 +249,14 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(InputFilter.calculate(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.15)));
-            this.RightLeadMotor.setVoltage(InputFilter.calculate(FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.15)));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.15));
+            this.RightLeadMotor.setVoltage((FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.15)));
         } 
         else
         {
             this.SimulatedDrive.setInputs(
-                InputFilter.calculate(
-                    FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(),
-                    nextWheelSpeeds.leftMetersPerSecond, 0.02)),
-
-                InputFilter.calculate(FeedForward.calculate(
-                    this.SimulatedDrive.getRightVelocityMetersPerSecond(),
-                    nextWheelSpeeds.rightMetersPerSecond, 0.02)));
+                FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(), nextWheelSpeeds.leftMetersPerSecond, 0.02),
+                FeedForward.calculate(this.SimulatedDrive.getRightVelocityMetersPerSecond(), nextWheelSpeeds.rightMetersPerSecond, 0.02));
         }
     }
 
@@ -288,16 +280,16 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
-            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
+            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelPosition, null);
+            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelPosition, null);
+            builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.getBusVoltage(), null);
+            builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.getBusVoltage(), null);
         }
 
         builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
         builder.addDoubleProperty("Desired Rotation", () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
                 null);
 
-        builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.get() * 12, null);
-        builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.get() * 12, null);
 
         builder.addDoubleProperty("Actual Speed", () ->this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation",

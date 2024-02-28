@@ -81,13 +81,17 @@ public class Robot extends TimedRobot
 
 		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
 		// SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
-		SmartDashboard.putData("Arm PID", Arm.PID);
+		// SmartDashboard.putData("Arm PID", Arm.PID);
 		
 		AutoBuilder.configureRamsete(
 			Localization::GetEstimatedPose,
 			(pose) -> Localization.ResetPosition(pose),
 			() -> Drive.GetSpeeds(),
-			(targetSpeeds) -> Drive.Set(targetSpeeds),
+			(targetSpeeds) ->
+			{
+				System.out.println(targetSpeeds.toString());
+				Drive.Set(targetSpeeds);
+			},
 			new ReplanningConfig(true, false),
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);
@@ -168,10 +172,10 @@ public class Robot extends TimedRobot
             //     PathCommands.PathToAmplifier().schedule();
             // }
 
-			// if (Controllers.DriverController.getAButtonPressed())
-			// {
-			// 	GameCommands.GotoSpeakerAndLaunch().schedule();
-			// }
+			if (Controllers.ShooterController.getBButtonPressed())
+			{
+				GameCommands.GotoSpeakerAndLaunch().schedule();
+			}
 
             Drive.SetArcade(-Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
 
@@ -179,6 +183,12 @@ public class Robot extends TimedRobot
 		
 		Launcher.setDefaultCommand(Commands.run(() -> 
 		{
+			// if (Controllers.ShooterController.getRightBumperPressed())
+			// {
+			// 	GameCommands.AutoRotateAndLaunch().schedule();
+			// 	return;
+			// }
+
 			if (RobotBase.isSimulation()) return;
 
 			// Reset the logic which determines if a note is loaded if something goes wrong.
@@ -191,12 +201,6 @@ public class Robot extends TimedRobot
 				Launcher.SetLoaded(true);
 			}
 
-			if (Controllers.ShooterController.getRightBumperPressed())
-			{
-				GameCommands.AutoRotateAndLaunch().withTimeout(5).schedule();
-				return;
-			}
-
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
 			speed = Math.copySign(speed * speed, speed);
 
@@ -205,7 +209,11 @@ public class Robot extends TimedRobot
 				// Commands.run(() -> Launcher.SetLaunchSpeed(0.14)).withTimeout(2).schedule();
 
 				// Launcher.SetLaunchSpeed(0.14);
-				speed = 0.15;
+				
+				// speed = 0.15;
+
+				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.21, 0.16)).schedule();
+				return;
 			}
 
 			if (Controllers.ShooterController.getAButton())
@@ -218,6 +226,7 @@ public class Robot extends TimedRobot
 			{
 				Launcher.GroundIntakeMotor.set(0.5);
 				Launcher.IntakeMotor.set(0.5);
+				Arm.SetAngle(Rotation2d.fromDegrees(50));
 			}
 			else 
 			{
@@ -229,30 +238,26 @@ public class Robot extends TimedRobot
 
 		}, Launcher));
 
-		// Arm.setDefaultCommand(Commands.run(() ->
-		// {
-		// 	if (Controllers.ShooterController.getXButtonPressed())
-		// 	{
-		// 		Arm.RunRotate(Constants.Arm.LoadingAngle).schedule();	
-		// 	}
-		// 	else
-		// 	{
-		// 		Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
-		// 	}
+		Arm.setDefaultCommand(Commands.run(() ->
+		{
+			if (Controllers.ShooterController.getXButtonPressed())
+			{
+				Arm.RunRotate(Constants.Arm.LoadingAngle).schedule();
+			}
+			else
+			{
+				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+			}
 
-		// 	if (RobotBase.isSimulation()) return;
+			if (RobotBase.isSimulation()) return;
 
-		// 	// if (Controllers.ShooterController.getBackButtonPressed())
-		// 	// {
-		// 	// 	System.out.println("Arm Encoder Pos Reset");
-		// 	// 	Arm.Encoder.reset();
-		// 	// }
+			// if (Controllers.ShooterController.getBackButtonPressed())
+			// {
+			// 	System.out.println("Arm Encoder Pos Reset");
+			// 	Arm.Encoder.reset();
+			// }
 
-
-		// 	// Arm.Motor.set(Controllers.ShooterController.getRightY() * 0.4);
-		// 	// System.out.println(Controllers.ShooterController.getRightY() * 0.4);
-
-		// }, Arm));
+		}, Arm));
 	}
 	
 	@Override

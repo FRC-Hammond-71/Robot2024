@@ -17,8 +17,6 @@ public class FaceAtCommand extends Command
 {
 	public final Translation2d Target;
 
-	public PIDController OutputController = new PIDController(Math.PI * 1.5, Math.PI / 2, Math.PI / 4);
-
 	public final Rotation2d AllowedError;
 
 	public FaceAtCommand(Translation2d position, Rotation2d error)
@@ -30,8 +28,7 @@ public class FaceAtCommand extends Command
 
 		addRequirements(Robot.Drive);
 		addRequirements(Robot.Localization);
-	}
-	
+	}	
 
 	/**
 	 * @return The angle between the Robot and the Target.
@@ -56,6 +53,7 @@ public class FaceAtCommand extends Command
 	public boolean isFinished()
 	{
 		var heading_error = this.GetHeadingError();
+
 		// System.out.println(heading_error);
 		return heading_error.getDegrees() < AllowedError.getDegrees() && heading_error.getDegrees() > -AllowedError.getDegrees();
 	}
@@ -63,15 +61,11 @@ public class FaceAtCommand extends Command
 	@Override
 	public void execute()
 	{
-		var output = this.OutputController.calculate(
-				Robot.Localization.GetEstimatedPose().getRotation().getRadians(),
-				this.GetTargetHeading().getRadians());
-		// Hard-limit, just in case something goes wrong with the calculation!
-		output = Math.max(Math.min(Math.PI, output), -Math.PI);
+		var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.5), -Math.PI / 2);
 
-		System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output,
-				Robot.Localization.GetEstimatedPose().getRotation().getRadians(),
-				this.GetTargetHeading().getRadians());
+		// System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output,
+		// 		Robot.Localization.GetEstimatedPose().getRotation().getDegrees(),
+		// 		this.GetTargetHeading().getDegrees());
 
 		Robot.Drive.Set(
 				new ChassisSpeeds(0, 0, output));
