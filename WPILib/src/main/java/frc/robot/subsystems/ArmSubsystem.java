@@ -218,11 +218,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             if (RobotBase.isReal())
             {
                 // System.out.println(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 2));
-                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 2));
+                this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 0.5));
             }
             else
             {
-                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 2));
+                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 1));
             }
         }
     }
@@ -256,6 +256,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         builder.addBooleanProperty("Holding", this::IsHolding, null);
         
         builder.addDoubleProperty("Velocity", () -> this.GetVelocity().getDegrees(), null);
+
+        builder.addDoubleProperty("Voltage", () -> RobotBase.isReal() ? this.Motor.getBusVoltage() : this.SimulatedArm.getOutput(0), null);
         
         this.addChild("Visualization", this.Visualization);
     }
@@ -301,8 +303,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 			.andThen(sysId.dynamic(Direction.kForward))
             .andThen(new WaitCommand(1))
 			.andThen(sysId.dynamic(Direction.kReverse))
-            .onlyWhile(() -> this.InBounds())
-			.finallyDo((interrupted) -> 
+            .onlyWhile(() -> Rotation2dUtils.InBounds(this.GetActualAngle(), lowerBound, upperBound))
+			.finallyDo((interrupted) ->
             {
                 this.Stop();
 

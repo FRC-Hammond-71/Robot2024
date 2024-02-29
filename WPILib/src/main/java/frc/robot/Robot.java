@@ -185,9 +185,9 @@ public class Robot extends TimedRobot
 			// 	return;
 			// }
 
-			if (Controllers.DriverController.getLeftBumperPressed())
+			if (Controllers.ShooterController.getLeftBumperPressed())
 			{
-				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.21, 0.16)).schedule();
+				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.28, 0.10)).schedule();
 				return;
 			}
 
@@ -203,7 +203,7 @@ public class Robot extends TimedRobot
 				Launcher.SetLoaded(true);
 			}
 
-			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
+			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.3;
 			speed = Math.copySign(speed * speed, speed);
 			
 			if (Controllers.ShooterController.getAButton())
@@ -212,16 +212,21 @@ public class Robot extends TimedRobot
 				Launcher.GroundIntakeMotor.set(-0.1);
 				Launcher.IntakeMotor.set(-0.1);
 			}
-			// else if (Controllers.ShooterController.getYButton())
-			// {
-			// 	Launcher.GroundIntakeMotor.set(0.5);
-			// 	Launcher.IntakeMotor.set(0.5);
-			// 	Arm.SetAngle(Rotation2d.fromDegrees(50));
-			// }
-			else if (Controllers.ShooterController.getYButtonPressed())
+			else if (Controllers.ShooterController.getYButton())
+			{
+				Launcher.IntakeMotor.set(0.5);
+				Launcher.GroundIntakeMotor.set(0.5);
+			}
+			else if (Controllers.ShooterController.getRightBumperPressed())
 			{
 				System.out.println("Picking up a Note!");
 				GameCommands.IntakeNote().schedule();
+				return;
+			}
+			else
+			{
+				Launcher.GroundIntakeMotor.stopMotor();
+				Launcher.IntakeMotor.stopMotor();
 			}
 			
 			Launcher.SetLaunchSpeed(speed);
@@ -232,14 +237,12 @@ public class Robot extends TimedRobot
 		{
 			if (Controllers.ShooterController.getXButtonPressed())
 			{
-				Arm.RunRotate(Rotation2d.fromDegrees(55)).schedule();
+				// Arm.RunRotate(Rotation2d.fromDegrees(55)).schedule();
 			}
 			else
 			{
-				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.2 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.4 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
 			}
-
-			if (RobotBase.isSimulation()) return;
 
 			// if (Controllers.ShooterController.getBackButtonPressed())
 			// {
@@ -265,11 +268,8 @@ public class Robot extends TimedRobot
 	@Override
 	public void testInit() 
 	{
-		// Launcher.PerformSysID().schedule();
-
-		Arm.PerformSysID().schedule();
+		Launcher.PerformSysID().schedule();
 	}
-
 	
 	@Override
 	public void disabledInit()

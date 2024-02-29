@@ -21,8 +21,8 @@ public class GameCommands
 	public static Command IntakeNote()
 	{
 		return Robot.Arm.RunRotate(Constants.Arm.IntakeAngle)
-			.andThen(Robot.Launcher.Intake(0.35))
-			.onlyWhile(() -> Controllers.ShooterController.getYButton() && !Robot.Launcher.IsLoaded());
+			.andThen(Robot.Launcher.Intake())
+			.onlyWhile(() -> Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded());
 	}
 
 	public static Command AutoRotateAndLaunch()

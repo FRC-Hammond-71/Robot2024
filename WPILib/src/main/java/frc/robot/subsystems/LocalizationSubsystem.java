@@ -140,22 +140,22 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         this.PoseEstimator = new DifferentialDrivePoseEstimator(
                 Robot.Drive.Kinematics,
                 Rotation2d.fromDegrees(0), 0, 0,
-                new Pose2d(),
-                VecBuilder.fill(0.02, 0.02, 0.01),
-                VecBuilder.fill(0.1, 0.1, 0.1));
+                new Pose2d(14.579517, 5.654767, new Rotation2d()),
+                VecBuilder.fill(0.01, 0.01, 0.01),
+                VecBuilder.fill(1, 1, 1));
 
         this.LauncherCamera = new PhotonCamera("Sauron");
         this.IntakeCamera = new PhotonCamera("Roz");
 
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-                PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 this.IntakeCamera,
                 new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, 0, Math.PI)));
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
                 AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-                PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 this.LauncherCamera,
                 new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
     }
@@ -189,21 +189,30 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     private synchronized void ApplyVisionMeasurement(Optional<EstimatedRobotPose> robotPose)
     {
         if (robotPose.isEmpty() || RobotBase.isSimulation()) return;
+
+        // var pose = new Pose2d(
+        //     robotPose.get().estimatedPose.toPose2d().getTranslation().minus(new Translation2d(8.305611, 4.086290)),
+        //     robotPose.get().estimatedPose.toPose2d().getRotation()
+        // );
+        var pose = robotPose.get().estimatedPose.toPose2d();
     
         // If an absolute field-relative position has not been reported until now, then reset position.
         if (this.HasAbsolutePositionFixed)
         {
             this.PoseEstimator.addVisionMeasurement(
-                robotPose.get().estimatedPose.toPose2d(),
+                pose,
                 robotPose.get().timestampSeconds);
         }
         else 
         {
-            this.ResetPosition(robotPose.get().estimatedPose.toPose2d());
+            System.out.println("Using new-field-relative position!");
+            this.ResetPosition(pose);
 
             // DataLogManager.getLog().
             this.HasAbsolutePositionFixed = true;
         }
+
+        Constants.Field.getObject("Robot - Vision").setPose(pose);
     }
 
     protected void UpdatePoseEstimationUsingWheels()
@@ -246,20 +255,22 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
     protected void UpdatePoseEstimationUsingVision()
     {
-        var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+        this.LauncherCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
+        var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update(this.LauncherCamera.getLatestResult());
         if (fieldPoseFromLauncher.isPresent())
         {
             this.ApplyVisionMeasurement(fieldPoseFromLauncher);
 
-            Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
+            // Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
         }
 
-        var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+        this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
+        var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update(this.IntakeCamera.getLatestResult());
         if (fieldPoseFromIntake.isPresent())
         {
-            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+            this.ApplyVisionMeasurement(fieldPoseFromIntake);
 
-            Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
+            // Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
         }
     }
 
@@ -267,6 +278,12 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     public void periodic()
     {
         super.periodic();
+
+        if (Controllers.DriverController.getPOV() == 270)
+        {
+            System.out.println("Reset");
+            this.ResetPosition(new Pose2d(14.579517, 5.654767, new Rotation2d()));
+        }
 
         // Update smart-dashboard with Robot positioning at default 20 Hz
         Constants.Field.setRobotPose(this.GetEstimatedPose());
@@ -280,7 +297,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         this.UpdatePoseEstimationUsingWheels();
         // this.UpdatePoseEstimationUsingIMU();
-        // this.UpdatePoseEstimationUsingVision();
+        this.UpdatePoseEstimationUsingVision();
         
     }
 

@@ -95,7 +95,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         this.TopLaunchMotor.setIdleMode(IdleMode.kCoast);
         this.BottomLaunchMotor.setIdleMode(IdleMode.kCoast);
-        this.IntakeMotor.setIdleMode(IdleMode.kCoast);
+        this.IntakeMotor.setIdleMode(IdleMode.kBrake);
         this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
 
         this.NoteSensor = new ColorSensorV3(Port.kOnboard);
@@ -186,9 +186,9 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     }
 
     
-    public Command Intake(double percentage)
+    public Command Intake()
     {
-        return Commands.runEnd(() -> { this.IntakeMotor.set(percentage); this.GroundIntakeMotor.set(percentage); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
+        return Commands.runEnd(() -> { this.IntakeMotor.set(0.15); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
     
 
