@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.proto.Controller;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.IPeriodic;
+import frc.robot.commands.ControllerCommands;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
@@ -71,7 +73,7 @@ public class Robot extends TimedRobot
 	{
 		System.out.println("Robot has initialized!");
 		
-		LEDs.Setup();
+		// LEDs.Setup();
 
 		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
 		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
@@ -101,6 +103,7 @@ public class Robot extends TimedRobot
 			
 		// NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
+		// NamedCommands.registerCommand(null, null);
 		// NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
 		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
 		NamedCommands.registerCommand("IntakeNote", GameCommands.IntakeNote());
@@ -191,7 +194,7 @@ public class Robot extends TimedRobot
 
 			if (Controllers.ShooterController.getLeftBumperPressed())
 			{
-				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.20, 0.05)).schedule();
+				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.20, 0.08)).schedule();
 				return;
 			}
 
@@ -214,7 +217,14 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getRightBumperPressed())
 			{
 				System.out.println("Picking up a Note!");
-				GameCommands.IntakeNote().schedule();
+				GameCommands.IntakeNote()
+					.finallyDo(() -> {
+						// Rumble the shooter-controller to indicate a note was picked up.
+						if (Robot.Launcher.IsLoaded())
+						{
+							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 2, 0.2).schedule();
+						}
+					}).schedule();
 				return;
 			}
 			else
@@ -229,15 +239,16 @@ public class Robot extends TimedRobot
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			System.out.println(Controllers.ShooterController.getRightTriggerAxis());
-			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
-			{
-				GameCommands.AutoPitchAndLaunch().schedule();
-			}
-			else
-			{
-				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
-			}
+			// if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			// {
+			// 	GameCommands.AutoPitchAndLaunch().schedule();
+			// }
+			// else
+			// {
+			// 	Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+			// } 	
+			Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+
 
 			// if (Controllers.ShooterController.getBackButtonPressed())
 			// {
@@ -263,7 +274,8 @@ public class Robot extends TimedRobot
 	@Override
 	public void testInit() 
 	{
-		Launcher.PerformSysID().schedule();
+		// Launcher.PerformSysID().schedule();
+		// Arm.PerformSysID().schedule();
 	}
 	
 	@Override

@@ -8,24 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.470117017817458,
-        "y": 3.6196732670766885
+        "x": 15.847167785633717,
+        "y": 3.2204800500899147
       },
       "isLocked": false,
       "linkedName": "P2"
     },
     {
       "anchor": {
-        "x": 13.65990195307761,
-        "y": 5.551187918118234
+        "x": 11.479025754057215,
+        "y": 1.8034688280503517
       },
       "prevControl": {
-        "x": 14.069781232179963,
-        "y": 5.199862821744788
+        "x": 13.556996298352242,
+        "y": 2.3397095351806785
+      },
+      "nextControl": {
+        "x": 9.401055209762188,
+        "y": 1.2672281209200233
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.291141026726498,
+        "y": 0.7944571444698458
+      },
+      "prevControl": {
+        "x": 9.371075175816541,
+        "y": 0.9251560871167382
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A2"
+      "linkedName": "M5"
     }
   ],
   "rotationTargets": [],
@@ -43,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-A",
+  "folder": "P2-M",
   "previewStartingState": {
-    "rotation": 56.30993247453372,
+    "rotation": 57.84770485871742,
     "velocity": 0
   },
   "useDefaultConstraints": true

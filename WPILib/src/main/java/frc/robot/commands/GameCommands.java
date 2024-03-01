@@ -3,6 +3,8 @@ package frc.robot.commands;
 import java.time.Duration;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,7 +24,7 @@ public class GameCommands
 	{
 		return Robot.Arm.RunRotate(Constants.Arm.IntakeAngle)
 			.andThen(Robot.Launcher.Intake())
-			.onlyWhile(() -> Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded());
+			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded());
 	}
 
 	public static Command AutoRotateAndLaunch()
@@ -34,7 +36,7 @@ public class GameCommands
 		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
 		{
 			System.out.println("Cannot shoot...reached arm rotation boundary!");
-			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 1, Duration.ofSeconds(1));
+			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
 		}
 
 		return new ParallelCommandGroup(
@@ -52,7 +54,7 @@ public class GameCommands
 		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
 		{
 			System.out.println("Cannot shoot...reached arm rotation boundary!");
-			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 1, Duration.ofSeconds(1));
+			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
 		}
 
 		return Robot.Arm.RunRotate(firingSolution.ArmAngle).andThen(Robot.Launcher.Launch(0.7, 0.7));

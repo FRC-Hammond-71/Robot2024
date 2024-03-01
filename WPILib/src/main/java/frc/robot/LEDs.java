@@ -20,6 +20,8 @@ public class LEDs
         LED.setData(ColorBuffer);
         LED.start();
         SetAll(255, 255, 255);
+
+        System.out.println("Setup LEDs!");
     }
 
     public static void SetAll(int r, int g, int b)
@@ -43,6 +45,7 @@ public class LEDs
     public static void Write()
     {
         LED.setData(ColorBuffer);
+        System.out.println("Updated LEDs!");
     }
 
     private static int RainbowHueStep = 0;

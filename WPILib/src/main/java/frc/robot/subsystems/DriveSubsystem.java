@@ -275,16 +275,15 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
-            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
-            builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.getBusVoltage(), null);
-            builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.getBusVoltage(), null);
+            // builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
+            // builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
+            // builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.getBusVoltage(), null);
+            // builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.getBusVoltage(), null);
         }
 
         builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
         builder.addDoubleProperty("Desired Rotation", () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
                 null);
-
 
         builder.addDoubleProperty("Actual Speed", () ->this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation",

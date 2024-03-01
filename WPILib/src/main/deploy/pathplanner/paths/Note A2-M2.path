@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.823746112542153,
-        "y": 4.344720358484939
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 15.470117017817458,
-        "y": 3.6196732670766885
-      },
-      "isLocked": false,
-      "linkedName": "P2"
-    },
-    {
-      "anchor": {
         "x": 13.65990195307761,
         "y": 5.551187918118234
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 13.03656701464351,
+        "y": 5.632912378514697
+      },
+      "isLocked": false,
+      "linkedName": "A2"
+    },
+    {
+      "anchor": {
+        "x": 10.811508070947527,
+        "y": 6.42924926363785
+      },
       "prevControl": {
-        "x": 14.069781232179963,
-        "y": 5.199862821744788
+        "x": 12.65891942408866,
+        "y": 6.367973345021612
+      },
+      "nextControl": {
+        "x": 8.964096717806393,
+        "y": 6.490525182254087
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.270256540513081,
+        "y": 5.796291592583185
+      },
+      "prevControl": {
+        "x": 8.855798367799508,
+        "y": 5.925683292159234
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A2"
+      "linkedName": "M2"
     }
   ],
   "rotationTargets": [],
@@ -43,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-A",
+  "folder": null,
   "previewStartingState": {
-    "rotation": 56.30993247453372,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

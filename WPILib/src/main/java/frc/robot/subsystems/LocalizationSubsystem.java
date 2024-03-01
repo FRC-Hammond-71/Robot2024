@@ -146,17 +146,15 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
             VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(30)));
 
-        // this.IntakeCamera = new PhotonCamera("Roz")
-
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-            PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Roz"),
             new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-            PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Sauron"),
             new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
     }
@@ -261,7 +259,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         try
         {
-            this.LauncherCameraPoseEstimator.update();
             var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
             if (fieldPoseFromLauncher.isPresent())
             {
@@ -270,7 +267,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
                 Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
             }
     
-            this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
+            // this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
             var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
             if (fieldPoseFromIntake.isPresent())
             {

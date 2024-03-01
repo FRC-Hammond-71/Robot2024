@@ -99,17 +99,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.GroundIntakeMotor.setInverted(true);
         this.IntakeMotor.setInverted(true);
 
-        this.TopLaunchMotor.setIdleMode(IdleMode.kCoast);
-        this.BottomLaunchMotor.setIdleMode(IdleMode.kCoast);
+        this.TopLaunchMotor.setIdleMode(IdleMode.kBrake);
+        this.BottomLaunchMotor.setIdleMode(IdleMode.kBrake);
         this.IntakeMotor.setIdleMode(IdleMode.kBrake);
         this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
 
         this.NoteSensor = new ColorSensorV3(Port.kOnboard);
-        this.NoteSensor.configureProximitySensor(ProximitySensorResolution.kProxRes8bit, ProximitySensorMeasurementRate.kProxRate6ms);
+        this.NoteSensor.configureProximitySensor(ProximitySensorResolution.kProxRes10bit, ProximitySensorMeasurementRate.kProxRate6ms);
 
         this.NoteDetectorNotifier = new Notifier(() -> 
         {
-            boolean isDetected = this.NoteSensor.getProximity() > 100;
+            boolean isDetected = this.NoteSensor.getProximity() > 75;
 
             if (!NoteLastDetected && isDetected)
             {
@@ -140,13 +140,13 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         {
             this.DelayedNoteDetected = this.NoteDetected;
         }
-       return this.DelayedNoteDetected;
+        return this.DelayedNoteDetected;
     }
 
     public void SetLoaded(boolean loaded)
     {
         this.NoteCount = loaded ? 1 : 0;
-        this.NoteLastDetected = this.NoteSensor.getProximity() > 80;
+        this.NoteLastDetected = this.NoteSensor.getProximity() > 65;
         this.NoteDetected = loaded;
         this.DelayedNoteDetected = loaded;
     }
@@ -156,8 +156,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         if (RobotBase.isSimulation()) return new LaunchSpeeds();
 
         return new LaunchSpeeds(
-            this.TopLaunchMotor.getEncoder().getVelocity() / 60,
-            this.BottomLaunchMotor.getEncoder().getVelocity() / 60
+            this.TopLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference,
+            this.BottomLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference
         );
     }
 
@@ -224,9 +224,9 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         // then END!
 
         return Commands.run(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
-            .withTimeout(1)
+            .withTimeout(2)
             .andThen(Commands.run(() -> this.IntakeMotor.set(0.3)))
-            .withTimeout(1.5)
+            .withTimeout(3)
             .finallyDo(() -> this.Stop());
     }
 
@@ -238,6 +238,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         if (RobotBase.isReal())
         {            
             builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+            builder.addBooleanProperty("Note Detected", () -> this.NoteSensor.getProximity() > 65, null);
         }
     }
 
@@ -246,14 +247,19 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         var topSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
                 Units.Volts.of(8),
-                Units.Seconds.of(10)),
+                Units.Seconds.of(6)),
                 new SysIdRoutine.Mechanism(
-                    (voltage) -> this.TopLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
+                    (voltage) ->
+                    {
+                         this.TopLaunchMotor.setVoltage(voltage.magnitude());
+                    },
                     (log) ->
                     {
+                        var wheelVelocity = this.GetSpeeds();
+
                         log.motor("launch-flywheel-top")
                             .voltage(Units.Volts.of(this.TopLaunchMotor.getBusVoltage()))
-                            .linearVelocity(Units.MetersPerSecond.of(this.TopLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference))
+                            .linearVelocity(Units.MetersPerSecond.of(wheelVelocity.TopMetersPerSecond))
                             .linearPosition(Units.Meters.of(this.TopLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));
                     },
                     this));
@@ -261,32 +267,35 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         var bottomSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
                 Units.Volts.of(8),
-                Units.Seconds.of(10)),
+                Units.Seconds.of(6)),
                 new SysIdRoutine.Mechanism(
-                    (voltage) -> this.BottomLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
+                    (voltage) -> 
+                    {
+                        System.out.println(voltage);
+                        this.BottomLaunchMotor.setVoltage(voltage.magnitude());
+                    },
                     (log) ->
                     {
+                        var wheelVelocity = this.GetSpeeds();
+
                         log.motor("launch-flywheel-bottom")
                             .voltage(Units.Volts.of(this.BottomLaunchMotor.getBusVoltage()))
-                            .linearVelocity(Units.MetersPerSecond.of(this.BottomLaunchMotor.getEncoder().getVelocity() / 60 * Constants.Launcher.WheelCircumference))
+                            .linearVelocity(Units.MetersPerSecond.of(wheelVelocity.BottomMetersPerSecond))
                             .linearPosition(Units.Meters.of(this.BottomLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));
                     },
                     this));
 
-        return topSysId.quasistatic(Direction.kForward)
-            .andThen(new WaitCommand(5))
-            .andThen(topSysId.quasistatic(Direction.kReverse))
-            .andThen(new WaitCommand(5))
-            .andThen(topSysId.dynamic(Direction.kForward))
-            .andThen(new WaitCommand(5))
-            .andThen(topSysId.dynamic(Direction.kReverse))
+        return bottomSysId.quasistatic(Direction.kForward)
+            .andThen(new WaitCommand(2))
+            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
+            .andThen(bottomSysId.quasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(2))
+            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
+            .andThen(bottomSysId.dynamic(Direction.kForward))
+            .andThen(new WaitCommand(2))
+            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
+            .andThen(bottomSysId.dynamic(Direction.kReverse))
             .finallyDo(() -> this.Stop());
-            // .andThen(new WaitCommand(10))
-            // .andThen(bottomSysId.quasistatic(Direction.kForward))
-            // .andThen(bottomSysId.quasistatic(Direction.kReverse))
-            // .andThen(bottomSysId.dynamic(Direction.kForward))
-            // .andThen(bottomSysId.dynamic(Direction.kReverse))
-            // .finallyDo(() -> this.Stop());
     }
 
 

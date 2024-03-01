@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.835456949094521,
-        "y": 4.368142031579689
+        "x": 8.270256540513081,
+        "y": 5.796291592583185
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.582387776289506,
-        "y": 4.524775678180315
+        "x": 9.270256540513081,
+        "y": 5.796291592583185
       },
       "isLocked": false,
-      "linkedName": "P2-M"
+      "linkedName": "M2"
     },
     {
       "anchor": {
-        "x": 10.807721615443231,
-        "y": 6.412383935878983
+        "x": 11.678109975335499,
+        "y": 6.171610859626855
       },
       "prevControl": {
-        "x": 11.982761262223546,
-        "y": 6.051626149586783
+        "x": 10.462472421378507,
+        "y": 6.238805045370433
       },
       "nextControl": {
-        "x": 9.617305901278469,
-        "y": 6.777862444613778
+        "x": 12.89374752929249,
+        "y": 6.104416673883278
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.299575456289528,
-        "y": 7.432345150406772
+        "x": 15.132806756341045,
+        "y": 5.527514849608872
       },
       "prevControl": {
-        "x": 9.054882589080442,
-        "y": 7.178742802564065
+        "x": 14.132806756341045,
+        "y": 5.527514849608872
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M1"
+      "linkedName": "Speaker(Front)"
     }
   ],
   "rotationTargets": [],
@@ -58,10 +58,10 @@
     "rotation": 0,
     "rotateFast": false
   },
-  "reversed": true,
-  "folder": "P2-M",
+  "reversed": false,
+  "folder": null,
   "previewStartingState": {
-    "rotation": 60.70863782901558,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true
