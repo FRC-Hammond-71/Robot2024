@@ -69,7 +69,9 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotInit() 
 	{
-		System.out.println("Robot has initialized!");	
+		System.out.println("Robot has initialized!");
+		
+		// LEDs.Setup();
 
 		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
 		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
@@ -148,6 +150,8 @@ public class Robot extends TimedRobot
 			}
 		}
 
+		// LEDs.Rainbow();
+
 		// Execute / iterate all subsystems, then commands.
 		CommandScheduler.getInstance().run();
 	}
@@ -173,7 +177,7 @@ public class Robot extends TimedRobot
             //     PathCommands.PathToAmplifier().schedule();
             // }
 
-            Drive.SetArcade(-Controllers.DriverController.getLeftY(), Controllers.DriverController.getRightX());
+            Drive.SetArcade(-Controllers.DriverController.getLeftY(), -Controllers.DriverController.getRightX());
 
 		}, Drive));
 		
@@ -203,7 +207,7 @@ public class Robot extends TimedRobot
 				Launcher.SetLoaded(true);
 			}
 
-			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.3;
+			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.7;
 			speed = Math.copySign(speed * speed, speed);
 			
 			if (Controllers.ShooterController.getAButton())
@@ -241,7 +245,7 @@ public class Robot extends TimedRobot
 			}
 			else
 			{
-				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(0.4 * -Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
+				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
 			}
 
 			// if (Controllers.ShooterController.getBackButtonPressed())

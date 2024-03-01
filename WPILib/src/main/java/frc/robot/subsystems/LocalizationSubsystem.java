@@ -70,11 +70,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     private ElapsedTimer IMUTimer;
     private Pose2d IMUAccumulatedPose = new Pose2d();
     
-    // -------
-    // Cameras
-    // -------
     private PhotonCamera LauncherCamera, IntakeCamera;
-    
+
     // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
     private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;
     
@@ -137,27 +134,30 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         this.IMUTimer = new ElapsedTimer(Duration.ofSeconds(1 / this.IMU.getActualUpdateRate()));
         System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
 
-        this.PoseEstimator = new DifferentialDrivePoseEstimator(
-                Robot.Drive.Kinematics,
-                Rotation2d.fromDegrees(0), 0, 0,
-                new Pose2d(14.579517, 5.654767, new Rotation2d()),
-                VecBuilder.fill(0.01, 0.01, 0.01),
-                VecBuilder.fill(1, 1, 1));
+        // this.IMU.setAngleAdjustment(FieldGeometry.GetStartingPosition1().getRotation().minus(this.GetIMUHeading()).getDegrees());
 
-        this.LauncherCamera = new PhotonCamera("Sauron");
-        this.IntakeCamera = new PhotonCamera("Roz");
+        this.PoseEstimator = new DifferentialDrivePoseEstimator(
+            Robot.Drive.Kinematics,
+            this.GetIMUHeading(),  
+            Robot.Drive.GetLeftWheelPosition(), 
+            Robot.Drive.GetRightWheelPosition(),
+            FieldGeometry.GetStartingPosition1(),
+            VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+
+        // this.IntakeCamera = new PhotonCamera("Roz")
 
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
-                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                this.IntakeCamera,
-                new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, 0, Math.PI)));
+            AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            new PhotonCamera("Roz"),
+            new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
-                AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                this.LauncherCamera,
-                new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
+            AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+            PoseStrategy.MULTI_TAG_PNP_ON_RIO,
+            new PhotonCamera("Sauron"),
+            new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
     }
 
     public Pose2d GetEstimatedPose()
@@ -165,8 +165,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         var pose = RobotBase.isReal() 
             ? this.PoseEstimator.getEstimatedPosition()
             : Robot.Drive.SimulatedDrive.getPose();
-
-        // return pose;
 
         return new Pose2d(
             pose.getTranslation(),
@@ -184,6 +182,11 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             this.IMUAccumulatedPose = position;
             this.PoseEstimator.resetPosition(position.getRotation(), 0, 0, position);
         }
+    }
+
+    public Rotation2d GetIMUHeading()
+    {
+        return Rotation2d.fromDegrees(-this.IMU.getAngle());
     }
 
     private synchronized void ApplyVisionMeasurement(Optional<EstimatedRobotPose> robotPose)
@@ -220,7 +223,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         var wheelPositions = Robot.Drive.GetWheelPositions();
 
         this.PoseEstimator.update(
-            Rotation2d.fromDegrees(this.IMU.getAngle()),
+            this.GetIMUHeading(),
             wheelPositions.leftMeters,
             wheelPositions.rightMeters);
     }
@@ -255,22 +258,27 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
     protected void UpdatePoseEstimationUsingVision()
     {
-        this.LauncherCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
-        var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update(this.LauncherCamera.getLatestResult());
-        if (fieldPoseFromLauncher.isPresent())
+        try
         {
-            this.ApplyVisionMeasurement(fieldPoseFromLauncher);
-
-            // Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
+            var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
+            if (fieldPoseFromLauncher.isPresent())
+            {
+                // this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+    
+                Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
+            }
+    
+            var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
+            if (fieldPoseFromIntake.isPresent())
+            {
+                // this.ApplyVisionMeasurement(fieldPoseFromIntake);
+    
+                Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
+            }
         }
-
-        this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
-        var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update(this.IntakeCamera.getLatestResult());
-        if (fieldPoseFromIntake.isPresent())
+        catch (UnsatisfiedLinkError ex)
         {
-            this.ApplyVisionMeasurement(fieldPoseFromIntake);
-
-            // Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
+            System.out.println("Something went wrong during Pose Estimation using PhotonVision: " + ex.toString());
         }
     }
 
@@ -279,11 +287,11 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super.periodic();
 
-        if (Controllers.DriverController.getPOV() == 270)
-        {
-            System.out.println("Reset");
-            this.ResetPosition(new Pose2d(14.579517, 5.654767, new Rotation2d()));
-        }
+        // if (Controllers.DriverController.getPOV() == 270)
+        // {
+        //     System.out.println("Reset");
+        //     this.ResetPosition(new Pose2d(14.579517, 5.654767, new Rotation2d()));
+        // }
 
         // Update smart-dashboard with Robot positioning at default 20 Hz
         Constants.Field.setRobotPose(this.GetEstimatedPose());
@@ -304,6 +312,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        builder.addDoubleProperty("Yaw", () -> this.GetEstimatedPose().getRotation().getDegrees(), null);
+        builder.addDoubleProperty("Heading", () -> this.GetEstimatedPose().getRotation().getDegrees(), null);
     }
 }

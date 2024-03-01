@@ -222,7 +222,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             }
             else
             {
-                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 1));
+                this.SimulatedArm.setInput(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians()));
             }
         }
     }
@@ -287,11 +287,10 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             
             new SysIdRoutine.Mechanism(
                 (voltage) -> this.SetAngle(Optional.of(voltage.magnitude())),
-			    // (log) -> log.motor("arm")
-                //             .voltage(edu.wpi.first.units.Units.Volts.of(this.Motor.getBusVoltage()))
-                //             .angularVelocity(edu.wpi.first.units.Units.Radians.of(this.GetVelocity().getRadians()).per(edu.wpi.first.units.Units.Minutes.of(1)))
-                //             .angularPosition(edu.wpi.first.units.Units.Radians.of(this.GetActualAngle().getRadians())),
-                (log) -> {},
+			    (log) -> log.motor("arm")
+                            .voltage(edu.wpi.first.units.Units.Volts.of(this.Motor.getBusVoltage()))
+                            .angularVelocity(edu.wpi.first.units.Units.Radians.of(this.GetVelocity().getRadians()).per(edu.wpi.first.units.Units.Minutes.of(1)))
+                            .angularPosition(edu.wpi.first.units.Units.Radians.of(this.GetActualAngle().getRadians())),
         this));
 
 		return this.RunRotate(lowerBound) 

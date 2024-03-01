@@ -18,4 +18,9 @@ public class ElapsedTimer
     {
         return this.Timer.hasElapsed(this.Period.getSeconds());
     }
+
+    public boolean advancedIfElapsed()
+    {
+        return this.Timer.advanceIfElapsed(this.Period.getSeconds());
+    }
 }

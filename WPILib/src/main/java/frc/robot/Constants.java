@@ -91,7 +91,7 @@ public final class Constants
 		public static Rotation2d IntakeAngle = Rotation2d.fromDegrees(50);
 
 		// Shooting from further would require a 0.5 degree inaccuracy
-		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1.5);
+		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(2);
 
 		public static double MomentOfInertia = 30;
 

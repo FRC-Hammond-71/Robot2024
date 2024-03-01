@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,6 +40,7 @@ import frc.IPeriodic;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.ElapsedTimer;
 import frc.robot.Robot;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
@@ -59,7 +61,9 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
     private int NoteCount = 0;
     private boolean NoteLastDetected = false; 
-    public boolean NoteDetected = false;
+    private boolean NoteDetected = false;
+    private boolean DelayedNoteDetected = NoteDetected;
+    public ElapsedTimer NoteDetectionUpdateTimer = new ElapsedTimer(Duration.ofMillis(500));
     //last note detection
     // private SlewRateLimiter LaunchMotorRateLimiter = new SlewRateLimiter(1, 1,
     // 0);
@@ -105,12 +109,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         {
             boolean isDetected = this.NoteSensor.getProximity() > 100;
 
-            SmartDashboard.putBoolean("Is Note Detected", isDetected);
-
             if (!NoteLastDetected && isDetected)
             {
                 NoteCount += 1;
                 NoteDetected = true;
+
+                // We want a new detection to be immediately set!  
+                this.NoteDetectionUpdateTimer.Timer.reset();
+                this.DelayedNoteDetected = NoteDetected;
             }
             else if (NoteCount >= 2 && !isDetected)
             {
@@ -128,13 +134,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
      */
     public boolean IsLoaded()
     {
-       return this.NoteDetected;
+        if (this.NoteDetectionUpdateTimer.advancedIfElapsed())
+        {
+            this.DelayedNoteDetected = this.NoteDetected;
+        }
+       return this.DelayedNoteDetected;
     }
 
     public void SetLoaded(boolean loaded)
     {
         this.NoteCount = loaded ? 1 : 0;
-        this.NoteLastDetected = this.NoteSensor.getProximity() > 100;
+        this.NoteLastDetected = this.NoteSensor.getProximity() > 80;
         this.NoteDetected = loaded;
     }
 
@@ -227,8 +237,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         var topSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(6),
-                Units.Seconds.of(12)),
+                Units.Volts.of(8),
+                Units.Seconds.of(10)),
                 new SysIdRoutine.Mechanism(
                     (voltage) -> this.TopLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
                     (log) ->
@@ -242,8 +252,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         var bottomSysId = new SysIdRoutine(new SysIdRoutine.Config(
                 Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(6),
-                Units.Seconds.of(12)),
+                Units.Volts.of(8),
+                Units.Seconds.of(10)),
                 new SysIdRoutine.Mechanism(
                     (voltage) -> this.BottomLaunchMotor.setVoltage(voltage.baseUnitMagnitude()),
                     (log) ->
@@ -256,16 +266,19 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
                     this));
 
         return topSysId.quasistatic(Direction.kForward)
+            .andThen(new WaitCommand(5))
             .andThen(topSysId.quasistatic(Direction.kReverse))
+            .andThen(new WaitCommand(5))
             .andThen(topSysId.dynamic(Direction.kForward))
+            .andThen(new WaitCommand(5))
             .andThen(topSysId.dynamic(Direction.kReverse))
-            .finallyDo(() -> this.Stop())
-            .andThen(new WaitCommand(10))
-            .andThen(bottomSysId.quasistatic(Direction.kForward))
-            .andThen(bottomSysId.quasistatic(Direction.kReverse))
-            .andThen(bottomSysId.dynamic(Direction.kForward))
-            .andThen(bottomSysId.dynamic(Direction.kReverse))
             .finallyDo(() -> this.Stop());
+            // .andThen(new WaitCommand(10))
+            // .andThen(bottomSysId.quasistatic(Direction.kForward))
+            // .andThen(bottomSysId.quasistatic(Direction.kReverse))
+            // .andThen(bottomSysId.dynamic(Direction.kForward))
+            // .andThen(bottomSysId.dynamic(Direction.kReverse))
+            // .finallyDo(() -> this.Stop());
     }
 
 

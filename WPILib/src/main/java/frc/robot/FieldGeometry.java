@@ -13,6 +13,24 @@ import frc.robot.utilities.DriverStationUtils;
 
 public class FieldGeometry 
 {
+    public static Pose2d GetStartingPosition1()
+    {
+        final var pose = new Pose2d(15.80, 6.71, Rotation2d.fromDegrees(-60));
+
+        DriverStationUtils.EnsureAllianceSelected();
+
+        return DriverStation.getAlliance().get() == Alliance.Red ? pose : GeometryUtil.flipFieldPose(pose);
+    }
+
+    public static Pose2d GetStartingPosition2()
+    {
+        final var pose = new Pose2d(15.82, 4.41, Rotation2d.fromDegrees(60));
+
+        DriverStationUtils.EnsureAllianceSelected();
+
+        return DriverStation.getAlliance().get() == Alliance.Red ? pose : GeometryUtil.flipFieldPose(pose);
+    }
+
     public static Pose2d GetSpeakerShootingPose() throws MissingResourceException
     {
         final var pose = new Pose2d(1.87, 5.58, Rotation2d.fromDegrees(180));

@@ -240,12 +240,12 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
                 this.Speeds.vxMetersPerSecond,
                 0,
-                -this.Speeds.omegaRadiansPerSecond));
+                this.Speeds.omegaRadiansPerSecond));
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.15));
-            this.RightLeadMotor.setVoltage((FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.15)));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.05));
+            this.RightLeadMotor.setVoltage((FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.05)));
         } 
         else
         {
@@ -275,8 +275,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelPosition, null);
-            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelPosition, null);
+            builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
+            builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
             builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.getBusVoltage(), null);
             builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.getBusVoltage(), null);
         }
