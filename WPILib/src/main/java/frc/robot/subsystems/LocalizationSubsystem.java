@@ -39,6 +39,7 @@ import frc.FunctionalPeriodic;
 import frc.IPeriodic;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
 import frc.robot.ElapsedTimer;
 import frc.robot.FieldGeometry;
@@ -142,14 +143,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             Robot.Drive.GetLeftWheelPosition(), 
             Robot.Drive.GetRightWheelPosition(),
             FieldGeometry.GetStartingPosition1(),
-            VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+            VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
+            VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(30)));
 
         // this.IntakeCamera = new PhotonCamera("Roz")
 
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            PoseStrategy.MULTI_TAG_PNP_ON_RIO,
             new PhotonCamera("Roz"),
             new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
 
@@ -215,7 +216,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             this.HasAbsolutePositionFixed = true;
         }
 
-        Constants.Field.getObject("Robot - Vision").setPose(pose);
+        // Constants.Field.getObject("Robot - Vision").setPose(pose);
     }
 
     protected void UpdatePoseEstimationUsingWheels()
@@ -260,18 +261,20 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         try
         {
+            this.LauncherCameraPoseEstimator.update();
             var fieldPoseFromLauncher = this.LauncherCameraPoseEstimator.update();
             if (fieldPoseFromLauncher.isPresent())
             {
-                // this.ApplyVisionMeasurement(fieldPoseFromLauncher);
+                this.ApplyVisionMeasurement(fieldPoseFromLauncher);
     
                 Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
             }
     
+            this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
             var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
             if (fieldPoseFromIntake.isPresent())
             {
-                // this.ApplyVisionMeasurement(fieldPoseFromIntake);
+                this.ApplyVisionMeasurement(fieldPoseFromIntake);
     
                 Constants.Field.getObject("Robot - Intake Vision").setPose(fieldPoseFromIntake.get().estimatedPose.toPose2d());
             }

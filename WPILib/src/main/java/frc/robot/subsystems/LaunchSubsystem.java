@@ -39,6 +39,7 @@ import frc.FunctionalPeriodic;
 import frc.IPeriodic;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
 import frc.robot.ElapsedTimer;
 import frc.robot.Robot;
@@ -63,7 +64,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     private boolean NoteLastDetected = false; 
     private boolean NoteDetected = false;
     private boolean DelayedNoteDetected = NoteDetected;
-    public ElapsedTimer NoteDetectionUpdateTimer = new ElapsedTimer(Duration.ofMillis(500));
+    public ElapsedTimer NoteDetectionUpdateTimer;
     //last note detection
     // private SlewRateLimiter LaunchMotorRateLimiter = new SlewRateLimiter(1, 1,
     // 0);
@@ -76,6 +77,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     public LaunchSubsystem(Robot robot)
     {
         super(robot);
+        this.NoteDetectionUpdateTimer = new ElapsedTimer(Duration.ofMillis(500));
     }
 
     @Override
@@ -146,6 +148,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.NoteCount = loaded ? 1 : 0;
         this.NoteLastDetected = this.NoteSensor.getProximity() > 80;
         this.NoteDetected = loaded;
+        this.DelayedNoteDetected = loaded;
     }
 
     public LaunchSpeeds GetSpeeds()
@@ -190,12 +193,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     }
 
     @Override
-    protected void realPeriodic()
+    public void periodic()
     {
-        
+        super.periodic();
+
+        // Reset the logic which determines if a note is loaded if something goes wrong.
+        if (Controllers.ShooterController.getBackButtonPressed())
+        {
+            this.SetLoaded(this.IsLoaded());
+        }
     }
 
-    
     public Command Intake()
     {
         return Commands.runEnd(() -> { this.IntakeMotor.set(0.15); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);

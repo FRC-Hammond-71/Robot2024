@@ -43,6 +43,21 @@ public class GameCommands
 			.andThen(Robot.Launcher.Launch(0.7, 0.7));
 	}
 
+	public static Command AutoPitchAndLaunch()
+	{
+		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
+
+		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
+
+		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
+		{
+			System.out.println("Cannot shoot...reached arm rotation boundary!");
+			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 1, Duration.ofSeconds(1));
+		}
+
+		return Robot.Arm.RunRotate(firingSolution.ArmAngle).andThen(Robot.Launcher.Launch(0.7, 0.7));
+	}
+
 	public static Command GotoSpeakerAndLaunch()
 	{
 		return PathCommands.PathToSpeaker()

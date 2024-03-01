@@ -191,21 +191,11 @@ public class Robot extends TimedRobot
 
 			if (Controllers.ShooterController.getLeftBumperPressed())
 			{
-				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.28, 0.10)).schedule();
+				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.20, 0.05)).schedule();
 				return;
 			}
 
 			if (RobotBase.isSimulation()) return;
-
-			// Reset the logic which determines if a note is loaded if something goes wrong.
-			if (Controllers.ShooterController.getPOV() == 180)
-			{
-				Launcher.SetLoaded(false);
-			}
-			else if (Controllers.ShooterController.getPOV() == 0)
-			{
-				Launcher.SetLoaded(true);
-			}
 
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.7;
 			speed = Math.copySign(speed * speed, speed);
@@ -239,9 +229,10 @@ public class Robot extends TimedRobot
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			if (Controllers.ShooterController.getXButtonPressed())
+			System.out.println(Controllers.ShooterController.getRightTriggerAxis());
+			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
 			{
-				// Arm.RunRotate(Rotation2d.fromDegrees(55)).schedule();
+				GameCommands.AutoPitchAndLaunch().schedule();
 			}
 			else
 			{
