@@ -14,11 +14,12 @@ public class LEDs
 
     public static void Setup()
     {
-        LED = new AddressableLED(9);
+        LED = new AddressableLED(0);
         ColorBuffer = new AddressableLEDBuffer(60);
         LED.setLength(ColorBuffer.getLength());
         LED.setData(ColorBuffer);
         LED.start();
+        SetAll(255, 255, 255);
     }
 
     public static void SetAll(int r, int g, int b)

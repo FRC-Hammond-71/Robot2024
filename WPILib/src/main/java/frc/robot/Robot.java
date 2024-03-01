@@ -71,7 +71,7 @@ public class Robot extends TimedRobot
 	{
 		System.out.println("Robot has initialized!");
 		
-		// LEDs.Setup();
+		LEDs.Setup();
 
 		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
 		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
