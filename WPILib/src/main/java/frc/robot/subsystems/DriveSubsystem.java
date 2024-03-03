@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.FieldGeometry;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.GameCommands;
@@ -79,10 +80,11 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         this.LeftLeadMotor.setInverted(false);
         this.RightLeadMotor.setInverted(true);
 
-        this.RightFollowMotor.setIdleMode(IdleMode.kBrake);
-        this.RightLeadMotor.setIdleMode(IdleMode.kCoast);
-        this.LeftFollowMotor.setIdleMode(IdleMode.kBrake);
-        this.LeftLeadMotor.setIdleMode(IdleMode.kCoast);
+        // this.RightFollowMotor.setIdleMode(IdleMode.kBrake);
+        // this.RightLeadMotor.setIdleMode(IdleMode.kCoast);
+        // this.LeftFollowMotor.setIdleMode(IdleMode.kBrake);
+        // this.LeftLeadMotor.setIdleMode(IdleMode.kCoast);
+        this.SetIdle(IdleMode.kBrake);
 
         this.LeftFollowMotor.follow(this.LeftLeadMotor);
         this.RightFollowMotor.follow(this.RightLeadMotor);
@@ -104,6 +106,14 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             null
         // VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
         );
+        try 
+        {
+            this.SimulatedDrive.setPose(FieldGeometry.GetStartingPosition());
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Could not set inital position in Simulation!");
+        }
     }
 
     public DifferentialDriveWheelPositions GetWheelPositions()
@@ -227,14 +237,31 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         ));
     }
 
+    public void SetIdle(IdleMode mode)
+    {
+        if (RobotBase.isReal())
+        {
+            this.RightFollowMotor.setIdleMode(mode);
+            this.RightLeadMotor.setIdleMode(mode);
+            this.LeftFollowMotor.setIdleMode(mode);
+            this.LeftLeadMotor.setIdleMode(mode);
+        }
+    }
+
     protected void UpdateMotors()
     {
-        if (this.OverrideVoltages.isPresent())
+        if (DriverStation.isDisabled())
         {
-            this.LeftLeadMotor.set(this.OverrideVoltages.get().left);
-            this.RightLeadMotor.set(this.OverrideVoltages.get().right);
+            this.Stop();
             return;
         }
+
+        // if (this.OverrideVoltages.isPresent())
+        // {
+        //     this.LeftLeadMotor.set(this.OverrideVoltages.get().left);
+        //     this.RightLeadMotor.set(this.OverrideVoltages.get().right);
+        //     return;
+        // }
 
         // Apply rate-limits
         var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(

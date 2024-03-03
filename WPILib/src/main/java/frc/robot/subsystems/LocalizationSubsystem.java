@@ -172,14 +172,18 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
     public void ResetPosition(Pose2d position)
     {
-        Robot.Drive.ResetEncoders();
-
+        
         if (RobotBase.isReal())
         {
             // Reset Yaw Gyro
+            Robot.Drive.ResetEncoders();
             this.IMU.reset();
             this.IMUAccumulatedPose = position;
             this.PoseEstimator.resetPosition(position.getRotation(), 0, 0, position);
+        }
+        else
+        {
+            Robot.Drive.SimulatedDrive.setPose(position);
         }
     }
 

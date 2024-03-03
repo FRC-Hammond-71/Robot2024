@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -187,29 +188,25 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         }
     }
 
-    private void UpdateMotors()
-    {
-
-    }
-
     @Override
     public void periodic()
     {
         super.periodic();
 
-        // Reset the logic which determines if a note is loaded if something goes wrong.
-        if (Controllers.ShooterController.getBackButtonPressed())
+        // Reset the logic which determines if a note is loaded if something goes wrong.     
+        if (Controllers.ShooterController.getXButtonPressed())
         {
-            this.SetLoaded(this.IsLoaded());
+            DataLogManager.log("Reset Launcher Note Detection to " + !this.IsLoaded());
+            this.SetLoaded(!this.IsLoaded());
         }
     }
 
     public Command Intake()
     {
+        if (RobotBase.isSimulation()) return Commands.none();
         return Commands.runEnd(() -> { this.IntakeMotor.set(0.15); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
     
-
     // public Command RunLaunchSpeed(double percentage)
     // {
     //     return Commands.run(() -> this.SetLaunchSpeed(percentage), this)
@@ -223,10 +220,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         // Wind-up, spin-up THEN start middle intake motors to push into launch motors
         // then END!
 
-        return Commands.run(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
-            .withTimeout(2)
-            .andThen(Commands.run(() -> this.IntakeMotor.set(0.3)))
-            .withTimeout(3)
+        return Commands.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom), this)
+            .andThen(new WaitCommand(0.5))
+            .andThen(RobotBase.isReal() ? Commands.runOnce(() -> this.IntakeMotor.set(0.3), this) : Commands.none())
+            .andThen(new WaitCommand(0.5))
             .finallyDo(() -> this.Stop());
     }
 
@@ -239,6 +236,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         {            
             builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
             builder.addBooleanProperty("Note Detected", () -> this.NoteSensor.getProximity() > 65, null);
+        }
+        else
+        {
+            builder.addBooleanProperty("Note Loaded", () -> false, null);
         }
     }
 

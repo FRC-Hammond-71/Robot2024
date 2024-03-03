@@ -16,4 +16,9 @@ public final class Controllers
     {
         return value > -Deadzone && value < Deadzone ? 0 : value;
     }
+
+    public static double SquareInput(double value)
+    {
+        return Math.copySign(value * value, value);
+    }
 }

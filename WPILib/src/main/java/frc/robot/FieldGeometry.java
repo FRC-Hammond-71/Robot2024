@@ -13,7 +13,26 @@ import frc.robot.utilities.DriverStationUtils;
 
 public class FieldGeometry 
 {
-    public static Pose2d GetStartingPosition1()
+    public static Pose2d GetStartingPosition() throws Exception
+    {
+        var location = Robot.SPosition.getSelected();
+
+        if (location == 3)
+        {
+            return GetStartingPosition3();
+        }
+        else if (location == 2)
+        {
+            return GetStartingPosition2();
+        }
+        else if (location == 1)
+        {
+            return GetStartingPosition1();
+        }
+        throw new Exception("Invalid Starting Position");
+    }
+
+    public static Pose2d GetStartingPosition3()
     {
         final var pose = new Pose2d(15.80, 6.71, Rotation2d.fromDegrees(-60));
 
@@ -23,6 +42,15 @@ public class FieldGeometry
     }
 
     public static Pose2d GetStartingPosition2()
+    {
+        final var pose = new Pose2d(15.151112, 5.653389, Rotation2d.fromDegrees(0));
+
+        DriverStationUtils.EnsureAllianceSelected();
+
+        return DriverStation.getAlliance().get() == Alliance.Red ? pose : GeometryUtil.flipFieldPose(pose);
+    }
+
+        public static Pose2d GetStartingPosition1()
     {
         final var pose = new Pose2d(15.82, 4.41, Rotation2d.fromDegrees(60));
 
@@ -40,13 +68,13 @@ public class FieldGeometry
         return DriverStation.getAlliance().get() == Alliance.Red ? GeometryUtil.flipFieldPose(pose) : pose;
     }
 
-    public static Translation2d GetSpeakerIntakePosition() throws MissingResourceException
+    public static Translation2d GetSpeakerIntakePosition()
     {
-        final var position = new Translation2d(0.427861, 5.551350);
+        final var position = new Translation2d(16.518642, 5.534473);
 
         DriverStationUtils.EnsureAllianceSelected();
 
-        return DriverStation.getAlliance().get() == Alliance.Red ? GeometryUtil.flipFieldPosition(position) : position;
+        return DriverStation.getAlliance().get() == Alliance.Red ? position : GeometryUtil.flipFieldPosition(position);
     }
     public static Translation2d GetSpeakerIntakeLeftMostPosition() throws MissingResourceException
     {

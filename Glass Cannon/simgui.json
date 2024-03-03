@@ -11,7 +11,7 @@
       }
     },
     "RoboRIO": {
-      "RoboRIO Input": {
+      "6V Rail": {
         "open": true
       }
     },
@@ -148,9 +148,6 @@
         "open": true
       },
       "SmartDashboard": {
-        "LaunchSubsystem": {
-          "open": true
-        },
         "open": true
       }
     }

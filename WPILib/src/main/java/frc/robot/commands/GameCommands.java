@@ -57,7 +57,8 @@ public class GameCommands
 			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
 		}
 
-		return Robot.Arm.RunRotate(firingSolution.ArmAngle).andThen(Robot.Launcher.Launch(0.7, 0.7));
+		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees()))
+			.andThen(Robot.Launcher.Launch(0.7, 0.7));
 	}
 
 	public static Command GotoSpeakerAndLaunch()

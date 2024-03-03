@@ -51,15 +51,15 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     public Encoder RelativeEncoder;
 
 
-    private final ArmFeedforward FeedForward = new ArmFeedforward(2.5, 0.1, 0.1);
+    private ArmFeedforward FeedForward;
 
-    public PIDController PositionalPID = new PIDController(0.05, 0, 0);
+    public PIDController PositionalPID;
 
-    private Rotation2d TargetRotation = Rotation2d.fromDegrees(90);
+    // private Rotation2d TargetRotation = Rotation2d.fromDegrees(90);
 
     public final ArmVisualization Visualization = new ArmVisualization();
     
-    private Optional<Double> OverrideRotation = Optional.empty() ;
+    private Optional<Double> OverrideRotation = Optional.empty();
 
     public ArmSubsystem(Robot robot) 
     {
@@ -69,29 +69,14 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         // this.RotationalRatePID = new PIDController(0.02, 0, 0);
 
         // this.PID.setTolerance(Constants.Arm.AllowedAngleError.getRadians());
-        // this.PID.setSetpoint(Rotation2d.fromDegrees(90).getRadians());
-    }
-
-    @Override
-    protected void initializeReal()
-    {
-        this.PositionalPID = new PIDController(0.005, 0, 0.1);
-        // this.RotationalRatePID = new PIDController(0.02, 0, 0);
-
-        this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
-        this.Motor.setIdleMode(IdleMode.kBrake);
-        this.Motor.setInverted(false);
-
-        this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
-        this.RelativeEncoder = new Encoder(2, 3);
-
-        this.PositionalPID.setTolerance(Constants.Arm.AllowedAngleError.getDegrees());
-        // this.RotationalRatePID.setTolerance(0.2);
+        // this.PID.setSetpoint(Rotation2d.fromDegrees(90).getRadians())        
     }
 
     @Override
     protected void initializeSimulated()
     {
+        this.FeedForward = new ArmFeedforward(2, 0.1, 0);
+
         this.SimulatedArm = new SingleJointedArmSim(
             DCMotor.getNEO(1),
             Constants.Arm.Gearing, 
@@ -100,7 +85,31 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             0, 
             Constants.Arm.MaxAngle.getRadians(), 
             false, 
-            Constants.Arm.MaxAngle.getRadians());
+            Math.PI / 2);
+
+        this.PositionalPID = new PIDController(0.05, 0, 0);
+        this.PositionalPID.setTolerance(0.25);
+        this.PositionalPID.setSetpoint(90);
+        this.SetAngle(Rotation2d.fromDegrees(90));
+    }
+
+    @Override
+    protected void initializeReal()
+    {
+        this.FeedForward = new ArmFeedforward(1, 0, 0);
+        
+        this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
+        this.Motor.setSmartCurrentLimit(25);
+        this.Motor.setIdleMode(IdleMode.kBrake);
+        this.Motor.setInverted(false);
+        
+        this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
+        this.RelativeEncoder = new Encoder(2, 3);
+
+        this.PositionalPID = new PIDController(2, 0, 0);
+        this.PositionalPID.setTolerance(0.25);
+        this.PositionalPID.setSetpoint(90);
+        this.SetAngle(Rotation2d.fromDegrees(90));
     }
 
     /**
@@ -122,7 +131,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetTargetAngle()
     {
-        return this.TargetRotation;
+        return Rotation2d.fromDegrees(this.PositionalPID.getSetpoint());
     }
 
     public Rotation2d GetAngleError()
@@ -150,7 +159,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public boolean IsHolding()
     {
-        return this.IsAt(this.TargetRotation);
+        return this.PositionalPID.atSetpoint();
     }
 
     // /**
@@ -167,7 +176,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         else this.SimulatedArm.setInputVoltage(0);
 
         this.OverrideRotation = Optional.empty();
-        this.TargetRotation = this.GetActualAngle();
+        // this.TargetRotation = this.GetActualAngle();
         this.PositionalPID.setSetpoint(this.GetActualAngle().getDegrees());
 
         // this.PID.setSetpoint(this.GetActualAngle().getRadians());
@@ -180,12 +189,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         this.PositionalPID.setSetpoint(rotation.getDegrees());
 
-        this.TargetRotation = rotation;
-        // this.PID.setSetpoint(rotation.getRadians());
-        
         // System.out.printf("Set rotation: %.2f\n", rotation.getDegrees());
 
-        this.UpdateMotors();
+        this.UpdateMotors(); 
     }
     private void SetAngle(Optional<Double> voltage)
     {
@@ -196,22 +202,39 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     protected void UpdateMotors()
     {
-        // https://www.chiefdelphi.com/t/understanding-feedforward-v-feedback-and-how-their-calculated/186889/10
-        if (this.OverrideRotation.isPresent())
+        if (DriverStation.isDisabled()) 
         {
-            if (RobotBase.isReal()) this.Motor.setVoltage(this.OverrideRotation.get());
-            else this.SimulatedArm.setInputVoltage(this.OverrideRotation.get());
-            
+            this.Stop();
             return;
         }
 
-        // if (!this.InBounds())
+        // https://www.chiefdelphi.com/t/understanding-feedforward-v-feedback-and-how-their-calculated/186889/10
+        // if (this.OverrideRotation != null && this.OverrideRotation.isPresent())
         // {
-        //     this.Stop();
-        //     this.TargetRotation = Rotation2d.fromDegrees(90);
+        //     if (RobotBase.isReal()) this.Motor.setVoltage(this.OverrideRotation.get());
+        //     else this.SimulatedArm.setInputVoltage(this.OverrideRotation.get());
+            
         //     return;
         // }
-        
+
+        var rot = this.PositionalPID.calculate(this.GetActualAngle().getDegrees());
+
+        rot = Math.min(rot, Constants.Arm.MaxSpeed.getDegrees());
+
+        if (this.GetActualAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees() + 1 && rot > 0)
+        {
+            // System.out.println("CANNOT ROTATE FURTHER UP FROM " + this.GetActualAngle().getDegrees());
+            this.Stop();
+            return;
+        }
+
+        if (this.GetActualAngle().getDegrees() <= Constants.Arm.MinAngle.getDegrees() - 1 && rot < 0)
+        {
+            // System.out.println("CANNOT ROTATE FURTHER DOWN FROM " + this.GetActualAngle().getDegrees());
+            this.Stop();
+            return;
+        }
+
         if (this.IsHolding())
         {
             if (RobotBase.isReal())
@@ -225,15 +248,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         }
         else 
         {
-            var rot = this.PositionalPID.calculate(this.GetActualAngle().getDegrees());
-
-            System.out.println(rot);
-
             if (RobotBase.isReal())
             {
-                // System.out.println(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 2));
-                // this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getRadians(), this.GetAngleError().getRadians() * 0.5));
-                // this.Motor.setVoltage(this.RotationalRatePID.calculate(this.GetVelocity().getDegrees(), rot) + this.FeedForward.calculate(this.GetActualAngle().getDegrees(), rot));
                 this.Motor.setVoltage(this.FeedForward.calculate(this.GetActualAngle().getDegrees(), rot));
             }
             else
@@ -248,8 +264,10 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         super.periodic();
 
-        // if (!DriverStation.isDisabled()) this.UpdateMotors();
-        this.UpdateMotors();
+        if (!DriverStation.isDisabled()) 
+        {
+            this.UpdateMotors();
+        }
 
         this.Visualization.Update(this);
     }
@@ -263,17 +281,16 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     public void initSendable(SendableBuilder builder) 
     {
-        builder.addDoubleProperty("Target Angle", 
-            () -> this.GetTargetAngle().getDegrees(), 
-            (deg) -> this.SetAngle(Rotation2d.fromDegrees(deg)));
+        // builder.addDoubleProperty("Target Angle", 
+        //     () -> this.GetTargetAngle().getDegrees(), 
+        //     (deg) -> this.SetAngle(Rotation2d.fromDegrees(deg)));
 
-        builder.addDoubleProperty("Angle", () -> this.GetActualAngle().getDegrees(), null);
+        // builder.addDoubleProperty("Angle", () -> this.GetActualAngle().getDegrees(), null);
 
         builder.addBooleanProperty("Holding", this::IsHolding, null);
-        
-        builder.addDoubleProperty("Velocity", () -> this.GetVelocity().getDegrees(), null);
 
-        builder.addDoubleProperty("Voltage", () -> RobotBase.isReal() ? this.Motor.getBusVoltage() : this.SimulatedArm.getOutput(0), null);
+        builder.addDoubleProperty("Velocity", () -> this.GetVelocity().getDegrees(), null);
+        // builder.addDoubleProperty("Voltage", () -> RobotBase.isReal() ? this.Motor.getBusVoltage() : this.SimulatedArm.getOutput(0), null);
         
         this.addChild("Visualization", this.Visualization);
     }

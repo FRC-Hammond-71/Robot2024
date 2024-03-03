@@ -3,11 +3,15 @@ package frc.robot;
 import java.time.Duration;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JacksonInject.Value;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,15 +19,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.proto.Controller;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -45,9 +53,46 @@ public class Robot extends TimedRobot
 	public static DriveSubsystem Drive;
 	public static LaunchSubsystem Launcher;
 	public static LocalizationSubsystem Localization;
+	
+	//pick and choose
+	public static SendableChooser<Integer> SPosition = new SendableChooser<>();
+	public static SendableChooser<Integer> AutoOptions = new SendableChooser<>();
 
 	public Robot()
 	{
+		SPosition.setDefaultOption("Sourceside", 1);
+		SPosition.addOption("Center", 2);
+		SPosition.addOption("Ampside", 3);
+
+		AutoOptions.setDefaultOption("Middle", 1);
+		AutoOptions.addOption("Source", 2);
+		AutoOptions.addOption("PathPlanA", 3);
+		AutoOptions.addOption("PathPlanB", 4);
+		AutoOptions.addOption("PathPlanC", 5);
+		AutoOptions.addOption("PathPlanD", 6);
+		AutoOptions.addOption("PathPlanE", 7);
+		AutoOptions.addOption("PathPlanF", 8);
+		SPosition.onChange((value) ->  
+		{
+			Pose2d pose;
+
+			try
+			{
+				pose = FieldGeometry.GetStartingPosition();
+			}
+			catch (Exception ex)
+			{	
+				System.out.println("Could not update starting point." + ex);
+				return;
+			}
+
+			System.out.println("Reset " + value);
+			System.out.println(pose.getX());
+			Localization.ResetPosition(pose);
+			Drive.SimulatedDrive.setPose(pose);
+			System.out.println(pose);
+		});
+		
 		System.out.println("Waiting for connection to Driver Station...");
 		
 		while (!DriverStation.waitForDsConnection(10))
@@ -78,6 +123,10 @@ public class Robot extends TimedRobot
 		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
 		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
+		
+
+		SmartDashboard.putData("Auto Options", AutoOptions);
+		SmartDashboard.putData("Starting Positions", SPosition);
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData(Arm);
 		SmartDashboard.putData(Drive);
@@ -123,6 +172,10 @@ public class Robot extends TimedRobot
 			// Do whatever you want with the poses here
 			Constants.Field.getObject("path").setPoses(poses);
 		});
+
+		Arm.SetAngle(Rotation2d.fromDegrees(90));
+
+		Constants.Field.getObject("Speaker").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakePosition(), Rotation2d.fromDegrees(0)));
 	}
 
 	public void Stop()
@@ -153,6 +206,11 @@ public class Robot extends TimedRobot
 			}
 		}
 
+		if (DriverStation.getMatchTime() < 4)
+		{
+			Drive.SetIdle(IdleMode.kCoast);
+		}
+
 		// LEDs.Rainbow();
 
 		// Execute / iterate all subsystems, then commands.
@@ -164,43 +222,15 @@ public class Robot extends TimedRobot
 	{
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
-			// if (Controllers.DriverController.getLeftBumperPressed() && RobotBase.isSimulation())
-			// {
-			// 	Localization.ResetPosition(new Pose2d(16.54 / 2, 5, new Rotation2d()));
-			// }
- 
-            // if (Controllers.DriverController.getAButtonPressed())
-            // {
-            //     System.out.println("Path finding to Speaker!");
-            //     PathCommands.PathToSpeaker().schedule();
-            // }
-            // if (Controllers.DriverController.getBButtonPressed())
-            // {
-            //     System.out.println("Path finding to Amp!");
-            //     PathCommands.PathToAmplifier().schedule();
-            // }
-
             Drive.SetArcade(-Controllers.DriverController.getLeftY(), -Controllers.DriverController.getRightX());
 
 		}, Drive));
 		
 		Launcher.setDefaultCommand(Commands.run(() -> 
-		{
-			// if (Controllers.DriverController.getRightBumperPressed())
-			// {
-			// 	GameCommands.AutoRotateAndLaunch().schedule();
-			// 	return;
-			// }
-
-			if (Controllers.ShooterController.getLeftBumperPressed())
-			{
-				Arm.RunRotate(Rotation2d.fromDegrees(100)).andThen(Launcher.Launch(0.20, 0.08)).schedule();
-				return;
-			}
-
+		{	
 			if (RobotBase.isSimulation()) return;
 
-			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.7;
+			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
 			speed = Math.copySign(speed * speed, speed);
 			
 			if (Controllers.ShooterController.getAButton())
@@ -218,11 +248,13 @@ public class Robot extends TimedRobot
 			{
 				System.out.println("Picking up a Note!");
 				GameCommands.IntakeNote()
+					.onlyWhile(() -> Controllers.ShooterController.getRightBumper() && !Launcher.IsLoaded())
 					.finallyDo(() -> {
 						// Rumble the shooter-controller to indicate a note was picked up.
 						if (Robot.Launcher.IsLoaded())
 						{
-							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 2, 0.2).schedule();
+							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 3, 0.3).schedule();
+							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 3, 0.3).schedule();
 						}
 					}).schedule();
 				return;
@@ -239,23 +271,21 @@ public class Robot extends TimedRobot
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			// if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
-			// {
-			// 	GameCommands.AutoPitchAndLaunch().schedule();
-			// }
-			// else
-			// {
-			// 	Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
-			// } 	
-			Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY()))));	
-
-
-			// if (Controllers.ShooterController.getBackButtonPressed())
-			// {
-			// 	System.out.println("Arm Encoder Pos Reset");
-			// 	Arm.Encoder.reset();
-			// }
-
+			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			{
+				GameCommands.AutoRotateAndLaunch().schedule();
+				GameCommands.AutoPitchAndLaunch().schedule();
+			}
+			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
+			{
+				Arm.RunRotate(Rotation2d.fromDegrees(100))
+					.andThen(Launcher.Launch(0.22, 0.05))
+					.schedule();
+			}
+			else
+			{
+				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(Controllers.SquareInput(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY())))));	
+			}
 		}, Arm));
 	}
 	
@@ -282,5 +312,69 @@ public class Robot extends TimedRobot
 	public void disabledInit()
 	{
 		this.Stop();
+	}
+
+	@Override
+	public void autonomousInit()
+	{
+		if (AutoOptions.getSelected() == 2)
+		{
+			GameCommands.AutoPitchAndLaunch()
+				.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? 0.623 : -0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5))
+				.schedule();
+		}
+		else if (AutoOptions.getSelected() == 1)
+		{
+			GameCommands.AutoPitchAndLaunch()
+				.andThen(new ParallelCommandGroup(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive).withTimeout(2), GameCommands.IntakeNote()))
+				.andThen(Launcher.Launch(0.6, 0.6))
+				.schedule();
+		}
+		else if (AutoOptions.getSelected() == 3)
+		{
+			new PathPlannerAuto("Beans").schedule();
+			
+		}
+		else if (AutoOptions.getSelected() == 4)
+		{
+			new PathPlannerAuto("Auto E(P1)").schedule();
+			
+		}
+		else if (AutoOptions.getSelected() == 5)
+		{
+			new PathPlannerAuto("Auto H(P2)").schedule();
+			
+		}
+		else if (AutoOptions.getSelected() == 6)
+		{
+			new PathPlannerAuto("Auto H(P2)").schedule();
+			
+		}
+		else if (AutoOptions.getSelected() == 7)
+		{
+			new PathPlannerAuto("Auto C(P1)").schedule();
+			
+		}
+		else if (AutoOptions.getSelected() == 8)
+		{
+			new PathPlannerAuto("Auto B(P1)").schedule();
+			
+		}
+
+
+
+		// AutoCommand = GameCommands.AutoPitch()  
+		// 	.andThen(Launcher.Launch(0.5, 0.5))
+		// 	.andThen(Commands.startEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive))
+		// 	.withTimeout(2);
+
+		// AutoCommand.schedule();
+	}
+
+	@Override
+	public void autonomousExit()
+	{
+		this.Stop();
+		// CommandScheduler.getInstance().cancel(AutoCommand);
 	}
 }

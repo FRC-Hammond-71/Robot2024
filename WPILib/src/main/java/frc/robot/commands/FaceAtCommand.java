@@ -27,7 +27,6 @@ public class FaceAtCommand extends Command
 		this.AllowedError = error;
 
 		addRequirements(Robot.Drive);
-		addRequirements(Robot.Localization);
 	}	
 
 	/**

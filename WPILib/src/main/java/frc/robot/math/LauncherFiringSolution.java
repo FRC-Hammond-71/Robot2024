@@ -8,7 +8,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.Constants.RedField;
 import frc.robot.FieldGeometry;
 
 public class LauncherFiringSolution implements Sendable
@@ -34,13 +33,13 @@ public class LauncherFiringSolution implements Sendable
         // The following calculations are credited to dydx#1394, and giant908. Thank you!
         // Equations from Desmos:  https://www.desmos.com/calculator/tsjv7opvqg
 
-        var distanceFromSpeaker = robotPose.getTranslation().getDistance(Constants.RedField.SpeakerPosition.toTranslation2d());
+        var distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldGeometry.GetSpeakerIntakePosition());
         // Offset launcher in ft
-        var ys = 0.75;
+        var ys = 2.3;
         // Distance away in ft
         var xs = Units.metersToFeet(distanceFromSpeaker);
         // Range from 0-10 ("oomph" value)
-        var h = 5;
+        var h = 10;
         var vy = Math.sqrt(Math.pow(h, 2) + ((80.5 / 12) - ys) * 32 * 2);
         var tm = (vy - h) / 32;
         var vx = xs / tm;
@@ -53,11 +52,11 @@ public class LauncherFiringSolution implements Sendable
         // var toLeft = FieldGeometry.GetSpeakerIntakeLeftMostPosition().minus(robotPose.getTranslation());
         // var toRight = FieldGeometry.GetSpeakerIntakeRightMostPosition().minus(robotPose.getTranslation());
         // var allowedError = Rotation2d.fromRadians(Math.abs(toLeft.getAngle().minus(toRight.getAngle()).getRadians()));
-        var allowedError = Rotation2d.fromDegrees(1);
+        var allowedError = Rotation2d.fromDegrees(0.5);
 
         // Use distance to magnify uncertainty
         
-        return new LauncherFiringSolution(launchAngle, launchSpeed, Constants.RedField.SpeakerPosition, allowedError);
+        return new LauncherFiringSolution(launchAngle, launchSpeed, new Translation3d(0, 0, 0), allowedError);
     }
 
     @Override

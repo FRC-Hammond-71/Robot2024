@@ -16,14 +16,6 @@ public final class Constants
 	 */
 	public static double RobotWeight = 80;
 
-	public static class RedField
-	{
-		/**
-		 * The position of the note-entrance of the Speaker game element. 
-		 */
-		public static Translation3d SpeakerPosition = new Translation3d(16.194929, 5.517298, 0);
-	}
-
 	public static class Drivetrain 
 	{
 		// https://www.revrobotics.com/rev-21-1650/
@@ -31,7 +23,7 @@ public final class Constants
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxForwardSpeed = 5;
+		public static double MaxForwardSpeed = 6;
 
 		/**
 		 * The maximum rate-of-change of forward speeds in (M/s).
@@ -41,7 +33,7 @@ public final class Constants
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(300);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(450);
 
 		/**
 		 * The maximum rotational acceleration in a second.
@@ -84,11 +76,16 @@ public final class Constants
 	{
 		public static int PitchMotorCANPort = 5;
 
+		/**
+		 * Max rotational speed per-second.
+		 */
+		public static Rotation2d MaxSpeed = Rotation2d.fromDegrees(50);
+
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(100);
 
-		public static Rotation2d MinAngle = Rotation2d.fromDegrees(30);
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(35);
 
-		public static Rotation2d IntakeAngle = Rotation2d.fromDegrees(45);
+		public static Rotation2d IntakeAngle = Rotation2d.fromDegrees(50);
 
 		// Shooting from further would require a 0.5 degree inaccuracy
 		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1);

@@ -26,8 +26,8 @@ public class ArmVisualization implements Sendable
 		Mechanism = new Mechanism2d(3.0, 3.0, new Color8Bit(Color.kBlack));
 
 		MechanismRoot2d root = Mechanism.getRoot("pivot", 0.5, 0.4);
-		Arm = new MechanismLigament2d("arm", 2, 20.0, 6, new Color8Bit(Color.kWhite));
-		TargetArm = new MechanismLigament2d("target_arm", 1, 0, 3, new Color8Bit(Color.kDimGray));
+		Arm = new MechanismLigament2d("arm", 2, 90, 6, new Color8Bit(Color.kWhite));
+		TargetArm = new MechanismLigament2d("target_arm", 1, 90, 3, new Color8Bit(Color.kDimGray));
 		root.append(TargetArm);
 		root.append(Arm);
 
