@@ -23,15 +23,16 @@ public class GameCommands
 	public static Command IntakeNote()
 	{
 		return Robot.Arm.RunRotate(Constants.Arm.IntakeAngle)
-			.andThen(Robot.Launcher.Intake())
-			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded());
+			.andThen(Robot.Launcher.RunIntake())
+			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded())
+			.withName("Intake Note");
 	}
 
 	public static Command AutoRotateAndLaunch()
 	{
 		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
 
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
+		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
 
 		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
 		{
@@ -40,16 +41,17 @@ public class GameCommands
 		}
 
 		return new ParallelCommandGroup(
-			new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.YawError),
+			new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.AllowedYawError),
 			Robot.Arm.RunRotate(firingSolution.ArmAngle))
-			.andThen(Robot.Launcher.Launch(0.7, 0.7));
+			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
+			.withName("AutoRotateAndLaunch");
 	}
 
 	public static Command AutoPitch()
 	{
 		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
 
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
+		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
 
 		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
 		{
@@ -57,14 +59,14 @@ public class GameCommands
 			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
 		}
 
-		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees()));
+		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees())).withName("Auto Pitch");
 	}
 
 	public static Command AutoPitchAndLaunch()
 	{
 		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
 
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.YawError.getDegrees());
+		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
 
 		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
 		{
@@ -73,7 +75,8 @@ public class GameCommands
 		}
 
 		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees()))
-			.andThen(Robot.Launcher.Launch(0.7, 0.7));
+			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
+			.withName("AutoPitchAndLaunch");
 	}
 
 	public static Command GotoSpeakerAndLaunch()

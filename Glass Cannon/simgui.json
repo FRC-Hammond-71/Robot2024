@@ -1,0 +1,77 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "navX-Sensor[0]": {
+        "header": {
+          "open": false
+        }
+      }
+    },
+    "RoboRIO": {
+      "RoboRIO Input": {
+        "open": false
+      }
+    }
+  },
+  "NTProvider": {
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Speaker Left": {
+          "arrows": false,
+          "length": 0.0,
+          "weight": 0.0,
+          "width": 0.0
+        },
+        "Speaker Right": {
+          "arrows": false,
+          "length": 0.0,
+          "selectable": false,
+          "weight": 0.0,
+          "width": 0.0
+        },
+        "Target": {
+          "arrows": false,
+          "color": [],
+          "style": ""
+        },
+        "path": {
+          "arrows": false,
+          "color": [],
+          "style": ""
+        },
+        "robot path pose": {
+          "arrowSize": 0,
+          "arrowWeight": 0.0,
+          "color": [],
+          "length": 0.0,
+          "width": 0.0
+        },
+        "traj": {
+          "arrows": false,
+          "style": ""
+        },
+        "units": ""
+      }
+    }
+  },
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "Movement": {
+          "open": false
+        }
+      },
+      "SmartDashboard": {
+        "LaunchSubsystem": {
+          "open": false
+        },
+        "Scheduler": {
+          "open": false
+        }
+      }
+    }
+  }
+}

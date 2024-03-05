@@ -64,7 +64,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public ArmSubsystem(Robot robot) 
     {
-        super(robot);    
+        super(robot);
         
         // this.PositionalPID = new PIDController(0.05, 0, 0);
         // this.RotationalRatePID = new PIDController(0.02, 0, 0);
@@ -76,7 +76,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeSimulated()
     {
-        this.FeedForward = new ArmFeedforward(2, 0.1, 0);
+        this.FeedForward = new ArmFeedforward(0.15, 0, 0.15);
 
         this.SimulatedArm = new SingleJointedArmSim(
             DCMotor.getNEO(1),
@@ -88,16 +88,18 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
             false, 
             Math.PI / 2);
 
-        this.PositionalPID = new PIDController(0.05, 0, 0);
+        this.PositionalPID = new PIDController(4, 0, 0.4);
         this.PositionalPID.setTolerance(0.25);
         this.PositionalPID.setSetpoint(90);
         this.SetAngle(Rotation2d.fromDegrees(90));
+
+        SmartDashboard.putData("Arm PID", this.PositionalPID);
     }
 
     @Override
     protected void initializeReal()
     {
-        this.FeedForward = new ArmFeedforward(1, 0, 0);
+        this.FeedForward = new ArmFeedforward(1, 0.05, 0);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);
@@ -107,13 +109,12 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
 
-        this.PositionalPID = new PIDController(1.25, 0, 0.23);
-        this.PositionalPID.setTolerance(1);
+        this.PositionalPID = new PIDController(2, 0, 0.5);
+        this.PositionalPID.setTolerance(0.5);
         this.PositionalPID.setSetpoint(90);
         this.SetAngle(Rotation2d.fromDegrees(90));
         
         SmartDashboard.putData(PositionalPID);
-        
     }
 
     /**
@@ -225,13 +226,14 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         rot = Math.min(rot, Constants.Arm.MaxSpeed.getDegrees());
 
+        SmartDashboard.putNumber("Arm PID Rotation", rot);
+
         if (this.GetActualAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees() + 1 && rot > 0)
         {
             // System.out.println("CANNOT ROTATE FURTHER UP FROM " + this.GetActualAngle().getDegrees());
             this.Stop();
             return;
         }
-
         if (this.GetActualAngle().getDegrees() <= Constants.Arm.MinAngle.getDegrees() - 1 && rot < 0)
         {
             // System.out.println("CANNOT ROTATE FURTHER DOWN FROM " + this.GetActualAngle().getDegrees());

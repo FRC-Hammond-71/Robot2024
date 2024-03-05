@@ -1,0 +1,103 @@
+{
+  "Docking": {
+    "Data": [
+      "DockNode      ID=0x00000001 Pos=177,778 Size=827,178 Split=X",
+      "DockNode    ID=0x00000004 Parent=0x00000001 SizeRef=633,178 Split=X",
+      "DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=494,73 Selected=0x138219D4",
+      "DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=300,73 Selected=0x3E3C37F1",
+      "DockNode    ID=0x00000005 Parent=0x00000001 SizeRef=192,178 Selected=0x6AE6D891"
+    ]
+  },
+  "MainWindow": {
+    "GLOBAL": {
+      "fps": "120",
+      "height": "1129",
+      "maximized": "1",
+      "style": "0",
+      "userScale": "2",
+      "width": "1920",
+      "xpos": "0",
+      "ypos": "23"
+    }
+  },
+  "Window": {
+    "###/SmartDashboard/Arm Visualization": {
+      "Collapsed": "0",
+      "Pos": "1046,95",
+      "Size": "437,426"
+    },
+    "###/SmartDashboard/Auto Options": {
+      "Collapsed": "0",
+      "Pos": "226,627",
+      "Size": "254,54"
+    },
+    "###/SmartDashboard/Field": {
+      "Collapsed": "0",
+      "Pos": "228,94",
+      "Size": "805,435"
+    },
+    "###/SmartDashboard/Scheduler": {
+      "Collapsed": "0",
+      "Pos": "593,559",
+      "Size": "400,200"
+    },
+    "###/SmartDashboard/Starting Positions": {
+      "Collapsed": "0",
+      "Pos": "224,559",
+      "Size": "254,54"
+    },
+    "###FMS": {
+      "Collapsed": "0",
+      "Pos": "5,540",
+      "Size": "169,184"
+    },
+    "###Joysticks": {
+      "Collapsed": "0",
+      "DockId": "0x00000002,0",
+      "Pos": "177,778",
+      "Size": "393,178"
+    },
+    "###Keyboard 0 Settings": {
+      "Collapsed": "0",
+      "DockId": "0x00000003,0",
+      "Pos": "572,778",
+      "Size": "238,178"
+    },
+    "###NetworkTables": {
+      "Collapsed": "0",
+      "Pos": "1017,560",
+      "Size": "750,185"
+    },
+    "###NetworkTables Info": {
+      "Collapsed": "0",
+      "Pos": "658,561",
+      "Size": "750,143"
+    },
+    "###Other Devices": {
+      "Collapsed": "0",
+      "Pos": "1025,20",
+      "Size": "250,695"
+    },
+    "###System Joysticks": {
+      "Collapsed": "0",
+      "DockId": "0x00000005,0",
+      "Pos": "812,778",
+      "Size": "192,178"
+    },
+    "###Timing": {
+      "Collapsed": "0",
+      "Pos": "43,276",
+      "Size": "135,127"
+    },
+    "Debug##Default": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "400,400"
+    },
+    "Robot State": {
+      "Collapsed": "0",
+      "Pos": "66,106",
+      "Size": "92,116"
+    }
+  }
+}

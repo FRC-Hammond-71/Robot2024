@@ -268,8 +268,8 @@ public class Robot extends TimedRobot
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
-			// if (Controllers.DriverController.getAButtonPressed())
+			// if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			if (Controllers.DriverController.getAButton())
 			{
 				// GameCommands.AutoRotateAndLaunch().schedule();
 				GameCommands.AutoPitch().schedule();
@@ -277,7 +277,7 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
 			{
 				Arm.RunRotate(Rotation2d.fromDegrees(100))
-					.andThen(Launcher.Launch(0.22, 0.05))
+					.andThen(Launcher.RunLaunch(0.22, 0.05))
 					.schedule();
 			}
 			else
