@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
 import com.revrobotics.CANSparkMax;
@@ -106,10 +107,13 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
 
-        this.PositionalPID = new PIDController(2, 0, 0);
-        this.PositionalPID.setTolerance(0.25);
+        this.PositionalPID = new PIDController(1.25, 0, 0.23);
+        this.PositionalPID.setTolerance(1);
         this.PositionalPID.setSetpoint(90);
         this.SetAngle(Rotation2d.fromDegrees(90));
+        
+        SmartDashboard.putData(PositionalPID);
+        
     }
 
     /**

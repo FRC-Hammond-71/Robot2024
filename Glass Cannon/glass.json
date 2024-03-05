@@ -1,0 +1,80 @@
+{
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "retained": {
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "Arm Visualization": {
+          "double[]##v_/SmartDashboard/Arm Visualization/dims": {
+            "open": true
+          }
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Arm Visualization": "Mechanism2d",
+      "/SmartDashboard/Auto Options": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/Starting Positions": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/Arm Visualization": {
+        "image": "C:\\Users\\Team Hammond\\Downloads\\OIP.jpg",
+        "window": {
+          "name": "live arm footage",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Options": {
+        "window": {
+          "name": "Autos",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "Robot - IMU": {
+          "arrowSize": 0,
+          "weight": 0.0
+        },
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Scheduler": {
+        "window": {
+          "name": "COMMAND SCHEDULER",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Starting Positions": {
+        "window": {
+          "name": "Start Positions",
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "71",
+    "visible": false
+  },
+  "NetworkTables View": {
+    "visible": false
+  }
+}

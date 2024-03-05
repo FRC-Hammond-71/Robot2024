@@ -3,6 +3,8 @@ package frc.robot;
 import java.time.Duration;
 import java.util.Optional;
 
+import org.photonvision.PhotonCamera;
+
 import com.fasterxml.jackson.annotation.JacksonInject.Value;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -13,6 +15,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,18 +63,15 @@ public class Robot extends TimedRobot
 
 	public Robot()
 	{
-		SPosition.setDefaultOption("Sourceside", 1);
-		SPosition.addOption("Center", 2);
-		SPosition.addOption("Ampside", 3);
+		SPosition.setDefaultOption("Center", 2);
+		SPosition.addOption("Source", 1);
+		SPosition.addOption("Amp", 3);
 
 		AutoOptions.setDefaultOption("Middle", 1);
 		AutoOptions.addOption("Source", 2);
-		AutoOptions.addOption("PathPlanA", 3);
-		AutoOptions.addOption("PathPlanB", 4);
-		AutoOptions.addOption("PathPlanC", 5);
-		AutoOptions.addOption("PathPlanD", 6);
-		AutoOptions.addOption("PathPlanE", 7);
-		AutoOptions.addOption("PathPlanF", 8);
+		AutoOptions.addOption("Auto Center 1N", 3);
+		AutoOptions.setDefaultOption("None", 0);
+
 		SPosition.onChange((value) ->  
 		{
 			Pose2d pose;
@@ -89,7 +89,9 @@ public class Robot extends TimedRobot
 			System.out.println("Reset " + value);
 			System.out.println(pose.getX());
 			Localization.ResetPosition(pose);
-			Drive.SimulatedDrive.setPose(pose);
+			if(isSimulation()) {
+				Drive.SimulatedDrive.setPose(pose);
+			}
 			System.out.println(pose);
 		});
 		
@@ -123,8 +125,6 @@ public class Robot extends TimedRobot
 		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
 		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
-		
-
 		SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData("Starting Positions", SPosition);
 		SmartDashboard.putData(Constants.Field);
@@ -132,7 +132,7 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData(Drive);
 		SmartDashboard.putData(Launcher);
 		SmartDashboard.putData(Localization);
-
+		SmartDashboard.putData(CommandScheduler.getInstance());
 		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
 		// SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
 		// SmartDashboard.putData("Arm PID", Arm.PID);
@@ -206,11 +206,6 @@ public class Robot extends TimedRobot
 			}
 		}
 
-		if (DriverStation.getMatchTime() < 4)
-		{
-			Drive.SetIdle(IdleMode.kCoast);
-		}
-
 		// LEDs.Rainbow();
 
 		// Execute / iterate all subsystems, then commands.
@@ -220,11 +215,13 @@ public class Robot extends TimedRobot
 	@Override
 	public void teleopInit()
 	{
+		CommandScheduler.getInstance().cancelAll();
+
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
             Drive.SetArcade(-Controllers.DriverController.getLeftY(), -Controllers.DriverController.getRightX());
 
-		}, Drive));
+		}, Drive).withName("Drive Teleop Command"));
 		
 		Launcher.setDefaultCommand(Commands.run(() -> 
 		{	
@@ -253,8 +250,8 @@ public class Robot extends TimedRobot
 						// Rumble the shooter-controller to indicate a note was picked up.
 						if (Robot.Launcher.IsLoaded())
 						{
-							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 3, 0.3).schedule();
-							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 3, 0.3).schedule();
+							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
+							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
 						}
 					}).schedule();
 				return;
@@ -267,14 +264,15 @@ public class Robot extends TimedRobot
 			
 			Launcher.SetLaunchSpeed(speed);
 
-		}, Launcher));
+		}, Launcher).withName("Launcher Teleop Command"));
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
 			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			// if (Controllers.DriverController.getAButtonPressed())
 			{
-				GameCommands.AutoRotateAndLaunch().schedule();
-				GameCommands.AutoPitchAndLaunch().schedule();
+				// GameCommands.AutoRotateAndLaunch().schedule();
+				GameCommands.AutoPitch().schedule();
 			}
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
 			{
@@ -286,7 +284,9 @@ public class Robot extends TimedRobot
 			{
 				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(Controllers.SquareInput(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY())))));	
 			}
-		}, Arm));
+		}, Arm).withName("Arm Teleop Command"));
+
+		System.out.println("Telop is READY!");
 	}
 	
 	@Override
@@ -317,49 +317,53 @@ public class Robot extends TimedRobot
 	@Override
 	public void autonomousInit()
 	{
-		if (AutoOptions.getSelected() == 2)
+		if (AutoOptions.getSelected() == 1)
+		{
+			GameCommands.AutoPitchAndLaunch()
+				.andThen(new ParallelCommandGroup(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive).withTimeout(2), GameCommands.IntakeNote()))
+				// .andThen(Launcher.Launch(0.6, 0.6))
+				.schedule();
+		}
+		else if (AutoOptions.getSelected() == 2)
 		{
 			GameCommands.AutoPitchAndLaunch()
 				.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? 0.623 : -0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5))
 				.schedule();
 		}
-		else if (AutoOptions.getSelected() == 1)
-		{
-			GameCommands.AutoPitchAndLaunch()
-				.andThen(new ParallelCommandGroup(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive).withTimeout(2), GameCommands.IntakeNote()))
-				.andThen(Launcher.Launch(0.6, 0.6))
-				.schedule();
-		}
 		else if (AutoOptions.getSelected() == 3)
 		{
-			new PathPlannerAuto("Beans").schedule();
-			
+			new PathPlannerAuto("Auto Center 1N").schedule();
 		}
-		else if (AutoOptions.getSelected() == 4)
+		else if (AutoOptions.getSelected() == 0)
 		{
-			new PathPlannerAuto("Auto E(P1)").schedule();
-			
+			// DO NOTHING
+			return;
 		}
-		else if (AutoOptions.getSelected() == 5)
-		{
-			new PathPlannerAuto("Auto H(P2)").schedule();
+		// else if (AutoOptions.getSelected() == 4)
+		// {
+		// 	new PathPlannerAuto("Auto E(P1)").schedule();
 			
-		}
-		else if (AutoOptions.getSelected() == 6)
-		{
-			new PathPlannerAuto("Auto H(P2)").schedule();
+		// }
+		// else if (AutoOptions.getSelected() == 5)
+		// {
+		// 	new PathPlannerAuto("Auto H(P2)").schedule();
 			
-		}
-		else if (AutoOptions.getSelected() == 7)
-		{
-			new PathPlannerAuto("Auto C(P1)").schedule();
+		// }
+		// else if (AutoOptions.getSelected() == 6)
+		// {
+		// 	new PathPlannerAuto("Auto H(P2)").schedule();
 			
-		}
-		else if (AutoOptions.getSelected() == 8)
-		{
-			new PathPlannerAuto("Auto B(P1)").schedule();
+		// }
+		// else if (AutoOptions.getSelected() == 7)
+		// {
+		// 	new PathPlannerAuto("Auto C(P1)").schedule();
 			
-		}
+		// }
+		// else if (AutoOptions.getSelected() == 8)
+		// {
+		// 	new PathPlannerAuto("Auto B(P1)").schedule();
+			
+		// }
 
 
 

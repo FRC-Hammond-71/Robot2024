@@ -1,0 +1,84 @@
+{
+  "Docking": {
+    "Data": [
+      "DockSpace         ID=0x8B93E3BD Window=0xA787BDB4 Pos=0,28 Size=1134,953 Split=Y",
+      "DockNode        ID=0x00000004 Parent=0x8B93E3BD SizeRef=1920,553 CentralNode=1 Selected=0xB5CBE9F0",
+      "DockNode        ID=0x00000005 Parent=0x8B93E3BD SizeRef=1920,408 Split=X Selected=0x80A7FE88",
+      "DockNode      ID=0x00000003 Parent=0x00000005 SizeRef=303,408 Selected=0x80A7FE88",
+      "DockNode      ID=0x00000002 Parent=0x00000005 SizeRef=829,408 Split=X Selected=0x707E77BF",
+      "DockNode    ID=0x00000001 Parent=0x00000002 SizeRef=415,408 Selected=0x7BD1C6E1",
+      "DockNode    ID=0x00000006 Parent=0x00000002 SizeRef=412,408 Split=Y Selected=0x4393743C",
+      "DockNode  ID=0x00000007 Parent=0x00000006 SizeRef=412,200 Selected=0x4393743C",
+      "DockNode  ID=0x00000008 Parent=0x00000006 SizeRef=412,206 Selected=0x707E77BF"
+    ]
+  },
+  "MainWindow": {
+    "GLOBAL": {
+      "fps": "120",
+      "height": "981",
+      "maximized": "0",
+      "style": "0",
+      "userScale": "4",
+      "width": "1134",
+      "xpos": "785",
+      "ypos": "38"
+    }
+  },
+  "Window": {
+    "###/SmartDashboard/Arm Visualization": {
+      "Collapsed": "0",
+      "DockId": "0x00000003,0",
+      "Pos": "0,573",
+      "Size": "303,408"
+    },
+    "###/SmartDashboard/Auto Options": {
+      "Collapsed": "0",
+      "DockId": "0x00000008,0",
+      "Pos": "722,775",
+      "Size": "412,206"
+    },
+    "###/SmartDashboard/Field": {
+      "Collapsed": "0",
+      "DockId": "0x00000004,0",
+      "Pos": "0,28",
+      "Size": "1134,543"
+    },
+    "###/SmartDashboard/Scheduler": {
+      "Collapsed": "0",
+      "DockId": "0x00000001,0",
+      "Pos": "305,573",
+      "Size": "415,408"
+    },
+    "###/SmartDashboard/Starting Positions": {
+      "Collapsed": "0",
+      "DockId": "0x00000007,0",
+      "Pos": "722,573",
+      "Size": "412,200"
+    },
+    "###NetworkTables": {
+      "Collapsed": "0",
+      "Pos": "596,317",
+      "Size": "937,442"
+    },
+    "###NetworkTables Info": {
+      "Collapsed": "0",
+      "Pos": "481,30",
+      "Size": "750,145"
+    },
+    "###NetworkTables Settings": {
+      "Collapsed": "0",
+      "Pos": "20,34",
+      "Size": "400,190"
+    },
+    "Debug##Default": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "400,400"
+    },
+    "DockSpaceViewport_11111111": {
+      "Collapsed": "0",
+      "Pos": "0,28",
+      "Size": "1134,953"
+    }
+  }
+}

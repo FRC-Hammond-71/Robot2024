@@ -78,12 +78,12 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     public LaunchSubsystem(Robot robot)
     {
         super(robot);
-        this.NoteDetectionUpdateTimer = new ElapsedTimer(Duration.ofMillis(500));
     }
 
     @Override
     protected void initializeReal()
     {
+        this.NoteDetectionUpdateTimer = new ElapsedTimer(Duration.ofMillis(500));   
         this.TopLaunchMotor = new CANSparkMax(8, MotorType.kBrushless);
         this.BottomLaunchMotor = new CANSparkMax(9, MotorType.kBrushless);
 
@@ -110,7 +110,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         this.NoteDetectorNotifier = new Notifier(() -> 
         {
-            boolean isDetected = this.NoteSensor.getProximity() > 75;
+            boolean isDetected = this.IsNoteDetected();
 
             if (!NoteLastDetected && isDetected)
             {
@@ -142,6 +142,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
             this.DelayedNoteDetected = this.NoteDetected;
         }
         return this.DelayedNoteDetected;
+    }
+
+    /**
+     * @return Whether or not a note is in front of the REV Color Sensor.
+     */
+    public boolean IsNoteDetected()
+    {
+        return this.NoteSensor.getProximity() > 75;
     }
 
     public void SetLoaded(boolean loaded)
@@ -194,17 +202,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         super.periodic();
 
         // Reset the logic which determines if a note is loaded if something goes wrong.     
-        if (Controllers.ShooterController.getXButtonPressed())
+        if (Controllers.ShooterController.getXButtonPressed() && !this.IsNoteDetected())
         {
-            DataLogManager.log("Reset Launcher Note Detection to " + !this.IsLoaded());
-            this.SetLoaded(!this.IsLoaded());
+            DataLogManager.log("Reset Launcher Note Detection to False");
+            this.SetLoaded(false);
         }
     }
 
     public Command Intake()
     {
         if (RobotBase.isSimulation()) return Commands.none();
-        return Commands.runEnd(() -> { this.IntakeMotor.set(0.15); this.GroundIntakeMotor.set(0.3); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
+        return Commands.runEnd(() -> { this.IntakeMotor.set(0.15); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
     }
     
     // public Command RunLaunchSpeed(double percentage)

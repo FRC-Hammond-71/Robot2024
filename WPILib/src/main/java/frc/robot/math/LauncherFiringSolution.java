@@ -35,19 +35,24 @@ public class LauncherFiringSolution implements Sendable
 
         var distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldGeometry.GetSpeakerIntakePosition());
         // Offset launcher in ft
-        var ys = 2.3;
-        // Distance away in ft
+        var ys = 1.8;
+        // // Distance away in ft
         var xs = Units.metersToFeet(distanceFromSpeaker);
         // Range from 0-10 ("oomph" value)
         var h = 10;
-        var vy = Math.sqrt(Math.pow(h, 2) + ((80.5 / 12) - ys) * 32 * 2);
-        var tm = (vy - h) / 32;
+        var vy = Math.sqrt(Math.pow(h, 2) + ((80.5 / 12) - ys) * 35 * 2);
+        var tm = (vy - h) / 35;
         var vx = xs / tm;
 
-        // Launch angle (deg)
+        // var angle = Math.atan((80 - ys) / xs);
+        // System.out.println(ys);
+        // System.out.println(xs);
+        // System.out.println(Units.radiansToDegrees(angle));
+
+        // Launch angle (deg) 
         var launchAngle = Rotation2d.fromDegrees(Math.tanh(vy / vx) * 180 / Math.PI);
         // Launch Speed (M/s)
-        double launchSpeed = Units.feetToMeters(Math.sqrt(Math.pow(vy, 2) + Math.pow(vx, 2)));
+        // double launchSpeed = Units.feetToMeters(Math.sqrt(Math.pow(vy, 2) + Math.pow(vx, 2)));
 
         // var toLeft = FieldGeometry.GetSpeakerIntakeLeftMostPosition().minus(robotPose.getTranslation());
         // var toRight = FieldGeometry.GetSpeakerIntakeRightMostPosition().minus(robotPose.getTranslation());
@@ -56,7 +61,7 @@ public class LauncherFiringSolution implements Sendable
 
         // Use distance to magnify uncertainty
         
-        return new LauncherFiringSolution(launchAngle, launchSpeed, new Translation3d(0, 0, 0), allowedError);
+        return new LauncherFiringSolution(launchAngle, 100, new Translation3d(0, 0, 0), allowedError);
     }
 
     @Override

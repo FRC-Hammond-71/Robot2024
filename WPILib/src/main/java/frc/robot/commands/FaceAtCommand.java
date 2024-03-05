@@ -60,7 +60,7 @@ public class FaceAtCommand extends Command
 	@Override
 	public void execute()
 	{
-		var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.05), -Math.PI / 2);
+		var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.1), -Math.PI / 2);
 
 		// System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output,
 		// 		Robot.Localization.GetEstimatedPose().getRotation().getDegrees(),

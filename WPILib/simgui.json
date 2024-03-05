@@ -54,6 +54,7 @@
       "/SmartDashboard/Launch Ground PID": "PIDController",
       "/SmartDashboard/New Auto": "Command",
       "/SmartDashboard/Note 1": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/SendableChooser[1]": "String Chooser",
       "/SmartDashboard/Speaker Auto": "Command",
@@ -68,6 +69,7 @@
       },
       "/SmartDashboard/Auto Options": {
         "window": {
+          "name": "Autos",
           "visible": true
         }
       },
@@ -132,23 +134,34 @@
           "visible": true
         }
       },
+      "/SmartDashboard/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Starting Positions": {
         "window": {
+          "name": "Start Positions",
           "visible": true
         }
       }
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "Shuffleboard": {
         "Movement": {
           "open": true
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
         "LaunchSubsystem": {
+          "open": true
+        },
+        "Scheduler": {
           "open": true
         },
         "open": true
@@ -166,6 +179,9 @@
       "open": true
     },
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plot": {
     "Plot <0>": {
@@ -197,6 +213,11 @@
           "viewTime": 8.999996185302734
         }
       ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <2>": {
       "window": {
         "visible": false
       }

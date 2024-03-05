@@ -33,7 +33,7 @@ public final class Constants
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(450);
+		public static Rotation2d MaxRotationalSpeed = Rotation2d.fromDegrees(300);
 
 		/**
 		 * The maximum rotational acceleration in a second.

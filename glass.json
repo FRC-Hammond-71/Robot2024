@@ -1,0 +1,27 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "CameraPublisher": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot - IMU": {
+          "arrowSize": 0,
+          "color": [],
+          "weight": 0.0
+        },
+        "Robot - Intake Vision": {
+          "color": []
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "serverTeam": "71"
+  }
+}
