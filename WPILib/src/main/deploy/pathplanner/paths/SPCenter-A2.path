@@ -1,0 +1,83 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 15.12,
+        "y": 5.56
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 14.301333081138312,
+        "y": 5.56
+      },
+      "isLocked": false,
+      "linkedName": "SPCenter"
+    },
+    {
+      "anchor": {
+        "x": 13.65990195307761,
+        "y": 5.551187918118234
+      },
+      "prevControl": {
+        "x": 14.360274917728885,
+        "y": 5.551187918118234
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.3,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "race",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "IntakeNote"
+                    }
+                  },
+                  {
+                    "type": "wait",
+                    "data": {
+                      "waitTime": 0.75
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": true,
+  "folder": "SPCenter-A",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
