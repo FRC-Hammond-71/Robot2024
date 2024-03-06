@@ -17,21 +17,10 @@ import frc.robot.FieldGeometry;
 public class PathCommands
 {
     public static PathConstraints PathFindingConstraints = new PathConstraints(
-            Constants.Drivetrain.MaxForwardSpeed,
-            Constants.Drivetrain.MaxForwardSpeed,
-            Constants.Drivetrain.MaxRotationalSpeed.getRadians(),
-            Constants.Drivetrain.MaxRotationalSpeed.getRadians());
-
-    public static Command PathToSpeaker()
-    {
-        return AutoBuilder.pathfindThenFollowPath(
-                new PathPlannerPath(
-                        PathPlannerPath.bezierFromPoses(
-                                FieldGeometry.GetSpeakerShootingPose().plus(new Transform2d(-1, 0, new Rotation2d())),
-                                FieldGeometry.GetSpeakerShootingPose()),
-                        PathFindingConstraints, new GoalEndState(0, FieldGeometry.GetSpeakerShootingPose().getRotation())),
-                PathFindingConstraints);
-    }
+            Constants.Drivetrain.MaxXSpeed,
+            Constants.Drivetrain.MaxXSpeed,
+            Constants.Drivetrain.MaxAngularSpeed.getRadians(),
+            Constants.Drivetrain.MaxAngularSpeed.getRadians());
 
     public static Command PathToAmplifier()
     {

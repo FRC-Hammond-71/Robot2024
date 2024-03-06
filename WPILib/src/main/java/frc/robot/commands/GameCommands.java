@@ -13,76 +13,61 @@ import frc.robot.Constants;
 import frc.robot.Constants.Arm;
 import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
+import frc.robot.FieldGeometry;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.math.LauncherFiringSolution;
+import frc.robot.subsystems.ArmPosition;
 import frc.robot.utilities.Rotation2dUtils;
 
 public class GameCommands
 {
 	public static Command IntakeNote()
 	{
-		return Robot.Arm.RunRotate(Constants.Arm.IntakeAngle)
+		return Robot.Arm.RunUntilHolding(ArmPosition.Intake)
 			.andThen(Robot.Launcher.RunIntake())
 			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded())
 			.withName("Intake Note");
 	}
 
-	public static Command AutoRotateAndLaunch()
+	public static Command BeginTrackingSpeaker()
 	{
-		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
+		return Commands.runOnce(() -> Robot.Arm.Mode = ArmPosition.TrackingSpeaker);
+	}
 
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
-
-		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
-		{
-			System.out.println("Cannot shoot...reached arm rotation boundary!");
-			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
-		}
-
-		return new ParallelCommandGroup(
-			new FaceAtCommand(firingSolution.TargetPosition.toTranslation2d(), firingSolution.AllowedYawError),
-			Robot.Arm.RunRotate(firingSolution.ArmAngle))
-			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
-			.withName("AutoRotateAndLaunch");
+	public static Command ScoreAmp()
+	{
+		return Robot.Arm.RunUntilHolding(ArmPosition.Amp).andThen(Robot.Launcher.RunLaunch(0.22, 0.05));
 	}
 
 	public static Command AutoPitch()
 	{
-		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
-
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
-
-		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
-		{
-			System.out.println("Cannot shoot...reached arm rotation boundary!");
-			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
-		}
-
-		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees())).withName("Auto Pitch");
+		return Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker).withName("Auto Pitch");
 	}
 
 	public static Command AutoPitchAndLaunch()
 	{
-		var firingSolution = LauncherFiringSolution.CalculateToSpeaker(Robot.Localization.GetEstimatedPose());
+		// if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
+		// {
+		// 	return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
+		// }
 
-		System.out.printf("Firing at %.2f Degrees with %.2f Degrees of Error!\n", firingSolution.ArmAngle.getDegrees(), firingSolution.AllowedYawError.getDegrees());
-
-		if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
-		{
-			System.out.println("Cannot shoot...reached arm rotation boundary!");
-			return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
-		}
-
-		return Robot.Arm.RunRotate(Rotation2d.fromDegrees(firingSolution.ArmAngle.getDegrees()))
+		return AutoPitch()
 			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
 			.withName("AutoPitchAndLaunch");
 	}
 
-	public static Command GotoSpeakerAndLaunch()
+	public static Command AutoRotateAndLaunch()
 	{
-		return PathCommands.PathToSpeaker()
-				.andThen(AutoRotateAndLaunch())
-				.withName("GotoSpeakerAndLaunch");
+		// if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
+		// {
+		// 	return ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 10, 0.5);
+		// }
+
+		return new ParallelCommandGroup(
+				new FaceAtCommand(FieldGeometry.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
+				Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker))
+			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
+			.withName("AutoRotateAndLaunch");
 	}
 }

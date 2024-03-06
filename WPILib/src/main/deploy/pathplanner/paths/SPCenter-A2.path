@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.12,
-        "y": 5.56
+        "x": 14.645245957158583,
+        "y": 5.537433881885308
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.301333081138312,
-        "y": 5.56
+        "x": 13.826579038296895,
+        "y": 5.537433881885308
       },
       "isLocked": false,
       "linkedName": "SPCenter"
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "name": "Intake Note",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -51,7 +51,7 @@
                   {
                     "type": "wait",
                     "data": {
-                      "waitTime": 0.75
+                      "waitTime": 2.0
                     }
                   }
                 ]
@@ -63,7 +63,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -74,7 +74,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPCenter-A",
+  "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.120368018513815,
-        "y": 5.556120001128891
+        "x": 14.645245957158583,
+        "y": 5.537433881885308
       },
       "prevControl": null,
       "nextControl": {
-        "x": 11.716196765726863,
-        "y": 7.341743572376034
+        "x": 11.24107470437163,
+        "y": 7.323057453132451
       },
       "isLocked": false,
       "linkedName": "SPCenter"
@@ -56,7 +56,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -67,7 +67,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPCenter-M",
+  "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

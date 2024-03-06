@@ -35,8 +35,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.FunctionalPeriodic;
-import frc.IPeriodic;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.Launcher;
@@ -137,12 +135,23 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
         // this.IMU.setAngleAdjustment(FieldGeometry.GetStartingPosition1().getRotation().minus(this.GetIMUHeading()).getDegrees());
 
+        Pose2d startingPosition;
+
+        try
+        {
+            startingPosition = FieldGeometry.GetStartingPosition();
+        } 
+        catch (Exception e)
+        {
+            startingPosition = new Pose2d();
+        }
+        
         this.PoseEstimator = new DifferentialDrivePoseEstimator(
             Robot.Drive.Kinematics,
             this.GetIMUHeading(),  
             Robot.Drive.GetLeftWheelPosition(), 
             Robot.Drive.GetRightWheelPosition(),
-            FieldGeometry.GetStartingPosition1(),
+            startingPosition,
             VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
             VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(30)));
 
@@ -167,8 +176,19 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
         return new Pose2d(
             pose.getTranslation(),
+            Rotation2d.fromRadians(MathUtil.inputModulus(pose.getRotation().getRadians(), 0, Math.PI*2)));
+    }
+    public Pose2d GetEstimatedPose180()
+    {
+        var pose = RobotBase.isReal() 
+            ? this.PoseEstimator.getEstimatedPosition()
+            : Robot.Drive.SimulatedDrive.getPose();
+
+        return new Pose2d(
+            pose.getTranslation(),
             Rotation2d.fromRadians(MathUtil.inputModulus(pose.getRotation().getRadians(), -Math.PI, Math.PI)));
     }
+    
 
     public void ResetPosition(Pose2d position)
     {
@@ -211,14 +231,11 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         }
         else 
         {
-            System.out.println("Using new-field-relative position!");
+            DataLogManager.log("Using new-field-relative position!");
             this.ResetPosition(pose);
 
-            // DataLogManager.getLog().
             this.HasAbsolutePositionFixed = true;
         }
-
-        // Constants.Field.getObject("Robot - Vision").setPose(pose);
     }
 
     protected void UpdatePoseEstimationUsingWheels()
@@ -271,7 +288,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
                 Constants.Field.getObject("Robot - Launcher Vision").setPose(fieldPoseFromLauncher.get().estimatedPose.toPose2d());
             }
     
-            // this.IntakeCameraPoseEstimator.setReferencePose(this.GetEstimatedPose());
             var fieldPoseFromIntake = this.IntakeCameraPoseEstimator.update();
             if (fieldPoseFromIntake.isPresent())
             {
@@ -291,17 +307,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         super.periodic();
 
-        // if (Controllers.DriverController.getPOV() == 270)
-        // {
-        //     System.out.println("Reset");
-        //     this.ResetPosition(new Pose2d(14.579517, 5.654767, new Rotation2d()));
-        // }
-
         // Update smart-dashboard with Robot positioning at default 20 Hz
-        Constants.Field.setRobotPose(this.GetEstimatedPose());
-
-        // Constants.Field.getObject("Speaker Left").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeLeftMostPosition(), new Rotation2d()));
-        // Constants.Field.getObject("Speaker Right").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakeRightMostPosition(), new Rotation2d()));
+        Constants.Field.setRobotPose(this.GetEstimatedPose180());
     }
 
     @Override
@@ -316,6 +323,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        builder.addDoubleProperty("Heading", () -> this.GetEstimatedPose().getRotation().getDegrees(), null);
+        builder.addDoubleProperty("Heading", () -> this.GetEstimatedPose180().getRotation().getDegrees(), null);
     }
 }

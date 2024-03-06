@@ -38,11 +38,11 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.IPeriodic;
 import frc.robot.commands.ControllerCommands;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
+import frc.robot.subsystems.ArmPosition;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
@@ -67,10 +67,14 @@ public class Robot extends TimedRobot
 		SPosition.addOption("Source", 1);
 		SPosition.addOption("Amp", 3);
 
-		AutoOptions.setDefaultOption("Middle", 1);
-		AutoOptions.addOption("Source", 2);
-		AutoOptions.addOption("Auto Center 1N", 3);
 		AutoOptions.setDefaultOption("None", 0);
+		// AutoOptions.setDefaultOption("Middle", 1);
+		// AutoOptions.addOption("Source", 2);
+		AutoOptions.addOption("SPAmp-A1-M1-3N", 3);
+		AutoOptions.addOption("SPAmp-A1-A2-3N", 4);
+		AutoOptions.addOption("SourceSide-M5-2N", 5);
+		AutoOptions.addOption("SPCenter-A2-2N", 6);
+		AutoOptions.addOption("SPCenter-A2-M2-3N", 7);
 
 		SPosition.onChange((value) ->  
 		{
@@ -86,17 +90,10 @@ public class Robot extends TimedRobot
 				return;
 			}
 
-			System.out.println("Reset " + value);
-			System.out.println(pose.getX());
 			Localization.ResetPosition(pose);
-			if(isSimulation()) {
-				Drive.SimulatedDrive.setPose(pose);
-			}
-			System.out.println(pose);
 		});
 		
 		System.out.println("Waiting for connection to Driver Station...");
-		
 		while (!DriverStation.waitForDsConnection(10))
 		{
 			System.out.println("Retrying connection to Driver Station...");
@@ -110,20 +107,9 @@ public class Robot extends TimedRobot
 	}
 
 	@Override
-	public void simulationInit() 
-	{
-		System.out.println("Robot is running in simulation!");
-	}
-
-	@Override
 	public void robotInit() 
-	{
-		System.out.println("Robot has initialized!");
-		
+	{		
 		// LEDs.Setup();
-
-		// IPeriodic.ApplyPeriodic(Localization.RelativeSensorUpdatePeriodic, this);
-		// IPeriodic.ApplyPeriodic(Localization.VisionUpdatePeriodic, this); 
 
 		SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData("Starting Positions", SPosition);
@@ -134,28 +120,24 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData(Localization);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
-		// SmartDashboard.putData("Assisted Note Intake", this.UseAssistedNoteIntake);
-		// SmartDashboard.putData("Arm PID", Arm.PID);
-		
-		AutoBuilder.configureRamsete(
-			Localization::GetEstimatedPose,
+
+		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
+		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
+		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
+		NamedCommands.registerCommand("UntilIntakeAngle", Arm.RunUntilHolding(ArmPosition.Intake));
+		NamedCommands.registerCommand("IntakeNote", GameCommands.IntakeNote());
+		NamedCommands.registerCommand("BeginTrackingSpeaker", GameCommands.BeginTrackingSpeaker());
+
+		AutoBuilder.configureLTV(
+			Localization::GetEstimatedPose180, 
 			(pose) -> Localization.ResetPosition(pose),
-			() -> Drive.GetSpeeds(),
-			(targetSpeeds) ->
-			{
-				System.out.println(targetSpeeds.toString());
-				Drive.Set(targetSpeeds);
-			},
-			new ReplanningConfig(true, false),
+			() -> Drive.GetSpeeds(), 
+			(speeds) -> Drive.Set(speeds), 
+			kDefaultPeriod, 
+			new ReplanningConfig(true, false), 
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);
-			
-		// NamedCommands.registerCommand("GotoSpeakerAndLaunch", GameCommands.GotoSpeakerAndLaunch());
-		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
-		// NamedCommands.registerCommand(null, null);
-		// NamedCommands.registerCommand("RampLauncher", new RampLauncherCommand(Duration.ofSeconds(1), 1));
-		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
-		NamedCommands.registerCommand("IntakeNote", GameCommands.IntakeNote());
+
 		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
 			// Do whatever you want with the pose here
 			Constants.Field.setRobotPose(pose);
@@ -172,10 +154,6 @@ public class Robot extends TimedRobot
 			// Do whatever you want with the poses here
 			Constants.Field.getObject("path").setPoses(poses);
 		});
-
-		Arm.SetAngle(Rotation2d.fromDegrees(90));
-
-		Constants.Field.getObject("Speaker").setPose(new Pose2d(FieldGeometry.GetSpeakerIntakePosition(), Rotation2d.fromDegrees(0)));
 	}
 
 	public void Stop()
@@ -215,8 +193,6 @@ public class Robot extends TimedRobot
 	@Override
 	public void teleopInit()
 	{
-		CommandScheduler.getInstance().cancelAll();
-
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
             Drive.SetArcade(-Controllers.DriverController.getLeftY(), -Controllers.DriverController.getRightX());
@@ -230,31 +206,24 @@ public class Robot extends TimedRobot
 			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 0.8;
 			speed = Math.copySign(speed * speed, speed);
 			
-			if (Controllers.ShooterController.getAButton())
+			// Intake note
+			if (Controllers.ShooterController.getYButton())
+			{
+				Launcher.RunIntake()
+					.onlyWhile(() -> Controllers.ShooterController.getYButton())
+					.finallyDo(() -> 
+					{
+						ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
+						ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
+					})
+					.schedule();
+			}
+			// Retake note
+			else if (Controllers.ShooterController.getAButton())
 			{
 				speed = -0.1;
 				Launcher.GroundIntakeMotor.set(-0.1);
 				Launcher.IntakeMotor.set(-0.1);
-			}
-			else if (Controllers.ShooterController.getYButton())
-			{
-				Launcher.IntakeMotor.set(0.5);
-				Launcher.GroundIntakeMotor.set(0.5);
-			}
-			else if (Controllers.ShooterController.getRightBumperPressed())
-			{
-				System.out.println("Picking up a Note!");
-				GameCommands.IntakeNote()
-					.onlyWhile(() -> Controllers.ShooterController.getRightBumper() && !Launcher.IsLoaded())
-					.finallyDo(() -> {
-						// Rumble the shooter-controller to indicate a note was picked up.
-						if (Robot.Launcher.IsLoaded())
-						{
-							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
-							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
-						}
-					}).schedule();
-				return;
 			}
 			else
 			{
@@ -271,22 +240,17 @@ public class Robot extends TimedRobot
 			// if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
 			if (Controllers.DriverController.getAButton())
 			{
-				// GameCommands.AutoRotateAndLaunch().schedule();
-				GameCommands.AutoPitch().schedule();
+				GameCommands.AutoRotateAndLaunch().schedule();
 			}
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
 			{
-				Arm.RunRotate(Rotation2d.fromDegrees(100))
-					.andThen(Launcher.RunLaunch(0.22, 0.05))
-					.schedule();
+				GameCommands.ScoreAmp().schedule();
 			}
 			else
 			{
-				Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(Controllers.SquareInput(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY())))));	
+				// Arm.SetAngle(Arm.GetTargetAngle().plus(Rotation2d.fromDegrees(Controllers.SquareInput(-Controllers.ApplyDeadzone(Controllers.ShooterController.getRightY())))));	
 			}
 		}, Arm).withName("Arm Teleop Command"));
-
-		System.out.println("Telop is READY!");
 	}
 	
 	@Override
@@ -302,13 +266,6 @@ public class Robot extends TimedRobot
 	}
 
 	@Override
-	public void testInit() 
-	{
-		// Launcher.PerformSysID().schedule();
-		// Arm.PerformSysID().schedule();
-	}
-	
-	@Override
 	public void disabledInit()
 	{
 		this.Stop();
@@ -317,13 +274,14 @@ public class Robot extends TimedRobot
 	@Override
 	public void autonomousInit()
 	{
+		// Dummy auto
 		if (AutoOptions.getSelected() == 1)
 		{
 			GameCommands.AutoPitchAndLaunch()
 				.andThen(new ParallelCommandGroup(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive).withTimeout(2), GameCommands.IntakeNote()))
-				// .andThen(Launcher.Launch(0.6, 0.6))
 				.schedule();
 		}
+		// Dummy auto
 		else if (AutoOptions.getSelected() == 2)
 		{
 			GameCommands.AutoPitchAndLaunch()
@@ -332,47 +290,24 @@ public class Robot extends TimedRobot
 		}
 		else if (AutoOptions.getSelected() == 3)
 		{
-			new PathPlannerAuto("Auto Center 1N").schedule();
+			new PathPlannerAuto("SPAmp-A1-M1-3N").schedule();
 		}
-		else if (AutoOptions.getSelected() == 0)
+		else if (AutoOptions.getSelected() == 4)
 		{
-			// DO NOTHING
-			return;
+			new PathPlannerAuto("SPAmp-A1-A2-3N").schedule();
 		}
-		// else if (AutoOptions.getSelected() == 4)
-		// {
-		// 	new PathPlannerAuto("Auto E(P1)").schedule();
-			
-		// }
-		// else if (AutoOptions.getSelected() == 5)
-		// {
-		// 	new PathPlannerAuto("Auto H(P2)").schedule();
-			
-		// }
-		// else if (AutoOptions.getSelected() == 6)
-		// {
-		// 	new PathPlannerAuto("Auto H(P2)").schedule();
-			
-		// }
-		// else if (AutoOptions.getSelected() == 7)
-		// {
-		// 	new PathPlannerAuto("Auto C(P1)").schedule();
-			
-		// }
-		// else if (AutoOptions.getSelected() == 8)
-		// {
-		// 	new PathPlannerAuto("Auto B(P1)").schedule();
-			
-		// }
-
-
-
-		// AutoCommand = GameCommands.AutoPitch()  
-		// 	.andThen(Launcher.Launch(0.5, 0.5))
-		// 	.andThen(Commands.startEnd(() -> Drive.Set(new ChassisSpeeds(-1, 0, 0)), () -> Drive.Stop(), Drive))
-		// 	.withTimeout(2);
-
-		// AutoCommand.schedule();
+		else if (AutoOptions.getSelected() == 5)
+		{
+			new PathPlannerAuto("SourceSide-M5-2N").schedule();
+		}
+		else if (AutoOptions.getSelected() == 6)
+		{
+			new PathPlannerAuto("SPCenter-A2-2N").schedule();
+		}
+		else if (AutoOptions.getSelected() == 7)
+		{
+			new PathPlannerAuto("SPCenter-A2-M2-3N").schedule();
+		}
 	}
 
 	@Override

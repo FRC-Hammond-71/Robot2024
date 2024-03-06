@@ -27,9 +27,7 @@ public class LauncherFiringSolution implements Sendable
 
     public static LauncherFiringSolution CalculateToSpeaker(Pose2d robotPose)
     {
-        // https://www.desmos.com/calculator/tsjv7opvqg
-
-        double distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldGeometry.GetSpeakerIntakePosition());
+        double distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldGeometry.GetSpeakerPosition());
         
         final double heightOfSpeakerIntake = Units.inchesToMeters(80.5);
         final double shooterYOffset = Units.feetToMeters(1.8);

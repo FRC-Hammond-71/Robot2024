@@ -15,52 +15,63 @@ import frc.robot.subsystems.LocalizationSubsystem;
 
 public class FaceAtCommand extends Command
 {
-	public final Translation2d Target;
-
+	public final Translation2d Point;
 	public final Rotation2d AllowedError;
+
+	private final PIDController RotationPID = new PIDController(0.07, 0, 0.005);
 
 	public FaceAtCommand(Translation2d position, Rotation2d error)
 	{
 		super();
 
-		this.Target = position;
-		this.AllowedError = error;
-
 		addRequirements(Robot.Drive);
-	}	
+
+		this.Point = position;
+		this.AllowedError = error;
+		
+		this.RotationPID.setTolerance(0.5);
+		this.RotationPID.calculate(this.GetHeadingError().getDegrees());
+	}
 
 	/**
 	 * @return The angle between the Robot and the Target.
 	 */
-	public Rotation2d GetTargetHeading()
+	public Rotation2d GetRequiredHeading()
 	{
-		return Target.minus(Robot.Localization.GetEstimatedPose().getTranslation()).getAngle();
+		return Point.minus(Robot.Localization.GetEstimatedPose().getTranslation()).getAngle();
 	}
 
 	public Rotation2d GetHeadingError()
 	{
-		return this.GetTargetHeading().minus(Robot.Localization.GetEstimatedPose().getRotation());
+		return this.GetRequiredHeading().minus(Robot.Localization.GetEstimatedPose180().getRotation());
 	}
 
 	@Override
 	public void initialize()
 	{
-		Constants.Field.getObject("Target").setPose(new Pose2d(this.Target, new Rotation2d()));
+		Constants.Field.getObject("Target").setPose(new Pose2d(this.Point, new Rotation2d()));
+
+		// Constants.Field.getObject("Arrow").setPose(new Pose2d(Robot.Localization.GetEstimatedPose180().getTranslation(), this.GetHeadingError()));
 	}
 
 	@Override
 	public boolean isFinished()
 	{
-		var heading_error = this.GetHeadingError();
+		return this.RotationPID.atSetpoint();
+
+		// var heading_error = this.GetHeadingError();
 
 		// System.out.println(heading_error);
-		return heading_error.getDegrees() < AllowedError.getDegrees() && heading_error.getDegrees() > -AllowedError.getDegrees();
+		// return heading_error.getDegrees() < AllowedError.getDegrees() && heading_error.getDegrees() > -AllowedError.getDegrees();
 	}
 
 	@Override
 	public void execute()
 	{
-		var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.1), -Math.PI / 2);
+		System.out.println(this.GetHeadingError().getDegrees());
+		double output = -this.RotationPID.calculate(this.GetHeadingError().getDegrees(), 0);
+
+		// var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.1), -Math.PI / 2);
 
 		// System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output,
 		// 		Robot.Localization.GetEstimatedPose().getRotation().getDegrees(),

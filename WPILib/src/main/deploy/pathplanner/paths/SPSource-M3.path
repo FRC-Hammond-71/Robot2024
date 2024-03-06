@@ -72,7 +72,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -83,7 +83,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPSource-M",
+  "folder": null,
   "previewStartingState": {
     "rotation": 58.57043438516144,
     "velocity": 0

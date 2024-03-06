@@ -3,52 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293678213604645,
-        "y": 7.436381206571257
+        "x": 8.270256540513081,
+        "y": 5.796291592583185
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.293678213604645,
-        "y": 7.436381206571257
+        "x": 11.634582391971803,
+        "y": 6.933946499471947
       },
       "isLocked": false,
       "linkedName": "M2"
     },
     {
       "anchor": {
-        "x": 11.678109975335499,
-        "y": 6.171610859626855
+        "x": 14.663382484659708,
+        "y": 5.5555704093864335
       },
       "prevControl": {
-        "x": 10.462472421378507,
-        "y": 6.238805045370433
-      },
-      "nextControl": {
-        "x": 12.89374752929249,
-        "y": 6.104416673883278
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 13.668952188118356,
-        "y": 5.539225686154654
-      },
-      "prevControl": {
-        "x": 12.668952188118356,
-        "y": 5.539225686154654
+        "x": 12.495896713632543,
+        "y": 5.5555704093864335
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Shooting-Center"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -59,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Transit",
+  "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

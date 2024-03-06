@@ -8,13 +8,19 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRotateAndLaunch"
+            "name": "AutoPitchAndLaunch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "UntilIntakeAngle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note SPAmp-A1"
+            "pathName": "SPCenter-A2"
           }
         },
         {
@@ -26,13 +32,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note A1-M1"
+            "pathName": "Note A2-M2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note M1-Center"
+            "pathName": "M2-Shooting-Center"
           }
         },
         {

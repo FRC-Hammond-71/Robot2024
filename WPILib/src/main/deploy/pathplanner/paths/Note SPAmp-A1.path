@@ -20,8 +20,8 @@
         "y": 7.003080254377342
       },
       "prevControl": {
-        "x": 14.980565881245884,
-        "y": 7.635465427849543
+        "x": 14.722158689122866,
+        "y": 7.003080254377342
       },
       "nextControl": null,
       "isLocked": false,
@@ -67,7 +67,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPAmp-A",
+  "folder": null,
   "previewStartingState": {
     "rotation": -59.03624346792672,
     "velocity": 0

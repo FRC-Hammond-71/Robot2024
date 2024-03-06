@@ -3,16 +3,13 @@
   "robotLength": 0.9,
   "holonomicMode": false,
   "pathFolders": [
-    "Transit",
-    "SPAmp-A",
-    "SPAmp-M",
-    "SPCenter-A",
-    "SPCenter-M",
-    "SPSource-A",
-    "SPSource-M"
+    "P1-A",
+    "P1-M",
+    "P2-A",
+    "P2-M"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.0,
+  "defaultMaxVel": 5.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

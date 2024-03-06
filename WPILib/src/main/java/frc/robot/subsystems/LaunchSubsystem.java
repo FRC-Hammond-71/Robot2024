@@ -112,7 +112,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return Commands.none();
 
-        return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this);
+        return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this).withName("Run Intake");
     }
 
     public Command RunLaunch(double percentageTop, double percentageBottom)
@@ -123,7 +123,9 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
             .andThen(new WaitCommand(0.5))
             .andThen(Commands.runOnce(() -> this.IntakeMotor.set(0.3), this))
             .until(() -> !this.IsLoaded())
-            .finallyDo(() -> this.Stop());
+            .andThen(Commands.waitSeconds(0.2))
+            .finallyDo(() -> this.Stop())
+            .withName("Launch Note");
     }
 
     @Override

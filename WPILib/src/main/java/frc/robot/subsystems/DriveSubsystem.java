@@ -231,9 +231,9 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         zRotation = Math.copySign(zRotation * zRotation, zRotation);
 
         this.Set(new ChassisSpeeds(
-            xSpeed * Constants.Drivetrain.MaxForwardSpeed,
+            xSpeed * Constants.Drivetrain.MaxXSpeed,
             0,
-            Constants.Drivetrain.MaxRotationalSpeed.times(zRotation).getRadians()
+            Constants.Drivetrain.MaxAngularSpeed.times(zRotation).getRadians()
         ));
     }
 
@@ -256,29 +256,21 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             return;
         }
 
-        // if (this.OverrideVoltages.isPresent())
-        // {
-        //     this.LeftLeadMotor.set(this.OverrideVoltages.get().left);
-        //     this.RightLeadMotor.set(this.OverrideVoltages.get().right);
-        //     return;
-        // }
-
-        // Apply rate-limits
-        var nextWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
-                this.Speeds.vxMetersPerSecond,
-                0,
-                this.Speeds.omegaRadiansPerSecond));
+        var setWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
+            Math.min(Math.max(this.Speeds.vxMetersPerSecond, -Constants.Drivetrain.MaxXSpeed), Constants.Drivetrain.MaxXSpeed),
+            0,
+            Math.min(Math.max(this.Speeds.omegaRadiansPerSecond, -Constants.Drivetrain.MaxAngularSpeed.getRadians()), Constants.Drivetrain.MaxAngularSpeed.getRadians())));
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(FeedForward.calculate(nextWheelSpeeds.leftMetersPerSecond, 0.05));
-            this.RightLeadMotor.setVoltage((FeedForward.calculate(nextWheelSpeeds.rightMetersPerSecond, 0.05)));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(setWheelSpeeds.leftMetersPerSecond, 0.05));
+            this.RightLeadMotor.setVoltage((FeedForward.calculate(setWheelSpeeds.rightMetersPerSecond, 0.05)));
         } 
         else
         {
             this.SimulatedDrive.setInputs(
-                FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(), nextWheelSpeeds.leftMetersPerSecond, 0.02),
-                FeedForward.calculate(this.SimulatedDrive.getRightVelocityMetersPerSecond(), nextWheelSpeeds.rightMetersPerSecond, 0.02));
+                FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(), setWheelSpeeds.leftMetersPerSecond, 0.02),
+                FeedForward.calculate(this.SimulatedDrive.getRightVelocityMetersPerSecond(), setWheelSpeeds.rightMetersPerSecond, 0.02));
         }
     }
 
@@ -300,14 +292,6 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        if (RobotBase.isReal())
-        {
-            // builder.addDoubleProperty("Left Encoder Velocity", this::GetLeftWheelVelocity, null);
-            // builder.addDoubleProperty("Right Encoder Velocity", this::GetRightWheelVelocity, null);
-            // builder.addDoubleProperty("Left Motor Voltage", () -> this.LeftLeadMotor.getBusVoltage(), null);
-            // builder.addDoubleProperty("Right Motor Voltage", () -> this.RightLeadMotor.getBusVoltage(), null);
-        }
-
         builder.addDoubleProperty("Desired Speed", () -> this.Speeds.vxMetersPerSecond, null);
         builder.addDoubleProperty("Desired Rotation", () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.Speeds.omegaRadiansPerSecond),
                 null);
