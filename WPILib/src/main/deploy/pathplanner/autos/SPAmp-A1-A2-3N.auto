@@ -1,0 +1,43 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPitchAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note SPAmp-A1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoRotateAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note A1-A2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoRotateAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
