@@ -54,7 +54,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": null,
+  "folder": "Transit",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

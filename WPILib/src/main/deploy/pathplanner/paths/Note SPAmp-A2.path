@@ -8,40 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.650049418604516,
-        "y": 7.199959445161176
+        "x": 15.39409400733936,
+        "y": 7.724745808151134
       },
       "isLocked": false,
-      "linkedName": "P1"
+      "linkedName": "SPAmp"
     },
     {
       "anchor": {
-        "x": 14.664373294509787,
-        "y": 5.386984811059493
+        "x": 13.65990195307761,
+        "y": 5.551187918118234
       },
       "prevControl": {
-        "x": 14.727755911780832,
-        "y": 5.993647004939503
-      },
-      "nextControl": {
-        "x": 14.582397438689316,
-        "y": 4.602358762492133
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 13.92659059212555,
-        "y": 4.087081954477746
-      },
-      "prevControl": {
-        "x": 14.92659059212555,
-        "y": 4.087081954477746
+        "x": 14.338052972561602,
+        "y": 6.081017562241955
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A3"
+      "linkedName": "A2"
     }
   ],
   "rotationTargets": [],
@@ -73,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 48.50353164478438,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-A",
+  "folder": "SPAmp-A",
   "previewStartingState": {
-    "rotation": -46.23474208947784,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": false

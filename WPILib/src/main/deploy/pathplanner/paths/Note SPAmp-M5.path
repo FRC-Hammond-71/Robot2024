@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.835456949094521,
-        "y": 4.368142031579689
+        "x": 15.85,
+        "y": 6.79
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.458157130300874,
-        "y": 1.74491464532463
+        "x": 15.429925775407106,
+        "y": 6.16061496345215
       },
       "isLocked": false,
-      "linkedName": "P2-M"
+      "linkedName": "SPAmp"
     },
     {
       "anchor": {
-        "x": 11.209676513510821,
-        "y": 3.923130242839991
+        "x": 13.811531623063246,
+        "y": 3.093145614862659
       },
       "prevControl": {
-        "x": 13.041585232988858,
-        "y": 3.317540583508407
+        "x": 14.834871447520674,
+        "y": 3.5839310408779546
       },
       "nextControl": {
-        "x": 9.79266529147126,
-        "y": 4.391563704671252
+        "x": 12.193776955608561,
+        "y": 2.3172836825119454
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.270256540513081,
-        "y": 5.796291592583185
+        "x": 8.291141026726498,
+        "y": 0.7944571444698458
       },
       "prevControl": {
-        "x": 8.609870800347327,
-        "y": 5.4800990058502705
+        "x": 9.032540287302796,
+        "y": 0.7318036858295944
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M2"
+      "linkedName": "M5"
     }
   ],
   "rotationTargets": [],
@@ -59,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-M",
+  "folder": "SPAmp-M",
   "previewStartingState": {
-    "rotation": 60.310561578082726,
+    "rotation": -61.560307932119215,
     "velocity": 0
   },
   "useDefaultConstraints": true

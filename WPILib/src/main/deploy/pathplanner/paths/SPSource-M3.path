@@ -12,7 +12,7 @@
         "y": 2.7754682613502175
       },
       "isLocked": false,
-      "linkedName": "P2"
+      "linkedName": "SPSource"
     },
     {
       "anchor": {
@@ -59,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-M",
+  "folder": "SPSource-M",
   "previewStartingState": {
     "rotation": 58.57043438516144,
     "velocity": 0

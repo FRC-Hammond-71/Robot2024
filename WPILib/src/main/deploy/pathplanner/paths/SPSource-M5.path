@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.53,
-        "y": 7.0
+        "x": 15.823746112542153,
+        "y": 4.344720358484939
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.559163975474107,
-        "y": 8.135999129144054
+        "x": 15.847167785633717,
+        "y": 3.2204800500899147
+      },
+      "isLocked": false,
+      "linkedName": "SPSource"
+    },
+    {
+      "anchor": {
+        "x": 11.479025754057215,
+        "y": 1.8034688280503517
+      },
+      "prevControl": {
+        "x": 13.556996298352242,
+        "y": 2.3397095351806785
+      },
+      "nextControl": {
+        "x": 9.401055209762188,
+        "y": 1.2672281209200233
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.284942222836145,
-        "y": 7.460326620116567
+        "x": 8.291141026726498,
+        "y": 0.7944571444698458
       },
       "prevControl": {
-        "x": 8.666088127985098,
-        "y": 7.445667162226223
+        "x": 9.371075175816541,
+        "y": 0.9251560871167382
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M1"
+      "linkedName": "M5"
     }
   ],
   "rotationTargets": [],
@@ -43,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-M",
+  "folder": "SPSource-M",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 57.84770485871742,
     "velocity": 0
   },
   "useDefaultConstraints": true

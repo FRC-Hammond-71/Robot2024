@@ -8,40 +8,46 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.39409400733936,
-        "y": 7.724745808151134
+        "x": 14.879163975474107,
+        "y": 7.925999129144054
       },
       "isLocked": false,
-      "linkedName": "P1"
+      "linkedName": "SPAmp"
     },
     {
       "anchor": {
-        "x": 13.65990195307761,
-        "y": 5.551187918118234
+        "x": 8.284942222836145,
+        "y": 7.460326620116567
       },
       "prevControl": {
-        "x": 14.338052972561602,
-        "y": 6.081017562241955
+        "x": 8.666088127985098,
+        "y": 7.445667162226223
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A2"
+      "linkedName": "M1"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0,
+      "name": "Intake Note",
+      "waypointRelativePos": 0.6,
       "command": {
-        "type": "parallel",
+        "type": "race",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
                 "name": "IntakeNote"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 1.5
               }
             }
           ]
@@ -50,8 +56,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.5,
-    "maxAcceleration": 2.5,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
@@ -61,10 +67,10 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-A",
+  "folder": "SPAmp-M",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -59.623735735405795,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

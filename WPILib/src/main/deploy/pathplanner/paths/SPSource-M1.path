@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.835456949094521,
-        "y": 4.368142031579689
+        "x": 15.823746112542153,
+        "y": 4.344720358484939
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.582387776289506,
-        "y": 4.524775678180315
+        "x": 14.570676939737139,
+        "y": 4.501354005085565
       },
       "isLocked": false,
-      "linkedName": "P2-M"
+      "linkedName": "SPSource"
     },
     {
       "anchor": {
@@ -59,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-M",
+  "folder": "SPSource-M",
   "previewStartingState": {
     "rotation": 60.70863782901558,
     "velocity": 0

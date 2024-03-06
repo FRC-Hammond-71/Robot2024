@@ -8,40 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.847167785633717,
-        "y": 3.2204800500899147
+        "x": 14.337199785510682,
+        "y": 2.43388931222307
       },
       "isLocked": false,
-      "linkedName": "P2"
+      "linkedName": "SPSource"
     },
     {
       "anchor": {
-        "x": 11.479025754057215,
-        "y": 1.8034688280503517
+        "x": 10.891259560296898,
+        "y": 1.911777156887648
       },
       "prevControl": {
-        "x": 13.556996298352242,
-        "y": 2.3397095351806785
+        "x": 12.186097705528747,
+        "y": 1.7864702396071466
       },
       "nextControl": {
-        "x": 9.401055209762188,
-        "y": 1.2672281209200233
+        "x": 9.996143581277853,
+        "y": 1.9984012838894913
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.291141026726498,
-        "y": 0.7944571444698458
+        "x": 8.301583269833205,
+        "y": 2.4547737984364866
       },
       "prevControl": {
-        "x": 9.371075175816541,
-        "y": 0.9251560871167382
+        "x": 9.335365337397342,
+        "y": 2.151948748341942
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M5"
+      "linkedName": "M4"
     }
   ],
   "rotationTargets": [],
@@ -59,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P2-M",
+  "folder": "SPSource-M",
   "previewStartingState": {
-    "rotation": 57.84770485871742,
+    "rotation": 56.82148834060731,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -3,50 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.85,
-        "y": 6.79
+        "x": 15.823746112542153,
+        "y": 4.344720358484939
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.507553525806053,
-        "y": 7.366116187296568
+        "x": 15.308469304527765,
+        "y": 4.180768646843998
       },
       "isLocked": false,
-      "linkedName": "P1"
+      "linkedName": "SPSource"
     },
     {
       "anchor": {
-        "x": 13.657241351572575,
-        "y": 7.003080254377342
+        "x": 13.92659059212555,
+        "y": 4.087081954477746
       },
       "prevControl": {
-        "x": 15.132806756341045,
-        "y": 7.705730447124233
+        "x": 14.430156563594155,
+        "y": 4.087081954477746
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A1"
+      "linkedName": "A3"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
-    "maxAcceleration": 2.5,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 17.914643092546157,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-A",
+  "folder": "SPSource-A",
   "previewStartingState": {
-    "rotation": -59.03624346792672,
+    "rotation": 57.7575321608768,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

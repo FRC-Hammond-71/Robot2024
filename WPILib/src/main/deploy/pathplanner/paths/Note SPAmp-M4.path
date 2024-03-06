@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.53,
-        "y": 7.0
+        "x": 15.85,
+        "y": 6.79
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.901080913272938,
-        "y": 5.368159625208139
+        "x": 15.221080913272939,
+        "y": 5.158159625208139
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "SPAmp"
     },
     {
       "anchor": {
@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 8.280698783619789,
-        "y": 2.517427257076737
+        "x": 8.301583269833205,
+        "y": 2.4547737984364866
       },
       "prevControl": {
-        "x": 9.847035249626055,
-        "y": 3.530324838427455
+        "x": 9.867919735839472,
+        "y": 3.4676713797872045
       },
       "nextControl": null,
       "isLocked": false,
@@ -75,9 +75,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-M",
+  "folder": "SPAmp-M",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -60.594134346485674,
     "velocity": 0
   },
   "useDefaultConstraints": true

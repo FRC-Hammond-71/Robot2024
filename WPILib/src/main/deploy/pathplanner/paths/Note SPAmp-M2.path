@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.53,
-        "y": 7.0
+        "x": 15.85,
+        "y": 6.79
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.632461264922531,
-        "y": 5.8051453245763645
+        "x": 14.744447266672312,
+        "y": 5.848502808116728
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "SPAmp"
     },
     {
       "anchor": {
@@ -59,9 +59,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "P1-M",
+  "folder": "SPAmp-M",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -60.22017779382533,
     "velocity": 0
   },
   "useDefaultConstraints": true
