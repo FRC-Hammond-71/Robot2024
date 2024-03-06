@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.85,
-        "y": 6.79
+        "x": 15.120368018513815,
+        "y": 5.556120001128891
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.443444246892938,
-        "y": 6.024865803069502
+        "x": 13.292975474839839,
+        "y": 4.334377557644005
       },
       "isLocked": false,
-      "linkedName": "SPAmp"
+      "linkedName": "SPCenter"
     },
     {
       "anchor": {
-        "x": 11.006124234470692,
-        "y": 4.052436993762877
+        "x": 11.496909660485986,
+        "y": 4.344819800750713
       },
       "prevControl": {
-        "x": 12.297174161964822,
-        "y": 4.146331533941091
+        "x": 13.439166878333758,
+        "y": 5.4099285976349725
       },
       "nextControl": {
-        "x": 9.283154121868241,
-        "y": 3.9271300764869372
+        "x": 9.010382103616633,
+        "y": 2.9812401727901032
       },
       "isLocked": false,
       "linkedName": null
@@ -33,25 +33,25 @@
     {
       "anchor": {
         "x": 8.301583269833205,
-        "y": 4.052436993762877
+        "y": 2.4547737984364866
       },
       "prevControl": {
-        "x": 9.314480851188367,
-        "y": 4.0315525075540215
+        "x": 9.063867016622922,
+        "y": 2.9246747382383664
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M3"
+      "linkedName": "M4"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake Note",
-      "waypointRelativePos": 1.15,
+      "name": "New Event Marker",
+      "waypointRelativePos": 1.3,
       "command": {
-        "type": "deadline",
+        "type": "race",
         "data": {
           "commands": [
             {
@@ -83,9 +83,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPAmp-M",
+  "folder": "SPCenter-M",
   "previewStartingState": {
-    "rotation": -59.988318591189966,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

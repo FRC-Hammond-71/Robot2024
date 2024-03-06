@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284942222836145,
-        "y": 7.460326620116567
+        "x": 8.280698783619789,
+        "y": 7.435723760336409
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.28617692308847,
-        "y": 7.148170089544952
+        "x": 9.281933483872114,
+        "y": 7.123567229764794
       },
       "isLocked": false,
       "linkedName": "M1"
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Speaker(Front)"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],

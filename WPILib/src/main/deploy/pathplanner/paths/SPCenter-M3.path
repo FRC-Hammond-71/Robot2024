@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.85,
-        "y": 6.79
+        "x": 15.120368018513815,
+        "y": 5.556120001128891
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.443444246892938,
-        "y": 6.024865803069502
+        "x": 11.590889848446363,
+        "y": 6.9449383343211135
       },
       "isLocked": false,
-      "linkedName": "SPAmp"
-    },
-    {
-      "anchor": {
-        "x": 11.006124234470692,
-        "y": 4.052436993762877
-      },
-      "prevControl": {
-        "x": 12.297174161964822,
-        "y": 4.146331533941091
-      },
-      "nextControl": {
-        "x": 9.283154121868241,
-        "y": 3.9271300764869372
-      },
-      "isLocked": false,
-      "linkedName": null
+      "linkedName": "SPCenter"
     },
     {
       "anchor": {
@@ -36,8 +20,8 @@
         "y": 4.052436993762877
       },
       "prevControl": {
-        "x": 9.314480851188367,
-        "y": 4.0315525075540215
+        "x": 13.679338469788052,
+        "y": 3.0813083848389926
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,9 +33,9 @@
   "eventMarkers": [
     {
       "name": "Intake Note",
-      "waypointRelativePos": 1.15,
+      "waypointRelativePos": 0.8,
       "command": {
-        "type": "deadline",
+        "type": "race",
         "data": {
           "commands": [
             {
@@ -83,9 +67,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPAmp-M",
+  "folder": "SPCenter-M",
   "previewStartingState": {
-    "rotation": -59.988318591189966,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

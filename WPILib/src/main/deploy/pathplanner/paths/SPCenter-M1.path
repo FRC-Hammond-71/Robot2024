@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.85,
-        "y": 6.79
+        "x": 15.120368018513815,
+        "y": 5.556120001128891
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.443444246892938,
-        "y": 6.024865803069502
+        "x": 14.20145062512347,
+        "y": 6.120001128891147
       },
       "isLocked": false,
-      "linkedName": "SPAmp"
+      "linkedName": "SPCenter"
     },
     {
       "anchor": {
-        "x": 11.006124234470692,
-        "y": 4.052436993762877
+        "x": 11.747523495046991,
+        "y": 6.986707306747947
       },
       "prevControl": {
-        "x": 12.297174161964822,
-        "y": 4.146331533941091
+        "x": 12.948381452318463,
+        "y": 6.642113284226568
       },
       "nextControl": {
-        "x": 9.283154121868241,
-        "y": 3.9271300764869372
+        "x": 10.466772664950877,
+        "y": 7.354227110166832
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.301583269833205,
-        "y": 4.052436993762877
+        "x": 8.280698783619789,
+        "y": 7.435723760336409
       },
       "prevControl": {
-        "x": 9.314480851188367,
-        "y": 4.0315525075540215
+        "x": 9.293596364970508,
+        "y": 7.4461660034431185
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M3"
+      "linkedName": "M1"
     }
   ],
   "rotationTargets": [],
@@ -51,7 +51,7 @@
       "name": "Intake Note",
       "waypointRelativePos": 1.15,
       "command": {
-        "type": "deadline",
+        "type": "race",
         "data": {
           "commands": [
             {
@@ -83,9 +83,9 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": "SPAmp-M",
+  "folder": "SPCenter-M",
   "previewStartingState": {
-    "rotation": -59.988318591189966,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true
