@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 15.823746112542153,
-        "y": 4.344720358484939
+        "x": 14.676084131055566,
+        "y": 4.473539560488536
       },
       "prevControl": {
-        "x": 15.28132753149967,
-        "y": 3.181499957626358
+        "x": 14.133665550013083,
+        "y": 3.310319159629955
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SPSource"
+      "linkedName": "Shooting-Source"
     }
   ],
   "rotationTargets": [],
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Transit",
   "previewStartingState": {
     "rotation": 1.079128061952049,
     "velocity": 0

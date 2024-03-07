@@ -237,8 +237,8 @@ public class Robot extends TimedRobot
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			// if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
-			if (Controllers.DriverController.getAButton())
+			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			// if (Controllers.DriverController.getAButton())
 			{
 				GameCommands.AutoRotateAndLaunch().schedule();
 			}

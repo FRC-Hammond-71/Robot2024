@@ -177,7 +177,11 @@
         "open": true
       },
       "open": true
-    }
+    },
+    "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plot": {
     "Plot <0>": {
@@ -195,7 +199,7 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 384,
+          "height": 179,
           "series": [
             {
               "color": [
@@ -217,7 +221,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -228,10 +235,13 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 384,
+          "height": 174,
           "viewTime": 8.999996185302734
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "window": {

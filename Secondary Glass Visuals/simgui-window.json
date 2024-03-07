@@ -1,12 +1,6 @@
 {
   "Docking": {
-    "Data": [
-      "DockNode      ID=0x00000001 Pos=177,778 Size=827,178 Split=X",
-      "DockNode    ID=0x00000004 Parent=0x00000001 SizeRef=633,178 Split=X",
-      "DockNode  ID=0x00000002 Parent=0x00000004 SizeRef=494,73 Selected=0x138219D4",
-      "DockNode  ID=0x00000003 Parent=0x00000004 SizeRef=300,73 Selected=0x3E3C37F1",
-      "DockNode    ID=0x00000005 Parent=0x00000001 SizeRef=192,178 Selected=0x6AE6D891"
-    ]
+    "Data": []
   },
   "MainWindow": {
     "GLOBAL": {
@@ -29,7 +23,7 @@
     "###/SmartDashboard/Auto Options": {
       "Collapsed": "0",
       "Pos": "226,627",
-      "Size": "254,54"
+      "Size": "307,60"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
@@ -44,7 +38,7 @@
     "###/SmartDashboard/Starting Positions": {
       "Collapsed": "0",
       "Pos": "224,559",
-      "Size": "254,54"
+      "Size": "307,60"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -53,13 +47,11 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "DockId": "0x00000002,0",
       "Pos": "177,778",
-      "Size": "393,178"
+      "Size": "976,82"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
-      "DockId": "0x00000003,0",
       "Pos": "572,778",
       "Size": "238,178"
     },
@@ -78,11 +70,20 @@
       "Pos": "1025,20",
       "Size": "250,695"
     },
-    "###System Joysticks": {
+    "###Plot <0>": {
       "Collapsed": "0",
-      "DockId": "0x00000005,0",
+      "Pos": "892,490",
+      "Size": "488,452"
+    },
+    "###Plot <1>": {
+      "Collapsed": "0",
+      "Pos": "1382,490",
+      "Size": "494,452"
+    },
+    "###System Joysticks": {
+      "Collapsed": "1",
       "Pos": "812,778",
-      "Size": "192,178"
+      "Size": "232,254"
     },
     "###Timing": {
       "Collapsed": "0",
@@ -97,7 +98,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "66,106",
-      "Size": "92,116"
+      "Size": "109,134"
     }
   }
 }

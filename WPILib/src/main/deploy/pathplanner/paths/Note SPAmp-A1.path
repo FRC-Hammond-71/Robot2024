@@ -67,7 +67,7 @@
     "rotateFast": false
   },
   "reversed": true,
-  "folder": null,
+  "folder": "SPAmp-A",
   "previewStartingState": {
     "rotation": -59.03624346792672,
     "velocity": 0

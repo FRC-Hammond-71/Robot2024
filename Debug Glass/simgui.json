@@ -101,7 +101,7 @@
           "style": "Hidden"
         },
         "bottom": 1476,
-        "height": 8.210550308227539,
+        "height": 8.21055033842288,
         "left": 150,
         "path": {
           "arrows": false,
@@ -132,7 +132,7 @@
           "style": "Track"
         },
         "units": "meters",
-        "width": 16.541748046875,
+        "width": 16.541751951988786,
         "window": {
           "visible": true
         }
@@ -161,6 +161,9 @@
         }
       },
       "SmartDashboard": {
+        "ArmSubsystem": {
+          "open": true
+        },
         "DriveSubsystem": {
           "open": true
         },
@@ -189,7 +192,7 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 384,
+          "height": 376,
           "series": [
             {
               "color": [
@@ -211,7 +214,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "name": "Speed"
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -222,7 +228,7 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 384,
+          "height": 378,
           "series": [
             {
               "color": [
@@ -245,7 +251,10 @@
           ],
           "viewTime": 8.999996185302734
         }
-      ]
+      ],
+      "window": {
+        "name": "Rotation"
+      }
     },
     "Plot <2>": {
       "window": {
@@ -261,7 +270,8 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 384,
+          "crosshairs": true,
+          "height": 378,
           "series": [
             {
               "color": [
@@ -279,13 +289,13 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/ArmSubsystem/Velocity"
+              "id": "NT:/SmartDashboard/ArmSubsystem/Angular Velocity"
             }
           ]
         }
       ],
       "window": {
-        "visible": false
+        "name": "Arm Angular Velocity"
       }
     }
   }

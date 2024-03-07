@@ -3,52 +3,150 @@
     "Other Devices": {
       "navX-Sensor[0]": {
         "header": {
-          "open": false
+          "open": true
         }
+      },
+      "window": {
+        "visible": false
       }
     },
     "RoboRIO": {
       "RoboRIO Input": {
-        "open": false
+        "open": true
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
       }
     }
   },
   "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Automation/AlightWithSpeakerCommand": "Command",
+      "/Shuffleboard/Automation/Commands/FaceAtCommand": "Command",
+      "/Shuffleboard/Automation/Commands/Origin": "Command",
+      "/Shuffleboard/Automation/Commands/Red Speaker": "Command",
+      "/Shuffleboard/Automation/Commands/Speaker": "Command",
+      "/Shuffleboard/Automation/Commands2/FaceAtCommand": "Command",
+      "/Shuffleboard/Automation/Follow Test Path": "Command",
+      "/Shuffleboard/Automation/FollowPathCommand": "Command",
+      "/Shuffleboard/Automation/PIDController[3]": "PIDController",
+      "/Shuffleboard/Automation/PIDController[4]": "PIDController",
+      "/Shuffleboard/Automation/ParallelRaceGroup": "Command",
+      "/Shuffleboard/Automation/Turning PID": "PIDController",
+      "/Shuffleboard/Drive/Go Around": "Command",
+      "/Shuffleboard/Drive/Go to Origin": "Command",
+      "/Shuffleboard/Drive/PIDController[1]": "PIDController",
+      "/Shuffleboard/Drive/PIDController[2]": "PIDController",
+      "/Shuffleboard/General/Scheduler": "Scheduler",
+      "/Shuffleboard/Movement/PIDController[1]": "PIDController",
+      "/Shuffleboard/Movement/PIDController[2]": "PIDController",
+      "/Shuffleboard/Movement/SimulatedDriveSubsystem": "Subsystem",
+      "/SmartDashboard/Arm PID": "PIDController",
+      "/SmartDashboard/Arm Visualization": "Mechanism2d",
+      "/SmartDashboard/Assisted Note Intake": "String Chooser",
+      "/SmartDashboard/Auto Options": "String Chooser",
+      "/SmartDashboard/Auto choices": "String Chooser",
+      "/SmartDashboard/AutoOptions": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Launch Ground PID": "PIDController",
+      "/SmartDashboard/New Auto": "Command",
+      "/SmartDashboard/Note 1": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/SendableChooser[1]": "String Chooser",
+      "/SmartDashboard/Speaker Auto": "Command",
+      "/SmartDashboard/Starting Positions": "String Chooser"
+    },
     "windows": {
+      "/SmartDashboard/Arm Visualization": {
+        "window": {
+          "name": "Arm",
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Options": {
+        "window": {
+          "name": "Autos",
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "Speaker": {
           "arrows": false
         },
         "Speaker Left": {
           "arrows": false,
-          "length": 0.0,
-          "weight": 0.0,
-          "width": 0.0
+          "length": 0.38100001215934753,
+          "weight": 2.0,
+          "width": 0.38100001215934753
         },
         "Speaker Right": {
           "arrows": false,
-          "length": 0.0,
+          "length": 0.38100001215934753,
           "selectable": false,
-          "weight": 0.0,
-          "width": 0.0
+          "weight": 2.0,
+          "width": 0.38100001215934753
         },
         "Target": {
-          "arrows": false
+          "arrows": false,
+          "color": [
+            0.022539416328072548,
+            0.3284313678741455,
+            0.20247581601142883,
+            255.0
+          ],
+          "style": "Hidden"
         },
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
         "path": {
-          "arrows": false
+          "arrows": false,
+          "color": [
+            0.0,
+            0.3828445076942444,
+            0.945147693157196,
+            255.0
+          ],
+          "style": "Track"
         },
+        "right": 2961,
         "robot path pose": {
-          "arrowSize": 0,
-          "arrowWeight": 0.0,
-          "length": 0.0,
-          "width": 0.0
+          "arrowSize": 15,
+          "arrowWeight": 2.0,
+          "color": [
+            0.6605189442634583,
+            0.14821341633796692,
+            0.7805907130241394,
+            255.0
+          ],
+          "length": 0.4000000059604645,
+          "width": 0.4000000059604645
         },
+        "top": 79,
         "traj": {
           "arrows": false,
-          "style": ""
+          "style": "Track"
         },
-        "units": ""
+        "units": "meters",
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Starting Positions": {
+        "window": {
+          "name": "Start Positions",
+          "visible": true
+        }
       }
     }
   },
@@ -59,8 +157,130 @@
     "transitory": {
       "Shuffleboard": {
         "Movement": {
-          "open": false
+          "open": true
         }
+      },
+      "SmartDashboard": {
+        "DriveSubsystem": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    }
+  },
+  "NetworkTables View": {
+    "visible": false
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "lockMax": true,
+              "lockMin": true
+            }
+          ],
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "height": 179,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/DriveSubsystem/Desired Rotation"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/DriveSubsystem/Actual Rotation"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "height": 174,
+          "viewTime": 8.999996185302734
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <2>": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 384,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Arm PID Rotation"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/ArmSubsystem/Velocity"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
       }
     }
   }

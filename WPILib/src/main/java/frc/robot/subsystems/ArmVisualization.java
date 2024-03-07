@@ -47,7 +47,7 @@ public class ArmVisualization implements Sendable
 		TargetArm.setAngle(arm.Mode.GetAngle());
 
 		// Note.setAngle(arm.GetAngle());
-		Note.setColor(new Color8Bit(Robot.Launcher.IsLoaded() ? Color.kOrange : Color.kBlack));
+		// Note.setsColor(new Color8Bit(Robot.Launcher.IsLoaded() ? Color.kOrange : Color.kBlack));
 	}
 
 	@Override

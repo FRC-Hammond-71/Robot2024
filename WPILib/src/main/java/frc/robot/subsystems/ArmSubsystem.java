@@ -88,7 +88,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeSimulated()
     {
-        this.FeedForward = new ArmFeedforward(0, 0, 0.13);
+        this.FeedForward = new ArmFeedforward(0, 0, 0.15);
 
         this.SimulatedArm = new SingleJointedArmSim(
             DCMotor.getNEO(1),
