@@ -14,7 +14,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SPCenter-A2"
+            "pathName": "Note SPAmp-A1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoRotateAndLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note A1-A2"
           }
         },
         {

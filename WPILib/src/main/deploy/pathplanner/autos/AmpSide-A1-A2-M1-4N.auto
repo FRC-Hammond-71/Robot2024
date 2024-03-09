@@ -8,7 +8,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRotateAndLaunch"
+            "name": "AutoPitchAndLaunch"
           }
         },
         {
@@ -26,13 +26,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note A1-M1"
+            "pathName": "Note A1-A2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoRotateAndLaunch"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note M1-Center"
+            "pathName": "Note A2-M1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M1-Shooting-Amp"
           }
         },
         {

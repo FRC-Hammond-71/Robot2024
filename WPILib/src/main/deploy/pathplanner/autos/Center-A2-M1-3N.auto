@@ -8,13 +8,19 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRotateAndLaunch"
+            "name": "AutoPitchAndLaunch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "UntilIntakeAngle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Note SPAmp-A1"
+            "pathName": "SPCenter-A2"
           }
         },
         {
@@ -26,7 +32,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note A1-A2"
+            "pathName": "Note A2-M1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M1-Shooting-Amp"
           }
         },
         {

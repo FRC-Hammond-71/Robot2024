@@ -14,19 +14,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SPSource-M5"
+            "pathName": "Note SPAmp-A1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "BeginTrackingSpeaker"
+            "name": "AutoRotateAndLaunch"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "M5-Shooting-Source"
+            "pathName": "Note A1-M1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note M1-Center"
           }
         },
         {

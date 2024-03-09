@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Intake Note",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -51,7 +51,7 @@
                   {
                     "type": "wait",
                     "data": {
-                      "waitTime": 2.0
+                      "waitTime": 1.5
                     }
                   }
                 ]

@@ -12,21 +12,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "SPSource-M5"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "BeginTrackingSpeaker"
+            "name": "UntilIntakeAngle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "M5-Shooting-Source"
+            "pathName": "SPCenter-A2"
           }
         },
         {
