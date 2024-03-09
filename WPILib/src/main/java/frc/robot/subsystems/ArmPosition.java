@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
-import frc.robot.FieldGeometry;
+import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -32,7 +32,7 @@ public enum ArmPosition
      */
     TrackingSpeaker(() ->
     {
-        double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldGeometry.GetSpeakerPosition());
+        double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
         
         final double heightOfSpeakerIntake = Units.inchesToMeters(82.5);
         final double shooterYOffset = Units.feetToMeters(1.8);

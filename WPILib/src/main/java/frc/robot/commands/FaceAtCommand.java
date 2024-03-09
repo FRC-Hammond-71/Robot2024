@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.LocalizationSubsystem;
 
 public class FaceAtCommand extends Command
@@ -50,19 +50,12 @@ public class FaceAtCommand extends Command
 	public void initialize()
 	{
 		Constants.Field.getObject("Target").setPose(new Pose2d(this.Point, new Rotation2d()));
-
-		// Constants.Field.getObject("Arrow").setPose(new Pose2d(Robot.Localization.GetEstimatedPose180().getTranslation(), this.GetHeadingError()));
 	}
 
 	@Override
 	public boolean isFinished()
 	{
 		return this.RotationPID.atSetpoint();
-
-		// var heading_error = this.GetHeadingError();
-
-		// System.out.println(heading_error);
-		// return heading_error.getDegrees() < AllowedError.getDegrees() && heading_error.getDegrees() > -AllowedError.getDegrees();
 	}
 
 	@Override
@@ -71,14 +64,7 @@ public class FaceAtCommand extends Command
 		System.out.println(this.GetHeadingError().getDegrees());
 		double output = -this.RotationPID.calculate(this.GetHeadingError().getDegrees(), 0);
 
-		// var output = Math.max(Math.min(Math.PI / 2, -this.GetHeadingError().getRadians() * 0.1), -Math.PI / 2);
-
-		// System.out.printf("Output: %.2f Current: %.2f Goal: %.2f\n", output,
-		// 		Robot.Localization.GetEstimatedPose().getRotation().getDegrees(),
-		// 		this.GetTargetHeading().getDegrees());
-
-		Robot.Drive.Set(
-				new ChassisSpeeds(0, 0, output));
+		Robot.Drive.Set(new ChassisSpeeds(0, 0, output));
 	}
 
 	@Override

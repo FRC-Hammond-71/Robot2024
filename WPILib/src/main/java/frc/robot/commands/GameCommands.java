@@ -13,7 +13,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Arm;
 import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
-import frc.robot.FieldGeometry;
+import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.math.LauncherFiringSolution;
@@ -25,7 +25,7 @@ public class GameCommands
 	public static Command IntakeNote()
 	{
 		return Robot.Arm.RunUntilHolding(ArmPosition.Intake)
-			.andThen(Robot.Launcher.RunIntake())
+			.andThen(Robot.Launcher.Intake())
 			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded())
 			.withName("Intake Note");
 	}
@@ -65,7 +65,7 @@ public class GameCommands
 		// }
 
 		return new ParallelCommandGroup(
-				new FaceAtCommand(FieldGeometry.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
+				new FaceAtCommand(FieldConstants.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
 				Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker))
 			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
 			.withName("AutoRotateAndLaunch");

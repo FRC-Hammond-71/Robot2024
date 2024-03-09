@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants;
-import frc.robot.FieldGeometry;
+import frc.robot.FieldConstants;
 
 public class PathCommands
 {
@@ -27,9 +27,9 @@ public class PathCommands
         return AutoBuilder.pathfindThenFollowPath(
                 new PathPlannerPath(
                         PathPlannerPath.bezierFromPoses(
-                                FieldGeometry.GetAmplifierPose().plus(new Transform2d(-0.75, 0, new Rotation2d())),
-                                FieldGeometry.GetAmplifierPose()),
-                        PathFindingConstraints, new GoalEndState(0, FieldGeometry.GetAmplifierPose().getRotation())),
+                                FieldConstants.GetAmplifierPose().plus(new Transform2d(-0.75, 0, new Rotation2d())),
+                                FieldConstants.GetAmplifierPose()),
+                        PathFindingConstraints, new GoalEndState(0, FieldConstants.GetAmplifierPose().getRotation())),
                 PathFindingConstraints);
         // return AutoBuilder.pathfindToPose(Field.GetAllianceAmplifierPose().plus(new Transform2d(-2, 0, new Rotation2d())), PathFindingConstraints);
     }

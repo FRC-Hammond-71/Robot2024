@@ -40,7 +40,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
 import frc.robot.ElapsedTimer;
-import frc.robot.FieldGeometry;
+import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
@@ -139,7 +139,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
         try
         {
-            startingPosition = FieldGeometry.GetStartingPosition();
+            startingPosition = FieldConstants.GetStartingPosition();
         } 
         catch (Exception e)
         {

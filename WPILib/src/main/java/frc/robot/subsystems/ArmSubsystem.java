@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
+import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -53,7 +54,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     
     private ArmFeedforward FeedForward;
     
-    public PIDController PositionalPID;
+    private PIDController PositionalPID;
 
     public ArmPosition Mode = ArmPosition.Default;
 
@@ -155,7 +156,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         this.Mode = ArmPosition.Identity;
     }
-
+    
     protected void UpdateMotors()
     {
         if (DriverStation.isDisabled()) 
@@ -201,6 +202,12 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         super.periodic();
 
         if (!DriverStation.isDisabled()) this.UpdateMotors();
+
+        if (this.IsHolding())
+        {
+            LEDs.SetArm(146, 70, 53);
+        }
+        else LEDs.SetArm(0, 53, 47);
 
         this.Visualization.Update(this);
     }

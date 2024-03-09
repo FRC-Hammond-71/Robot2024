@@ -4,13 +4,12 @@ import java.util.stream.IntStream;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class LEDs
 {
     private static AddressableLED LED;
     private static AddressableLEDBuffer ColorBuffer;
-
-    private static IntStream ArmRange = IntStream.range(0, 144);
 
     public static void Setup()
     {
@@ -24,20 +23,24 @@ public class LEDs
         System.out.println("Setup LEDs!");
     }
 
-    public static void SetAll(int r, int g, int b)
+    public static void SetAll(int h, int s, int v)
     {
+        if (RobotBase.isSimulation()) return;
+
         for (var i = 0; i < ColorBuffer.getLength(); i++)
         {
-            ColorBuffer.setRGB(i, r, g, b);
+            ColorBuffer.setHSV(i, h, s, v);
         }
         Write();
     }
     
-    public static void SetRange(int start, int end, int r, int g, int b)
+    public static void SetRange(int start, int end, int h, int s, int v)
     {
+        if (RobotBase.isSimulation()) return;
+
         for (var i = start; i < end; i++)
         {
-            ColorBuffer.setRGB(i, r, g, b);
+            ColorBuffer.setHSV(i, h, s, v);
         }
         Write();
     }
@@ -72,6 +75,6 @@ public class LEDs
 
     public static void SetArm(int r, int g, int b)
     {
-        SetRange(ArmRange.min().getAsInt(), ArmRange.max().getAsInt(), r, g, b);
+        SetRange(0, 288, r, g, b);
     }
 }

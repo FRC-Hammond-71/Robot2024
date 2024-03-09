@@ -8,7 +8,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.FieldGeometry;
+import frc.robot.FieldConstants;
 
 public class LauncherFiringSolution implements Sendable
 {
@@ -27,7 +27,7 @@ public class LauncherFiringSolution implements Sendable
 
     public static LauncherFiringSolution CalculateToSpeaker(Pose2d robotPose)
     {
-        double distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldGeometry.GetSpeakerPosition());
+        double distanceFromSpeaker = robotPose.getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
         
         final double heightOfSpeakerIntake = Units.inchesToMeters(80.5);
         final double shooterYOffset = Units.feetToMeters(1.8);

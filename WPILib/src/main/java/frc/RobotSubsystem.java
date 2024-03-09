@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class RobotSubsystem<T extends TimedRobot> extends SubsystemBase
+public abstract class RobotSubsystem<T> extends SubsystemBase
 {
     public T Robot;
 

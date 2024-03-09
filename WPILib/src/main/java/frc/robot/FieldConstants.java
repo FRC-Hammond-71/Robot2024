@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.utilities.DriverStationUtils;
 
-public class FieldGeometry 
+public class FieldConstants 
 {
     public static Pose2d GetStartingPosition() throws Exception
     {

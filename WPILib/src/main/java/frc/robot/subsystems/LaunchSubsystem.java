@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 {
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
+
+    // public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.05, 0.2);
 
     public ColorSensorV3 NoteSensor;
 
@@ -55,8 +58,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.GroundIntakeMotor.setInverted(true);
         this.IntakeMotor.setInverted(true);
 
-        this.TopLaunchMotor.setIdleMode(IdleMode.kBrake);
-        this.BottomLaunchMotor.setIdleMode(IdleMode.kBrake);
+        this.TopLaunchMotor.setIdleMode(IdleMode.kCoast);
+        this.BottomLaunchMotor.setIdleMode(IdleMode.kCoast);
         this.IntakeMotor.setIdleMode(IdleMode.kBrake);
         this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
 
@@ -108,22 +111,23 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         }
     }
 
-    public Command RunIntake()
+    public Command Intake()
     {
         if (RobotBase.isSimulation()) return Commands.none();
 
-        return Commands.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); }, this).withName("Run Intake");
+        return this.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); })
+            .withName("Intake");
     }
 
     public Command RunLaunch(double percentageTop, double percentageBottom)
     {
         if (RobotBase.isSimulation()) return Commands.none();
 
-        return Commands.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom), this)
+        return this.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
             .andThen(new WaitCommand(0.5))
-            .andThen(Commands.runOnce(() -> this.IntakeMotor.set(0.3), this))
+            .andThen(this.runOnce(() -> this.IntakeMotor.set(0.3)))
             .until(() -> !this.IsLoaded())
-            .andThen(Commands.waitSeconds(0.2))
+            .andThen(Commands.waitSeconds(0.1))
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
     }
@@ -131,7 +135,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        builder.addStringProperty("Launcher Speed", () -> this.GetSpeeds().toString(), null);
+        builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
+        builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
     }
 
