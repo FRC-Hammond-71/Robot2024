@@ -10,6 +10,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.FieldConstants;
 
+@Deprecated
 public class LauncherFiringSolution implements Sendable
 {
     public Rotation2d ArmAngle;
@@ -19,6 +20,7 @@ public class LauncherFiringSolution implements Sendable
 
     protected LauncherFiringSolution(Rotation2d angle, double speed, Translation3d target, Rotation2d yawError)
     {
+        // We do not use this anymore - use ArmPosition.
         this.ArmAngle = angle;
         this.LaunchVelocity = speed;
         this.TargetPosition = target;

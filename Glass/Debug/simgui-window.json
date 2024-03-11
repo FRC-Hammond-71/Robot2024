@@ -46,7 +46,7 @@
     "###/SmartDashboard/Auto Options": {
       "Collapsed": "0",
       "Pos": "152,555",
-      "Size": "361,66"
+      "Size": "307,60"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
@@ -61,8 +61,8 @@
     },
     "###/SmartDashboard/Starting Positions": {
       "Collapsed": "0",
-      "Pos": "151,481",
-      "Size": "361,66"
+      "Pos": "153,484",
+      "Size": "307,60"
     },
     "###Joysticks": {
       "Collapsed": "0",
@@ -103,7 +103,7 @@
     },
     "###Plot <3>": {
       "Collapsed": "0",
-      "Pos": "535,482",
+      "Pos": "532,483",
       "Size": "442,452"
     },
     "###System Joysticks": {
@@ -120,7 +120,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "18,94",
-      "Size": "126,152"
+      "Size": "109,134"
     }
   }
 }

@@ -25,6 +25,11 @@ import frc.robot.Robot;
 
 public class LaunchSubsystem extends RobotSubsystem<Robot>
 {
+    /**
+     * Any value larger than this threshold from the sensor will mark a detected note. 
+     */
+    public static final int NoteProximityThreshold = 100;
+
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
 
@@ -72,7 +77,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
      */
     public boolean IsLoaded()
     {
-        return RobotBase.isReal() ? this.NoteSensor.getProximity() > 100 : false;
+        return RobotBase.isReal() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
     }
 
     public LaunchSpeeds GetSpeeds()
@@ -138,6 +143,11 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
         builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+
+        if (RobotBase.isReal())
+        {
+            builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
+        }
     }
 
     public Command PerformSysID()

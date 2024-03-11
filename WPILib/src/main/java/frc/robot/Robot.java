@@ -48,7 +48,7 @@ import frc.robot.commands.PathCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
 import frc.robot.subsystems.ArmPosition;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.LocalizationSubsystem;
 
@@ -57,7 +57,7 @@ public class Robot extends TimedRobot
 	public final SendableChooser<Boolean> UseAssistedNoteIntake = new SendableChooser<>();
 
 	public static ArmSubsystem Arm;
-	public static Drive Drive;
+	public static DriveSubsystem Drive;
 	public static LaunchSubsystem Launcher;
 	public static LocalizationSubsystem Localization;
 	
@@ -96,7 +96,7 @@ public class Robot extends TimedRobot
 		System.out.println("Connected to Driver Station!");
 		
 		Arm = new ArmSubsystem(this);
-		Drive = new Drive(this);
+		Drive = new DriveSubsystem(this);
 		Launcher = new LaunchSubsystem(this);
 		Localization = new LocalizationSubsystem(this);
 	}
@@ -263,17 +263,21 @@ public class Robot extends TimedRobot
 		{
 			if (Controllers.ShooterController.getRightBumperPressed())
 			{
+				// Arm will begin tracking teh speaker!
 				Arm.Mode = ArmPosition.TrackingSpeaker;
 			}
 			else if (Controllers.ShooterController.getLeftBumperPressed())
 			{
+				// Arm will rotate to the Amp shooting position!
 				Arm.Mode = ArmPosition.Amp;
 			}
 
 			// if (Controllers.DriverController.getAButton())
 			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
 			{
-				GameCommands.AutoRotateAndLaunch().schedule();
+				GameCommands.AutoPitchAndLaunch().schedule();
+				// Enable with caution - needs to be tested!
+				// GameCommands.AutoRotateAndLaunch().schedule();
 			}
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
 			{

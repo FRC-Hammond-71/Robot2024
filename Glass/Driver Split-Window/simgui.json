@@ -88,6 +88,7 @@
           "arrows": false,
           "style": ""
         },
+        "units": "",
         "width": 5.398241246e-315,
         "window": {
           "visible": true
@@ -120,6 +121,9 @@
       "SmartDashboard": {
         "ArmSubsystem": {
           "open": true
+        },
+        "DriveSubsystem": {
+          "open": false
         },
         "open": true
       }

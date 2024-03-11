@@ -46,7 +46,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.PathCommands;
 
-public class Drive extends RobotSubsystem<Robot>
+public class DriveSubsystem extends RobotSubsystem<Robot>
 {
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
     public DifferentialDrivetrainSim SimulatedDrive;
@@ -54,15 +54,12 @@ public class Drive extends RobotSubsystem<Robot>
     // https://www.revrobotics.com/rev-21-1650/
     private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
+    
     private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
 
-    // private PIDController LeftMotorsPID = new PIDController(.05, 0, 0);
-    // private PIDController RightMotorsPID = new PIDController(.05,0,0);
-
     private ChassisSpeeds Speeds = new ChassisSpeeds();
-    private Optional<DifferentialDriveWheelVoltages> OverrideVoltages = Optional.empty();
 
-    public Drive(Robot robot)
+    public DriveSubsystem(Robot robot)
     {
         super(robot);
     }
@@ -97,7 +94,8 @@ public class Drive extends RobotSubsystem<Robot>
             edu.wpi.first.math.util.Units.lbsToKilograms(Constants.RobotWeight),
             Constants.Drivetrain.WheelRadius,
             Constants.Drivetrain.TrackWidth,
-            VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
+            null
+            // VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
         );
         try 
         {
@@ -172,7 +170,6 @@ public class Drive extends RobotSubsystem<Robot>
     {
         // Bypass Set()
         this.Speeds = new ChassisSpeeds(0, 0, 0);
-        this.OverrideVoltages = Optional.empty();
 
         if (RobotBase.isReal())
         {
@@ -208,11 +205,6 @@ public class Drive extends RobotSubsystem<Robot>
     public void Set(ChassisSpeeds speeds)
     {
         this.Speeds = speeds;
-        this.UpdateMotors();
-    }
-    public void Set(Optional<DifferentialDriveWheelVoltages> voltages)
-    {
-        this.OverrideVoltages = voltages;
         this.UpdateMotors();
     }
     public void SetArcade(double xSpeed, double zRotation)
@@ -300,41 +292,5 @@ public class Drive extends RobotSubsystem<Robot>
 
             return requiredCommand != null && !isDefault ? requiredCommand.getName() : "None";
         }, null);
-    }
-
-    public Command PerformSysID()
-    {
-        var sysId = new SysIdRoutine(new SysIdRoutine.Config(
-
-			Units.Volts.of(0.25).per(Units.Seconds.of(1)),
-			Units.Volts.of(0.5),
-			Units.Seconds.of(3.4)
-
-		), new SysIdRoutine.Mechanism(
-			(voltage) -> 
-			{
-				System.out.println(voltage);
-
-				// Apply voltages to motors.
-				this.Set(Optional.of(new DifferentialDriveWheelVoltages(-voltage.magnitude(), -voltage.magnitude())));
-			},
-			(log) ->
-			{
-				log.motor("flywheel")
-					.voltage(Units.Volts.of(this.LeftLeadMotor.getBusVoltage()))
-					.linearVelocity(Units.MetersPerSecond.of(this.LeftLeadMotor.getEncoder().getVelocity() / 60))
-					.linearPosition(Units.Meters.of(this.LeftLeadMotor.getEncoder().getPosition()));
-			},
-			this));
-
-		return sysId
-			.quasistatic(Direction.kForward)
-			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-			.andThen(sysId.quasistatic(Direction.kReverse))
-			.andThen(Commands.runOnce(() -> System.out.println("Beginning dynamic test...")))
-			.andThen(sysId.dynamic(Direction.kForward))
-			.andThen(Commands.runOnce(() -> System.out.println("Going Back!")))
-			.andThen(sysId.dynamic(Direction.kReverse))
-			.finallyDo(() -> this.Stop());
     }
 }

@@ -73,7 +73,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeReal()
     {
-        this.FeedForward = new ArmFeedforward(1, 0.05, 0);
+        this.PositionalPID = new PIDController(1, 0, 0.35);
+        
+        this.FeedForward = new ArmFeedforward(0.5, 0.05, 0.1);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);
@@ -83,7 +85,6 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
 
-        this.PositionalPID = new PIDController(2, 0, 0.35);
     }
 
     @Override

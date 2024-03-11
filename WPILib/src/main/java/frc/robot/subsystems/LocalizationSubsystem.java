@@ -160,12 +160,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Roz"),
             new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
+            // UPDATE THESE OFFSETS!
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Sauron"),
             new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
+            // UPDATE THESE OFFSETS!
     }
 
     public Pose2d GetEstimatedPose()
