@@ -106,6 +106,8 @@ public class Robot extends TimedRobot
 	{		
 		LEDs.Setup();
 
+		// LEDs.SetAll(3, 59, 57);
+
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
 		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
@@ -189,7 +191,7 @@ public class Robot extends TimedRobot
 			}
 		}
 
-		// LEDs.Rainbow();
+		LEDs.Rainbow();
 
 		// Execute / iterate all subsystems, then commands.
 		CommandScheduler.getInstance().run();

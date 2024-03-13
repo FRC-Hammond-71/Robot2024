@@ -48,7 +48,6 @@ public class LEDs
     public static void Write()
     {
         LED.setData(ColorBuffer);
-        System.out.println("Updated LEDs!");
     }
 
     private static int RainbowHueStep = 0;
