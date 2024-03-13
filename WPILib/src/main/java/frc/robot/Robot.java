@@ -51,6 +51,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.LocalizationSubsystem;
+import frc.robot.FieldConstants;
 
 public class Robot extends TimedRobot  
 {		
@@ -66,8 +67,6 @@ public class Robot extends TimedRobot
 	public static SendableChooser<Command> AutoOptions = new SendableChooser<>();
 
 	public static SendableChooser<Boolean> AutoSpinUp = new SendableChooser<>();
-
-	public static PhotonCamera NoteIntakeCamera = new PhotonCamera("Note Intake");
 
 	public Robot()
 	{
@@ -150,9 +149,9 @@ public class Robot extends TimedRobot
 		SPosition.addOption("Source", 1);
 		SPosition.addOption("Amp", 3);
 
-		AutoOptions = AutoBuilder.buildAutoChooser();
+		// AutoOptions = AutoBuilder.buildAutoChooser();
 
-		SmartDashboard.putData("Auto Options", AutoOptions);
+		// SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData("Starting Positions", SPosition);
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData(Arm);

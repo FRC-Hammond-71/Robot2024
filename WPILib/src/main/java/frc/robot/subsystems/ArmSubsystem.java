@@ -119,7 +119,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
     public Rotation2d GetAngle() 
     {
-        return Rotation2d.fromRadians(RobotBase.isReal() ? this.AbsoluteEncoder.getAbsolutePosition() * 2 * Math.PI -edu.wpi.first.math.util.Units.degreesToRadians(54) : this.SimulatedArm.getAngleRads());
+        return Rotation2d.fromRadians(RobotBase.isReal() ? this.AbsoluteEncoder.getAbsolutePosition() * 2 * Math.PI + edu.wpi.first.math.util.Units.degreesToRadians(4.8) : this.SimulatedArm.getAngleRads());
     }
 
     public Rotation2d GetAngleError()
@@ -204,11 +204,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         if (!DriverStation.isDisabled()) this.UpdateMotors();
 
-        if (this.IsHolding())
+       /*  if (this.IsHolding())
         {
             LEDs.SetArm(146, 70, 53);
         }
-        else LEDs.SetArm(0, 53, 47);
+        else LEDs.SetArm(0, 53, 47); */
 
         this.Visualization.Update(this);
     }

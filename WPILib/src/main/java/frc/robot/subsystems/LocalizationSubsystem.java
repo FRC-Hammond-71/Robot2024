@@ -69,7 +69,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     private ElapsedTimer IMUTimer;
     private Pose2d IMUAccumulatedPose = new Pose2d();
     
-    private PhotonCamera LauncherCamera, IntakeCamera;
+    // private PhotonCamera LauncherCamera, IntakeCamera;
 
     // https://docs.photonvision.org/en/latest/docs/programming/photonlib/robot-pose-estimator.html
     private PhotonPoseEstimator LauncherCameraPoseEstimator, IntakeCameraPoseEstimator;

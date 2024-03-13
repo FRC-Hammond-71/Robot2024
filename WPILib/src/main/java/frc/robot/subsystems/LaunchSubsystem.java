@@ -28,7 +28,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     /**
      * Any value larger than this threshold from the sensor will mark a detected note. 
      */
-    public static final int NoteProximityThreshold = 100;
+    public static final int NoteProximityThreshold = 150;
 
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
@@ -48,7 +48,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     protected void initializeReal()
     {
         this.TopLaunchMotor = new CANSparkMax(8, MotorType.kBrushless);
-        this.BottomLaunchMotor = new CANSparkMax(9, MotorType.kBrushless);
+        this.BottomLaunchMotor = new CANSparkMax(7, MotorType.kBrushless);
 
         this.TopLaunchMotor.getEncoder().setPositionConversionFactor(Constants.Launcher.WheelCircumference);
         this.TopLaunchMotor.getEncoder().setVelocityConversionFactor(Constants.Launcher.WheelCircumference);
@@ -56,7 +56,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.BottomLaunchMotor.getEncoder().setVelocityConversionFactor(Constants.Launcher.WheelCircumference);
 
         this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
-        this.IntakeMotor = new CANSparkMax(7, MotorType.kBrushless);
+        this.IntakeMotor = new CANSparkMax(9, MotorType.kBrushless);
 
         this.TopLaunchMotor.setInverted(false);
         this.BottomLaunchMotor.setInverted(false);
