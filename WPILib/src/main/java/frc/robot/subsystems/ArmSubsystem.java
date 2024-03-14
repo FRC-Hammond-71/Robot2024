@@ -50,6 +50,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         this.PositionalPID.setSetpoint(90);
 
         SmartDashboard.putData("Arm PID", this.PositionalPID);
+
+        // Temp fix
+        SmartDashboard.putNumber("Arm PID Rotation", 0);
     }
 
     @Override
@@ -94,8 +97,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         if (RobotBase.isReal())
         {
-            System.out.println(this.RelativeEncoder.getRate());
-            return Rotation2d.fromRotations(this.RelativeEncoder.getRate());
+            // System.out.println(this.RelativeEncoder.getRate());
+            // Unsure of what unit the rate is in!
+            return Rotation2d.fromDegrees(this.RelativeEncoder.getRate());
         }
         else return Rotation2d.fromRadians(this.SimulatedArm.getVelocityRadPerSec());
     }
