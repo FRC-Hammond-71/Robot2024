@@ -13,5 +13,3 @@ The 2024 Robot for FRC Team Hammond 71.
 ## Shuffle Board
 
 Use the [Shuffle Board Configuration](/Shuffleboard.json).
-
-Camera focus 0.224

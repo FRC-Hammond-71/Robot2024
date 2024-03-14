@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.stream.IntStream;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.RobotBase;

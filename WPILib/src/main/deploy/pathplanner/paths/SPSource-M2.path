@@ -1,0 +1,92 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 15.823746112542153,
+        "y": 4.344720358484939
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 13.446446293748506,
+        "y": 1.7214929722298804
+      },
+      "isLocked": false,
+      "linkedName": "SPSource"
+    },
+    {
+      "anchor": {
+        "x": 11.209676513510821,
+        "y": 3.923130242839991
+      },
+      "prevControl": {
+        "x": 13.041585232988858,
+        "y": 3.317540583508407
+      },
+      "nextControl": {
+        "x": 9.79266529147126,
+        "y": 4.391563704671252
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.270256540513081,
+        "y": 5.796291592583185
+      },
+      "prevControl": {
+        "x": 8.609870800347327,
+        "y": 5.4800990058502705
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "M2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 1.5,
+      "command": {
+        "type": "race",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeNote"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 1.5
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": true,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 60.310561578082726,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

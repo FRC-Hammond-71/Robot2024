@@ -1,0 +1,76 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 15.10938508324948,
+        "y": 5.551187918118234
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 11.579906913182027,
+        "y": 6.940006251310457
+      },
+      "isLocked": false,
+      "linkedName": "SPCenter"
+    },
+    {
+      "anchor": {
+        "x": 8.301583269833205,
+        "y": 4.052436993762877
+      },
+      "prevControl": {
+        "x": 13.679338469788052,
+        "y": 3.0813083848389926
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "M3"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Note",
+      "waypointRelativePos": 0.8,
+      "command": {
+        "type": "race",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeNote"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 1.5
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": true,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
