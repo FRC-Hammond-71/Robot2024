@@ -72,8 +72,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         this.RightFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
         this.RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
 
-        this.LeftLeadMotor.setInverted(false);
-        this.RightLeadMotor.setInverted(true);
+        this.LeftLeadMotor.setInverted(true);
+        this.RightLeadMotor.setInverted(false);
 
         this.SetIdle(IdleMode.kBrake);
 

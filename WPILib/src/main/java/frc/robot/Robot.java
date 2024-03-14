@@ -202,7 +202,7 @@ public class Robot extends TimedRobot
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
 			final double x = -Controllers.DriverController.getLeftY();
-			final double rotation = -Controllers.DriverController.getRightX();
+			final double rotation = Controllers.DriverController.getRightX();
 
             Drive.SetArcade(x, rotation);
 

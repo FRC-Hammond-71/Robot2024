@@ -129,10 +129,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         if (RobotBase.isSimulation()) return Commands.none();
 
         return this.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
-            .andThen(new WaitCommand(0.5))
+            .andThen(new WaitCommand(0.2))
             .andThen(this.runOnce(() -> this.IntakeMotor.set(0.3)))
-            .until(() -> !this.IsLoaded())
-            .andThen(Commands.waitSeconds(0.1))
+            // .until(() -> !this.IsLoaded())
+            .andThen(Commands.waitSeconds(0.3))
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
     }
