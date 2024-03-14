@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.535026887457484,
-        "y": 1.1476619814865876
+        "x": 9.740033522153034,
+        "y": 0.7944571444698458
       },
       "isLocked": false,
       "linkedName": "M5"
     },
     {
       "anchor": {
-        "x": 14.62924078487244,
-        "y": 3.513250963734452
+        "x": 14.676084131055566,
+        "y": 4.473539560488536
       },
       "prevControl": {
-        "x": 13.446446293748508,
-        "y": 2.9277091364453773
+        "x": 14.133665550013083,
+        "y": 3.310319159629955
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Transit",
   "previewStartingState": {
     "rotation": 1.079128061952049,
     "velocity": 0
