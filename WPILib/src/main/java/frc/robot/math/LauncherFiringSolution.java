@@ -6,8 +6,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.FieldConstants;
 
 @Deprecated

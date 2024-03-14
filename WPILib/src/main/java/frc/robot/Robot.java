@@ -1,57 +1,28 @@
 package frc.robot;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.photonvision.PhotonCamera;
-
-import com.fasterxml.jackson.annotation.JacksonInject.Value;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.CANSparkBase.IdleMode;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.proto.Controller;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.ControllerCommands;
 import frc.robot.commands.GameCommands;
-import frc.robot.commands.PathCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
 import frc.robot.subsystems.ArmPosition;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.LocalizationSubsystem;
-import frc.robot.FieldConstants;
 
 public class Robot extends TimedRobot  
 {		
@@ -69,35 +40,39 @@ public class Robot extends TimedRobot
 	public static SendableChooser<Boolean> AutoSpinUp = new SendableChooser<>();
 
 	public Robot()
-	{
-		SPosition.onChange((value) ->  
-		{
-			Pose2d pose;
-
-			try
-			{
-				pose = FieldConstants.GetStartingPosition();
-			}
-			catch (Exception ex)
-			{	
-				System.out.println("Could not update starting point." + ex);
-				return;
-			}
-
-			Localization.ResetPosition(pose);
-		});
-		
+	{		
 		System.out.println("Waiting for connection to Driver Station...");		
 		while (!DriverStation.waitForDsConnection(2))
 		{
 			System.out.println("Retrying connection to Driver Station...");
 		}
 		System.out.println("Connected to Driver Station!");
+
+		// Starting position need to be declared before subsystems initialize! 
+		SPosition.setDefaultOption("Center", 2);
+		SPosition.addOption("Source", 1);
+		SPosition.addOption("Amp", 3);
 		
-		Arm = new ArmSubsystem(this);
 		Drive = new DriveSubsystem(this);
-		Launcher = new LaunchSubsystem(this);
 		Localization = new LocalizationSubsystem(this);
+		Arm = new ArmSubsystem(this);
+		Launcher = new LaunchSubsystem(this);
+		
+		// this.UpdateStartingPosition();
+		SPosition.onChange((value) -> this.UpdateStartingPosition());
+	}
+
+	public void UpdateStartingPosition()
+	{
+		var pose = FieldConstants.GetStartingPosition();
+
+		if (pose.isPresent())
+		{
+			// This is an issue with how our simulation is handled... and the methodology of our subsystems.
+			if (RobotBase.isReal()) Localization.ResetPosition(pose.get());
+			else Robot.Drive.SimulatedDrive.setPose(pose.get());
+			DataLogManager.log("Reset starting position!");
+		}
 	}
 
 	@Override
@@ -105,8 +80,7 @@ public class Robot extends TimedRobot
 	{		
 		LEDs.Setup();
 
-		// LEDs.SetAll(3, 59, 57);
-
+		// These are all the command which are invoked in PathPlanner. Commands are mapped to their name!
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
 		NamedCommands.registerCommand("UntilNoteLoaded", new UntilNoteLoadedCommand());
@@ -114,6 +88,7 @@ public class Robot extends TimedRobot
 		NamedCommands.registerCommand("IntakeNote", GameCommands.IntakeNote());
 		NamedCommands.registerCommand("BeginTrackingSpeaker", GameCommands.BeginTrackingSpeaker());
 
+		// Configure PathPlanner to use the LTV path follower! (LTV appears to work better than ramsete)
 		AutoBuilder.configureLTV(
 			Localization::GetEstimatedPose180, 
 			(pose) -> Localization.ResetPosition(pose),
@@ -124,35 +99,25 @@ public class Robot extends TimedRobot
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);
 
-		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-			// Do whatever you want with the pose here
-			Constants.Field.setRobotPose(pose);
-		});
+		PathPlannerLogging.setLogCurrentPoseCallback((pose) -> Constants.Field.setRobotPose(pose));
 
 		// Logging callback for target robot pose
-		PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-			// Do whatever you want with the pose here
-			Constants.Field.getObject("robot path pose").setPose(pose);
-		});
+		PathPlannerLogging.setLogTargetPoseCallback((pose) -> Constants.Field.getObject("robot path pose").setPose(pose));
 
 		// Logging callback for the active path, this is sent as a list of poses
-		PathPlannerLogging.setLogActivePathCallback((poses) -> {
-			// Do whatever you want with the poses here
-			Constants.Field.getObject("path").setPoses(poses);
-		});
+		PathPlannerLogging.setLogActivePathCallback((poses) -> Constants.Field.getObject("path").setPoses(poses));
 
 		// Work around for Glass not supporting boolean widgets.
 		AutoSpinUp.addOption("Enabled", true);
 		AutoSpinUp.setDefaultOption("Disabled", false);
 
-		SPosition.setDefaultOption("Center", 2);
-		SPosition.addOption("Source", 1);
-		SPosition.addOption("Amp", 3);
+		AutoOptions = new SendableChooser<>();
+		AutoOptions.setDefaultOption("None", Commands.none());
+		AutoOptions.addOption("CenterSide-1N", new PathPlannerAuto("CenterSide-1N"));
 
-		// AutoOptions = AutoBuilder.buildAutoChooser();
-
-		// SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData("Starting Positions", SPosition);
+		SmartDashboard.putData("Auto Options", AutoOptions);
+
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData(Arm);
 		SmartDashboard.putData(Drive);
@@ -202,7 +167,7 @@ public class Robot extends TimedRobot
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
 			final double x = -Controllers.DriverController.getLeftY();
-			final double rotation = -Controllers.DriverController.getRightX();
+			final double rotation = Controllers.DriverController.getRightX();
 
             Drive.SetArcade(x, rotation);
 
@@ -247,13 +212,13 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getAButton())
 			{
 				speed = -0.1;
-				Launcher.GroundIntakeMotor.set(-0.1);
 				Launcher.IntakeMotor.set(-0.1);
+				Launcher.FeederMotor.set(-0.1);
 			}
 			else
 			{
-				Launcher.GroundIntakeMotor.stopMotor();
 				Launcher.IntakeMotor.stopMotor();
+				Launcher.FeederMotor.stopMotor();
 			}
 			
 			Launcher.SetLaunchSpeed(speed);

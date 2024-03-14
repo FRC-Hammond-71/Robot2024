@@ -1,9 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
@@ -43,7 +40,6 @@ public final class Constants
 		/**
 		 * Wheel circumference in Meters.
 		 */
-		// WheelRadius * 2 * Math.PI
 		public static double WheelCircumference = WheelRadius * 2 * Math.PI;
 
 		/**
@@ -78,7 +74,7 @@ public final class Constants
 
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(100);
 
-		public static Rotation2d MinAngle = Rotation2d.fromDegrees(25);
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(30);
 
 		// Shooting from further would require a 0.5 degree inaccuracy
 		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1);
