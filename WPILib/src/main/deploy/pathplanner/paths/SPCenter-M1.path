@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 15.10938508324948,
-        "y": 5.551187918118234
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
         "x": 14.190467689859135,
-        "y": 6.115069045880491
+        "y": 6.113881127762256
       },
       "isLocked": false,
       "linkedName": "SPCenter"

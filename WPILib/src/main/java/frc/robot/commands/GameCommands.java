@@ -1,24 +1,14 @@
 package frc.robot.commands;
 
-import java.time.Duration;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.robot.Constants;
-import frc.robot.Constants.Arm;
-import frc.robot.Constants.Launcher;
 import frc.robot.Controllers;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
-import frc.robot.math.LauncherFiringSolution;
 import frc.robot.subsystems.ArmPosition;
-import frc.robot.utilities.Rotation2dUtils;
 
 public class GameCommands
 {

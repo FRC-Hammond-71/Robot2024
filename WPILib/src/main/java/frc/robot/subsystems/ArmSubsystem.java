@@ -2,22 +2,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-
-import java.util.Optional;
-
-import javax.swing.text.html.Option;
-
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -28,16 +18,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
-import frc.robot.Controllers;
-import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -73,9 +55,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeReal()
     {
-        this.PositionalPID = new PIDController(3, 0, 0.4);
+        this.PositionalPID = new PIDController(4, 0, 0.4);
         
-        this.FeedForward = new ArmFeedforward(0.1, 0.05, 0.05);
+        this.FeedForward = new ArmFeedforward(0.05, 0.05, 0.1);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);

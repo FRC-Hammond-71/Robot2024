@@ -1,9 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
@@ -43,7 +40,6 @@ public final class Constants
 		/**
 		 * Wheel circumference in Meters.
 		 */
-		// WheelRadius * 2 * Math.PI
 		public static double WheelCircumference = WheelRadius * 2 * Math.PI;
 
 		/**
