@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 13.65990195307761,
-        "y": 5.551187918118234
+        "x": 14.663382484659708,
+        "y": 5.5555704093864335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.65990195307761,
-        "y": 5.846381523951544
+        "x": 12.544711879723332,
+        "y": 5.176189753235427
       },
       "isLocked": false,
-      "linkedName": "A2"
+      "linkedName": "Shooting-Center"
     },
     {
       "anchor": {
-        "x": 13.657241351572575,
-        "y": 7.003080254377342
+        "x": 10.963748946042827,
+        "y": 4.27445533921025
       },
       "prevControl": {
-        "x": 13.668530205875358,
-        "y": 6.303171287604855
+        "x": 11.829133550692548,
+        "y": 4.481660103703846
+      },
+      "nextControl": {
+        "x": 10.13227955129234,
+        "y": 4.075371117931963
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.301583269833205,
+        "y": 4.052436993762877
+      },
+      "prevControl": {
+        "x": 9.019750079443096,
+        "y": 4.133925300660873
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A1"
+      "linkedName": "M3"
     }
   ],
   "rotationTargets": [],
@@ -33,9 +49,9 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.2,
+      "waypointRelativePos": 1.1,
       "command": {
-        "type": "race",
+        "type": "parallel",
         "data": {
           "commands": [
             {

@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 13.65990195307761,
-        "y": 5.551187918118234
+        "x": 13.92659059212555,
+        "y": 4.087081954477746
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.65990195307761,
-        "y": 5.846381523951544
+        "x": 14.92659059212555,
+        "y": 4.087081954477746
       },
       "isLocked": false,
-      "linkedName": "A2"
+      "linkedName": "A3"
     },
     {
       "anchor": {
-        "x": 13.657241351572575,
-        "y": 7.003080254377342
+        "x": 12.24023012953301,
+        "y": 1.6980712991383184
       },
       "prevControl": {
-        "x": 13.668530205875358,
-        "y": 6.303171287604855
+        "x": 14.149092520882773,
+        "y": 2.5212275016402934
+      },
+      "nextControl": {
+        "x": 10.331367738183248,
+        "y": 0.8749150966363433
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.291141026726498,
+        "y": 0.7944571444698458
+      },
+      "prevControl": {
+        "x": 9.195412627629818,
+        "y": 0.9017344140251753
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A1"
+      "linkedName": "M5"
     }
   ],
   "rotationTargets": [],
@@ -33,9 +49,9 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.2,
+      "waypointRelativePos": 1.2,
       "command": {
-        "type": "race",
+        "type": "parallel",
         "data": {
           "commands": [
             {
@@ -47,7 +63,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 1.5
+                "waitTime": 2.0
               }
             }
           ]
