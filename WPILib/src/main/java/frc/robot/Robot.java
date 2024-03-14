@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -110,7 +111,10 @@ public class Robot extends TimedRobot
 		AutoSpinUp.addOption("Enabled", true);
 		AutoSpinUp.setDefaultOption("Disabled", false);
 
-		AutoOptions = AutoBuilder.buildAutoChooser();
+		AutoOptions = new SendableChooser<>();
+		AutoOptions.setDefaultOption("None", Commands.none());
+		AutoOptions.addOption("CenterSide-1N", new PathPlannerAuto("CenterSide-1N"));
+
 		SmartDashboard.putData("Starting Positions", SPosition);
 		SmartDashboard.putData("Auto Options", AutoOptions);
 

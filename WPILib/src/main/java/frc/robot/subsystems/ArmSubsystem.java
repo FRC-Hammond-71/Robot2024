@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.concurrent.CountDownLatch;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -46,8 +49,8 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         super(robot);    
         
-        this.PositionalPID.setTolerance(1);
         this.PositionalPID.setSetpoint(90);
+        this.PositionalPID.setTolerance(3);
 
         SmartDashboard.putData("Arm PID", this.PositionalPID);
 
@@ -58,9 +61,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeReal()
     {
-        this.PositionalPID = new PIDController(4, 0, 0.4);
+        this.PositionalPID = new PIDController(6, 0, 0.55);
         
-        this.FeedForward = new ArmFeedforward(0.05, 0.05, 0.1);
+        this.FeedForward = new ArmFeedforward(0.02, 0.02, 0.04);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);
@@ -69,7 +72,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
-
+        // this.RelativeEncoder.setDistancePerPulse(1 / 8192 * Math.PI);
     }
 
     @Override
@@ -97,9 +100,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         if (RobotBase.isReal())
         {
-            // System.out.println(this.RelativeEncoder.getRate());
-            // Unsure of what unit the rate is in!
-            return Rotation2d.fromDegrees(this.RelativeEncoder.getRate());
+            return Rotation2d.fromRadians(-this.RelativeEncoder.getRate() * 1 / 2048 * Math.PI);
         }
         else return Rotation2d.fromRadians(this.SimulatedArm.getVelocityRadPerSec());
     }

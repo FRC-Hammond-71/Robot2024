@@ -79,6 +79,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         return RobotBase.isReal() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
     }
 
+    
+
     public LaunchSpeeds GetSpeeds()
     {
         if (RobotBase.isSimulation()) return new LaunchSpeeds();
@@ -129,11 +131,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         return this.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
             // Ramp up for half a second. 
-            .andThen(new WaitCommand(0.5))
+            .andThen(new WaitCommand(0.3))
             // Begin pushing the note using the feeder 
-            .andThen(this.runOnce(() -> this.FeederMotor.set(0.3)))
             // Wait until the note is no-longer loaded.
-            .until(() -> !this.IsLoaded())
+            .andThen(this.runOnce(() -> this.FeederMotor.set(0.3)).until(() -> this.NoteSensor.isConnected() ? !this.IsLoaded() : true))
             // Wait another 200 ms to ensure it is out.
             .andThen(Commands.waitSeconds(0.2))
             // Stop the launcher motors.
@@ -147,6 +148,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
         builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+        builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
 
         if (RobotBase.isReal())
         {

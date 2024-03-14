@@ -16,7 +16,7 @@ public class GameCommands
 	{
 		return Robot.Arm.RunUntilHolding(ArmPosition.Intake)
 			.andThen(Robot.Launcher.Intake())
-			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getRightBumper() && !Robot.Launcher.IsLoaded())
+			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getAButton() && !Robot.Launcher.IsLoaded())
 			.withName("Intake Note");
 	}
 
@@ -27,7 +27,8 @@ public class GameCommands
 
 	public static Command ScoreAmp()
 	{
-		return Robot.Arm.RunUntilHolding(ArmPosition.Amp).andThen(Robot.Launcher.RunLaunch(0.22, 0.05));
+		// Adjust these values to change amp note speed!
+		return Robot.Arm.RunUntilHolding(ArmPosition.Amp).andThen(Robot.Launcher.RunLaunch(0.23, 0.07));
 	}
 
 	public static Command AutoPitch()

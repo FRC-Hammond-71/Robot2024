@@ -74,7 +74,7 @@ public final class Constants
 
 		public static Rotation2d MaxAngle = Rotation2d.fromDegrees(100);
 
-		public static Rotation2d MinAngle = Rotation2d.fromDegrees(25);
+		public static Rotation2d MinAngle = Rotation2d.fromDegrees(30);
 
 		// Shooting from further would require a 0.5 degree inaccuracy
 		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1);
