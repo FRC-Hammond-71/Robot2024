@@ -3,9 +3,6 @@
   "robotLength": 0.9,
   "holonomicMode": false,
   "pathFolders": [
-    "SPAmp-A",
-    "SPAmp-M",
-    "SPCenter-A",
     "SPCenter-M",
     "SPSource-A",
     "SPSource-M",

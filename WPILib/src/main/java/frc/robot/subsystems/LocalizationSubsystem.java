@@ -2,10 +2,6 @@ package frc.robot.subsystems;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.logging.Logger;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.HiddenAction;
-
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -13,7 +9,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -27,22 +22,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
-import frc.robot.Constants.Launcher;
-import frc.robot.Controllers;
 import frc.robot.ElapsedTimer;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
 /**
  * The localization subsystem utilizes several sensors on the Robot to estimate
@@ -135,23 +123,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
         // this.IMU.setAngleAdjustment(FieldGeometry.GetStartingPosition1().getRotation().minus(this.GetIMUHeading()).getDegrees());
 
-        Pose2d startingPosition;
-
-        try
-        {
-            startingPosition = FieldConstants.GetStartingPosition();
-        } 
-        catch (Exception e)
-        {
-            startingPosition = new Pose2d();
-        }
+        var startingPosition = FieldConstants.GetStartingPosition();
         
         this.PoseEstimator = new DifferentialDrivePoseEstimator(
             Robot.Drive.Kinematics,
             this.GetIMUHeading(),  
             Robot.Drive.GetLeftWheelPosition(), 
             Robot.Drive.GetRightWheelPosition(),
-            startingPosition,
+            startingPosition.isPresent() ? startingPosition.get() : new Pose2d(),
             VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
             VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(30)));
 
@@ -159,14 +138,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Roz"),
-            new Transform3d(-0.3302, 0, 0.23622, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
+            new Transform3d(-0.3429, 0, 0.26035, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
             // UPDATE THESE OFFSETS!
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Sauron"),
-            new Transform3d(0.3302, 0.1397, 0.254, new Rotation3d(0, Units.degreesToRadians(24), 0)));
+            new Transform3d(0.3429, 0.16, 0.26035, new Rotation3d(0, Units.degreesToRadians(24), 0)));
             // UPDATE THESE OFFSETS!
     }
 
@@ -191,7 +170,6 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             Rotation2d.fromRadians(MathUtil.inputModulus(pose.getRotation().getRadians(), -Math.PI, Math.PI)));
     }
     
-
     public void ResetPosition(Pose2d position)
     {
         
