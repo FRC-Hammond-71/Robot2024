@@ -1,7 +1,6 @@
 package frc.robot;
 
 import java.util.MissingResourceException;
-import java.util.Optional;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
@@ -14,21 +13,19 @@ import frc.robot.utilities.DriverStationUtils;
 
 public class FieldConstants 
 {
-    public static Optional<Pose2d> GetStartingPosition() 
+    public static Pose2d GetStartingPosition() throws Exception
     {
-        Optional<Pose2d> pose;
-
-        if (Robot.SPosition.getSelected() == null) return Optional.empty();
+        Pose2d pose;
 
         switch (Robot.SPosition.getSelected())
         {
-            case 1: pose = Optional.of(new Pose2d(15.82, 4.41, Rotation2d.fromDegrees(60))); break;
-            case 2: pose = Optional.of(new Pose2d(15.151112, 5.524321, Rotation2d.fromDegrees(0))); break;
-            case 3: pose = Optional.of(new Pose2d(15.80, 6.71, Rotation2d.fromDegrees(-60))); break;
-            default: return Optional.empty();
+            case 1: pose = new Pose2d(15.82, 4.41, Rotation2d.fromDegrees(60)); break;
+            case 2: pose = new Pose2d(15.151112, 5.524321, Rotation2d.fromDegrees(0)); break;
+            case 3: pose = new Pose2d(15.80, 6.71, Rotation2d.fromDegrees(-60)); break;
+            default: throw new Exception("Invalid Starting Position");
         }
 
-        return DriverStation.getAlliance().get() == Alliance.Red ? pose : Optional.of(GeometryUtil.flipFieldPose(pose.get()));
+        return DriverStation.getAlliance().get() == Alliance.Red ? pose : GeometryUtil.flipFieldPose(pose);
     }
 
     public static Translation2d GetSpeakerPosition()

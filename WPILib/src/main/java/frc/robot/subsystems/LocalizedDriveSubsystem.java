@@ -19,4 +19,11 @@ public class LocalizedDriveSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         super(robot);
     }
+
+    @Override
+    protected void initializeReal()
+    {
+        
+    }
+
 }
