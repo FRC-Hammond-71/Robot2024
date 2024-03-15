@@ -149,8 +149,14 @@ public class Robot extends TimedRobot
 		SPosition.addOption("Source", 1);
 		SPosition.addOption("Amp", 3);
 
-		// AutoOptions = AutoBuilder.buildAutoChooser();
+	
+	/* 
+ 	* IF YOU'RE GONNA MAKE A WHOLE NEW AUTO OPTIONS SYSTEM, MAKE SURE WE ACTUALLY HAVE OPTIONS ON THERE.
+ 	*/
 
+
+		//AutoOptions = AutoBuilder.buildAutoChooser();
+		
 		// SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData("Starting Positions", SPosition);
 		SmartDashboard.putData(Constants.Field);
