@@ -8,53 +8,29 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.49108547339902,
-        "y": 2.4360876791929025
+        "x": 15.128470185381502,
+        "y": 3.3336498873392078
       },
       "isLocked": false,
       "linkedName": "SPSource"
     },
     {
       "anchor": {
-        "x": 8.291141026726498,
-        "y": 0.7944571444698458
+        "x": 12.661275555106734,
+        "y": 1.2482829974641043
       },
       "prevControl": {
-        "x": 9.485403883088468,
-        "y": 1.1211894353613268
+        "x": 13.953615599533858,
+        "y": 2.0119384782670924
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M5"
+      "linkedName": "OSource"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Intake Note",
-      "waypointRelativePos": 0.0,
-      "command": {
-        "type": "race",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeNote"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 5.0
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 3.0,
@@ -69,7 +45,7 @@
   "reversed": true,
   "folder": null,
   "previewStartingState": {
-    "rotation": 57.84770485871742,
+    "rotation": 61.742854217832374,
     "velocity": 0
   },
   "useDefaultConstraints": true

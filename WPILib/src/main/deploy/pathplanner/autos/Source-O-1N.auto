@@ -12,21 +12,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "UntilIntakeAngle"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "SPCenter-A2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoRotateAndLaunch"
+            "pathName": "Source-OSource"
           }
         }
       ]

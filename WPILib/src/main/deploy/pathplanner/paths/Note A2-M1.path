@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.55,
+      "name": "Intake Note",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "race",
         "data": {
@@ -47,7 +47,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 2.0
+                "waitTime": 4.0
               }
             }
           ]

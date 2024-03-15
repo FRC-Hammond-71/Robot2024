@@ -20,25 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SPCenter-A2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoRotateAndLaunch"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Note A2-M1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "M1-Shooting-Amp"
+            "pathName": "Note SPAmp-A1"
           }
         },
         {

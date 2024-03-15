@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Intake Note",
-      "waypointRelativePos": 1.5,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "race",
         "data": {
@@ -63,7 +63,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 1.5
+                "waitTime": 5.0
               }
             }
           ]

@@ -49,9 +49,9 @@ public class Robot extends TimedRobot
 		System.out.println("Connected to Driver Station!");
 
 		// Starting position need to be declared before subsystems initialize! 
+		SPosition.addOption("Amp", 3);
 		SPosition.setDefaultOption("Center", 2);
 		SPosition.addOption("Source", 1);
-		SPosition.addOption("Amp", 3);
 		
 		Drive = new DriveSubsystem(this);
 		Localization = new LocalizationSubsystem(this);
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot
 			(pose) -> Localization.ResetPosition(pose),
 			() -> Drive.GetSpeeds(), 
 			(speeds) -> Drive.Set(speeds), 
-			0.02, 
+			0.02,
 			new ReplanningConfig(true, false), 
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);
@@ -113,15 +113,18 @@ public class Robot extends TimedRobot
 
 		AutoOptions = new SendableChooser<>();
 		AutoOptions.setDefaultOption("None", Commands.none());
+		AutoOptions.addOption("Amp-A1-2N", new PathPlannerAuto("Amp-A1-2N"));
+		AutoOptions.addOption("Amp-A1-M1-3N", new PathPlannerAuto("Amp-A1-M1-3N"));
 		AutoOptions.addOption("Center-1N", new PathPlannerAuto("Center-1N"));
 		AutoOptions.addOption("Center-2N", new PathPlannerAuto("Center-2N"));
+		AutoOptions.addOption("Center-A2-M1-3N", new PathPlannerAuto("Center-A2-M1-3N"));
+		AutoOptions.addOption("Center-A2-M2-3N", new PathPlannerAuto("Center-A2-M2-3N"));
 		AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
-
-		SmartDashboard.putData("Starting Positions", SPosition);
-
-		SmartDashboard.putData("Auto Options", AutoOptions);
+		AutoOptions.addOption("Source-O-1N", new PathPlannerAuto("Source-O-1N"));
 
 		SmartDashboard.putData(Constants.Field);
+		SmartDashboard.putData("Starting Positions", SPosition);
+		SmartDashboard.putData("Auto Options", AutoOptions);
 		SmartDashboard.putData(Arm);
 		SmartDashboard.putData(Drive);
 		SmartDashboard.putData(Launcher);

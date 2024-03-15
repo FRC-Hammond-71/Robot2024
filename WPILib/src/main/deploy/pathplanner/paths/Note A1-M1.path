@@ -20,8 +20,8 @@
         "y": 7.435723760336409
       },
       "prevControl": {
-        "x": 9.685999169113568,
-        "y": 7.096681998087406
+        "x": 9.67898077248692,
+        "y": 7.435723760336409
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "race",
         "data": {
@@ -47,7 +47,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 2.0
+                "waitTime": 4.0
               }
             }
           ]
