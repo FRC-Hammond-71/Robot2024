@@ -2,49 +2,26 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import java.util.Optional;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.DifferentialDriveAccelerationLimiter;
-import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Controllers;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
-import frc.robot.commands.GameCommands;
-import frc.robot.commands.PathCommands;
 
 public class DriveSubsystem extends RobotSubsystem<Robot>
 {
@@ -72,8 +49,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
         this.RightFollowMotor = new CANSparkMax(3, MotorType.kBrushless);
         this.RightLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
 
-        this.LeftLeadMotor.setInverted(false);
-        this.RightLeadMotor.setInverted(true);
+        this.LeftLeadMotor.setInverted(true);
+        this.RightLeadMotor.setInverted(false);
 
         this.SetIdle(IdleMode.kBrake);
 
@@ -97,13 +74,12 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             null
             // VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
         );
-        try 
+
+
+        var startingPosition = FieldConstants.GetStartingPosition();
+        if (startingPosition.isPresent())
         {
-            this.SimulatedDrive.setPose(FieldConstants.GetStartingPosition());
-        }
-        catch (Exception ex)
-        {
-            System.out.println("Could not set inital position in Simulation!");
+            this.SimulatedDrive.setPose(startingPosition.get());
         }
     }
 

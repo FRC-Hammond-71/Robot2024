@@ -2,22 +2,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
+
+import java.util.concurrent.CountDownLatch;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-
-import java.util.Optional;
-
-import javax.swing.text.html.Option;
-
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -28,16 +21,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
-import frc.robot.Controllers;
-import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -64,18 +49,21 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         super(robot);    
         
-        this.PositionalPID.setTolerance(1);
         this.PositionalPID.setSetpoint(90);
+        this.PositionalPID.setTolerance(3);
 
         SmartDashboard.putData("Arm PID", this.PositionalPID);
+
+        // Temp fix
+        SmartDashboard.putNumber("Arm PID Rotation", 0);
     }
 
     @Override
     protected void initializeReal()
     {
-        this.PositionalPID = new PIDController(1, 0, 0.35);
+        this.PositionalPID = new PIDController(6, 0, 0.55);
         
-        this.FeedForward = new ArmFeedforward(0.5, 0.05, 0.1);
+        this.FeedForward = new ArmFeedforward(0.02, 0.02, 0.04);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);
@@ -84,7 +72,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
-
+        // this.RelativeEncoder.setDistancePerPulse(1 / 8192 * Math.PI);
     }
 
     @Override
@@ -112,7 +100,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         if (RobotBase.isReal())
         {
-            return Rotation2d.fromRotations(this.RelativeEncoder.getRate());
+            return Rotation2d.fromRadians(-this.RelativeEncoder.getRate() * 1 / 2048 * Math.PI);
         }
         else return Rotation2d.fromRadians(this.SimulatedArm.getVelocityRadPerSec());
     }

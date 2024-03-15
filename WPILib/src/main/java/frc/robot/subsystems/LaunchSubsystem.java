@@ -10,7 +10,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,7 +30,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     public static final int NoteProximityThreshold = 150;
 
     // https://www.revrobotics.com/rev-21-1650/
-    public CANSparkMax GroundIntakeMotor, IntakeMotor, TopLaunchMotor, BottomLaunchMotor;
+    public CANSparkMax IntakeMotor, FeederMotor, TopLaunchMotor, BottomLaunchMotor;
 
     // public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.05, 0.2);
 
@@ -55,18 +54,19 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.BottomLaunchMotor.getEncoder().setPositionConversionFactor(Constants.Launcher.WheelCircumference);
         this.BottomLaunchMotor.getEncoder().setVelocityConversionFactor(Constants.Launcher.WheelCircumference);
 
-        this.GroundIntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
-        this.IntakeMotor = new CANSparkMax(9, MotorType.kBrushless);
+        this.IntakeMotor = new CANSparkMax(Constants.GroundIntake.CANPort, MotorType.kBrushless);
+        this.FeederMotor = new CANSparkMax(9, MotorType.kBrushless);
 
         this.TopLaunchMotor.setInverted(false);
         this.BottomLaunchMotor.setInverted(false);
-        this.GroundIntakeMotor.setInverted(true);
         this.IntakeMotor.setInverted(true);
+        this.FeederMotor.setInverted(true);
 
-        this.TopLaunchMotor.setIdleMode(IdleMode.kCoast);
-        this.BottomLaunchMotor.setIdleMode(IdleMode.kCoast);
-        this.IntakeMotor.setIdleMode(IdleMode.kBrake);
-        this.GroundIntakeMotor.setIdleMode(IdleMode.kCoast);
+        // May hurt the shooter motors lol
+        this.TopLaunchMotor.setIdleMode(IdleMode.kBrake);
+        this.BottomLaunchMotor.setIdleMode(IdleMode.kBrake);
+        this.FeederMotor.setIdleMode(IdleMode.kBrake);
+        this.IntakeMotor.setIdleMode(IdleMode.kCoast);
 
         this.NoteSensor = new ColorSensorV3(Port.kOnboard);
         this.NoteSensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.kProxRate6ms);
@@ -79,6 +79,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         return RobotBase.isReal() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
     }
+
+    
 
     public LaunchSpeeds GetSpeeds()
     {
@@ -109,18 +111,21 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            this.GroundIntakeMotor.stopMotor();
             this.IntakeMotor.stopMotor();
+            this.FeederMotor.stopMotor();
             this.TopLaunchMotor.stopMotor();
             this.BottomLaunchMotor.stopMotor();
         }
     }
 
-    public Command Intake()
+    public Command AutoIntake()
     {
         if (RobotBase.isSimulation()) return Commands.none();
 
-        return this.runEnd(() -> { this.IntakeMotor.set(0.3); this.GroundIntakeMotor.set(0.6); }, () -> { this.IntakeMotor.stopMotor(); this.GroundIntakeMotor.stopMotor(); })
+        // IF HAVING ISSUES WITH AUTO-INTAKE YOU CAN DISABLE IT AUTO-STOPPING WHEN DETECTING A NOTE. COMMENT OUT LINE 127!
+        
+        return this.runEnd(() -> { this.FeederMotor.set(0.3); this.IntakeMotor.set(0.6); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
+            .until(() -> this.NoteSensor.getProximity() > 350)
             .withName("Intake");
     }
 
@@ -129,10 +134,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         if (RobotBase.isSimulation()) return Commands.none();
 
         return this.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
-            .andThen(new WaitCommand(0.5))
-            .andThen(this.runOnce(() -> this.IntakeMotor.set(0.3)))
-            .until(() -> !this.IsLoaded())
-            .andThen(Commands.waitSeconds(0.1))
+            // Ramp up for half a second. 
+            .andThen(new WaitCommand(0.3))
+            // Begin pushing the note using the feeder 
+            // Wait until the note is no-longer loaded.
+            .andThen(this.runOnce(() -> this.FeederMotor.set(0.3)).until(() -> this.NoteSensor.isConnected() ? !this.IsLoaded() : true))
+            // Wait another 200 ms to ensure it is out.
+            .andThen(Commands.waitSeconds(0.2))
+            // Stop the launcher motors.
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
     }
@@ -143,6 +152,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
         builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
+        builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
 
         if (RobotBase.isReal())
         {

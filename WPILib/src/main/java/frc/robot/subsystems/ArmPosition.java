@@ -34,13 +34,15 @@ public enum ArmPosition
     {
         double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
         
-        final double heightOfSpeakerIntake = Units.inchesToMeters(82.5);
+        final double heightOfSpeakerIntake = Units.inchesToMeters(83);
         final double shooterYOffset = Units.feetToMeters(1.8);
         
         double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
 
         return Rotation2d.fromRadians(rotationRadians);
-    });
+    }),
+    BySideSpeaker(() -> Rotation2d.fromDegrees(57)),
+    AcrossMap(() -> Rotation2d.fromDegrees(50));
 
     public final Supplier<Rotation2d> AngleSupplier;
 
