@@ -152,7 +152,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
         builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
-        builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
+        // builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
 
         if (RobotBase.isReal())
         {

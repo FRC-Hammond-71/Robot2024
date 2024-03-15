@@ -113,12 +113,12 @@ public class Robot extends TimedRobot
 
 		AutoOptions = new SendableChooser<>();
 		AutoOptions.setDefaultOption("None", Commands.none());
-		AutoOptions.addOption("CenterSide-1N", new PathPlannerAuto("CenterSide-1N"));
-		AutoOptions.addOption("CenterSide-2N", new PathPlannerAuto("Center-2N"));
-		AutoOptions.addOption(null, null);
-
+		AutoOptions.addOption("Center-1N", new PathPlannerAuto("Center-1N"));
+		AutoOptions.addOption("Center-2N", new PathPlannerAuto("Center-2N"));
+		AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
 
 		SmartDashboard.putData("Starting Positions", SPosition);
+
 		SmartDashboard.putData("Auto Options", AutoOptions);
 
 		SmartDashboard.putData(Constants.Field);
