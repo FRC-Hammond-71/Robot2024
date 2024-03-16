@@ -164,6 +164,12 @@
         "DriveSubsystem": {
           "open": true
         },
+        "Field": {
+          "double[]##v_/SmartDashboard/Field/Robot": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       }
     }
@@ -176,9 +182,6 @@
       "open": true
     },
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   },
   "Plot": {
     "Plot <0>": {

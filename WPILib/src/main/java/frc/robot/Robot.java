@@ -5,11 +5,15 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -113,14 +117,20 @@ public class Robot extends TimedRobot
 
 		AutoOptions = new SendableChooser<>();
 		AutoOptions.setDefaultOption("None", Commands.none());
-		AutoOptions.addOption("Amp-A1-2N", new PathPlannerAuto("Amp-A1-2N"));
-		AutoOptions.addOption("Amp-A1-M1-3N", new PathPlannerAuto("Amp-A1-M1-3N"));
-		AutoOptions.addOption("Center-1N", new PathPlannerAuto("Center-1N"));
-		AutoOptions.addOption("Center-2N", new PathPlannerAuto("Center-2N"));
-		AutoOptions.addOption("Center-A2-M1-3N", new PathPlannerAuto("Center-A2-M1-3N"));
-		AutoOptions.addOption("Center-A2-M2-3N", new PathPlannerAuto("Center-A2-M2-3N"));
-		AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
-		AutoOptions.addOption("Source-O-1N", new PathPlannerAuto("Source-O-1N"));
+	//	AutoOptions.addOption("Amp-A1-2N", new PathPlannerAuto("Amp-A1-2N"));
+	//	AutoOptions.addOption("Amp-A1-M1-3N", new PathPlannerAuto("Amp-A1-M1-3N"));
+	//	AutoOptions.addOption("Center-1N", new PathPlannerAuto("Center-1N"));
+	//	AutoOptions.addOption("Center-2N", new PathPlannerAuto("Center-2N"));
+	//	AutoOptions.addOption("Center-A2-M1-3N", new PathPlannerAuto("Center-A2-M1-3N"));
+	//	AutoOptions.addOption("Center-A2-M2-3N", new PathPlannerAuto("Center-A2-M2-3N"));
+	//	AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
+	//	AutoOptions.addOption("Source-O-1N", new PathPlannerAuto("Source-O-1N"));
+
+		AutoOptions.addOption("Simple Center", GameCommands.AutoPitchAndLaunch()
+			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1,0,0)), () -> Drive.Stop(), Drive).withTimeout(2)));
+		
+		AutoOptions.addOption("Simple Source", GameCommands.AutoPitchAndLaunch()
+			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? 0.623 : -0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5)));
 
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData("Starting Positions", SPosition);
