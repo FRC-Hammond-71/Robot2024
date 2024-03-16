@@ -7,7 +7,11 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DataLogReader;
+import edu.wpi.first.util.datalog.DataLogRecord;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -82,8 +86,8 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotInit() 
 	{		
-		LEDs.Setup();
-
+		// LEDs.Setup();
+		
 		// These are all the command which are invoked in PathPlanner. Commands are mapped to their name!
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
 		NamedCommands.registerCommand("AutoRotateAndLaunch", GameCommands.AutoRotateAndLaunch());
@@ -130,7 +134,7 @@ public class Robot extends TimedRobot
 			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1,0,0)), () -> Drive.Stop(), Drive).withTimeout(2)));
 		
 		AutoOptions.addOption("Simple Source", GameCommands.AutoPitchAndLaunch()
-			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? 0.623 : -0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5)));
+			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? -0.623 : 0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5)));
 
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData("Starting Positions", SPosition);
@@ -171,7 +175,7 @@ public class Robot extends TimedRobot
 			}
 		}
 
-		LEDs.Rainbow();
+		// LEDs.Rainbow();
 
 		// Execute / iterate all subsystems, then commands.
 		CommandScheduler.getInstance().run();

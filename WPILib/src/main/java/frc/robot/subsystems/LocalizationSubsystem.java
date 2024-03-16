@@ -178,6 +178,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             // Reset Yaw Gyro
             Robot.Drive.ResetEncoders();
             this.IMU.reset();
+            this.IMU.setAngleAdjustment(this.IMU.getAngle() - position.getRotation().getDegrees());
             this.IMUAccumulatedPose = position;
             this.PoseEstimator.resetPosition(position.getRotation(), 0, 0, position);
         }
