@@ -20,6 +20,7 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Arm PID": "PIDController",
       "/SmartDashboard/Arm Visualization": "Mechanism2d",
       "/SmartDashboard/Auto Options": "String Chooser",
       "/SmartDashboard/Field": "Field2d",

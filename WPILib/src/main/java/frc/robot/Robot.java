@@ -131,10 +131,13 @@ public class Robot extends TimedRobot
 	//	AutoOptions.addOption("Source-O-1N", new PathPlannerAuto("Source-O-1N"));
 
 		AutoOptions.addOption("Simple Center", GameCommands.AutoPitchAndLaunch()
-			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1,0,0)), () -> Drive.Stop(), Drive).withTimeout(2)));
+			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1,0,0)), () -> Drive.Stop(), Drive)
+			.withTimeout(2)));
 		
 		AutoOptions.addOption("Simple Source", GameCommands.AutoPitchAndLaunch()
-			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, DriverStation.getAlliance().get() == Alliance.Blue ? -0.623 : 0.623)), () -> Drive.Stop(), Drive).withTimeout(2.5)));
+			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-2, 0, 
+			DriverStation.getAlliance().get() == Alliance.Blue ? -0.623 : 0.623)), () -> Drive.Stop(), Drive)
+			.withTimeout(3)));
 
 		SmartDashboard.putData(Constants.Field);
 		SmartDashboard.putData("Starting Positions", SPosition);
@@ -242,7 +245,7 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getBButton())
 			{
 				// SHOOT ACROSS MAP
-				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.RunLaunch(0.8, 0.8)).schedule();
+				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.RunLaunch(0.65, 0.65)).schedule();
 			}
 			else
 			{
