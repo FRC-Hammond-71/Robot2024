@@ -245,7 +245,7 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getBButton())
 			{
 				// SHOOT ACROSS MAP
-				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.RunLaunch(0.65, 0.65)).schedule();
+				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.RunLaunch(0.60, 0.60)).schedule();
 			}
 			else
 			{

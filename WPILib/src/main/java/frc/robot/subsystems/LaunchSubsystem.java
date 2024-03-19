@@ -139,8 +139,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
             // Begin pushing the note using the feeder 
             // Wait until the note is no-longer loaded.
             .andThen(this.runOnce(() -> this.FeederMotor.set(0.3)).until(() -> this.NoteSensor.isConnected() ? !this.IsLoaded() : true))
-            // Wait another 200 ms to ensure it is out.
-            .andThen(Commands.waitSeconds(0.2))
+            // Wait another 300 ms to ensure it is out.
+            .andThen(Commands.waitSeconds(0.3))
             // Stop the launcher motors.
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
@@ -149,8 +149,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
-        builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
+        // builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
+        // builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
         // builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
 

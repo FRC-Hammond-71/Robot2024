@@ -42,7 +42,7 @@ public enum ArmPosition
         return Rotation2d.fromRadians(rotationRadians);
     }),
     BySideSpeaker(() -> Rotation2d.fromDegrees(57)),
-    AcrossMap(() -> Rotation2d.fromDegrees(50));
+    AcrossMap(() -> Rotation2d.fromDegrees(40));
 
     public final Supplier<Rotation2d> AngleSupplier;
 
