@@ -29,7 +29,7 @@ public class GameCommands
 	public static Command ScoreAmp()
 	{
 		// Adjust these values to change amp note speed!
-		return Robot.Arm.RunUntilHolding(ArmPosition.Amp).andThen(Robot.Launcher.RunLaunch(0.23, 0.07));
+		return Robot.Arm.RunUntilHolding(ArmPosition.Amp).andThen(Robot.Launcher.Launch(0.23, 0.07));
 	}
 
 	public static Command AutoPitch()
@@ -45,7 +45,7 @@ public class GameCommands
 		// }
 
 		return AutoPitch()
-			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
+			.andThen(Robot.Launcher.Launch(0.7, 0.7))
 			.withName("AutoPitchAndLaunch");
 	}
 
@@ -59,7 +59,7 @@ public class GameCommands
 		return new ParallelCommandGroup(
 				new FaceAtCommand(FieldConstants.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
 				Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker))
-			.andThen(Robot.Launcher.RunLaunch(0.7, 0.7))
-			.withName("AutoRotateAndLaunch");
+				.andThen(Robot.Launcher.Launch(0.7, 0.7))
+				.withName("AutoRotateAndLaunch");
 	}
 }

@@ -120,9 +120,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
 
         this.IMUTimer = new ElapsedTimer(Duration.ofSeconds(1 / this.IMU.getActualUpdateRate()));
         System.out.printf("IMU Update Rate: %d", this.IMU.getActualUpdateRate());
-
-        // this.IMU.setAngleAdjustment(FieldGeometry.GetStartingPosition1().getRotation().minus(this.GetIMUHeading()).getDegrees());
-
+        
         var startingPosition = FieldConstants.GetStartingPosition();
         
         this.PoseEstimator = new DifferentialDrivePoseEstimator(

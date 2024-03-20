@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 13.657241351572575,
+        "y": 7.003080254377342
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 14.072273735546254,
+        "y": 6.891872662258831
+      },
+      "isLocked": false,
+      "linkedName": "A1"
+    },
+    {
+      "anchor": {
+        "x": 14.62924078487244,
+        "y": 6.686887667641241
+      },
+      "prevControl": {
+        "x": 14.285256376745302,
+        "y": 6.7790580120078054
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Shooting-Amp"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

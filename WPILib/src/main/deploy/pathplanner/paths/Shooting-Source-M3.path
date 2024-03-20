@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.10938508324948,
-        "y": 5.551187918118234
+        "x": 14.676439638593564,
+        "y": 4.383177909212962
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.103349060107533,
-        "y": 5.4601485849981986
+        "x": 13.43961671823165,
+        "y": 2.2175380307826815
       },
       "isLocked": false,
-      "linkedName": "SPCenter"
+      "linkedName": "Shooting-Source"
     },
     {
       "anchor": {
-        "x": 13.657241351572575,
-        "y": 7.003080254377342
+        "x": 11.58922074552557,
+        "y": 3.818277403996669
       },
       "prevControl": {
-        "x": 14.840035842696508,
-        "y": 6.5463576290918635
+        "x": 13.101846024801173,
+        "y": 2.878393735320566
+      },
+      "nextControl": {
+        "x": 9.898297454608873,
+        "y": 4.86894818670219
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.301583269833205,
+        "y": 4.052436993762877
+      },
+      "prevControl": {
+        "x": 9.665396361204172,
+        "y": 4.479133108534554
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A1"
+      "linkedName": "M3"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Intake Note",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0,
       "command": {
         "type": "race",
         "data": {
@@ -47,7 +63,7 @@
             {
               "type": "wait",
               "data": {
-                "waitTime": 3.0
+                "waitTime": 4.0
               }
             }
           ]

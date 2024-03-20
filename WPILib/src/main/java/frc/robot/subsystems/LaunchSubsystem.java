@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.commands.RampCommand;
+import frc.robot.math.SpeakerCalculations;
 
 public class LaunchSubsystem extends RobotSubsystem<Robot>
 {
@@ -80,8 +82,6 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         return RobotBase.isReal() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
     }
 
-    
-
     public LaunchSpeeds GetSpeeds()
     {
         if (RobotBase.isSimulation()) return new LaunchSpeeds();
@@ -118,30 +118,28 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         }
     }
 
+    public Command Feed(double speed)
+    {
+        return this.runEnd(() -> this.FeederMotor.set(speed), () -> this.FeederMotor.stopMotor());
+    }
+
     public Command AutoIntake()
     {
-        if (RobotBase.isSimulation()) return Commands.none();
-
-        // IF HAVING ISSUES WITH AUTO-INTAKE YOU CAN DISABLE IT AUTO-STOPPING WHEN DETECTING A NOTE. COMMENT OUT LINE 127!
+        if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
         
         return this.runEnd(() -> { this.FeederMotor.set(0.3); this.IntakeMotor.set(0.6); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
-            .until(() -> this.NoteSensor.getProximity() > 350)
+            .until(() -> this.NoteSensor.getProximity() > 300)
             .withName("Intake");
     }
 
-    public Command RunLaunch(double percentageTop, double percentageBottom)
+    public Command Launch(double percentageTop, double percentageBottom)
     {
-        if (RobotBase.isSimulation()) return Commands.none();
+        if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
 
-        return this.runOnce(() -> this.SetLaunchSpeed(percentageTop, percentageBottom))
-            // Ramp up for half a second. 
-            .andThen(new WaitCommand(0.3))
-            // Begin pushing the note using the feeder 
-            // Wait until the note is no-longer loaded.
-            .andThen(this.runOnce(() -> this.FeederMotor.set(0.3)).until(() -> this.NoteSensor.isConnected() ? !this.IsLoaded() : true))
-            // Wait another 300 ms to ensure it is out.
-            .andThen(Commands.waitSeconds(0.3))
-            // Stop the launcher motors.
+        double percentage = SpeakerCalculations.CalculateLaunchPercentageForSpeaker();
+
+        return new RampCommand(0, percentage, 1 / 2, (speed) -> this.SetLaunchSpeed(speed), this)
+            .andThen(this.Feed(0.3).withTimeout(1))
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
     }
@@ -158,61 +156,5 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         {
             builder.addDoubleProperty("Note Proximity", () -> this.NoteSensor.getProximity(), null);
         }
-    }
-
-    public Command PerformSysID()
-    {
-        var topSysId = new SysIdRoutine(new SysIdRoutine.Config(
-                Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(8),
-                Units.Seconds.of(6)),
-                new SysIdRoutine.Mechanism(
-                    (voltage) ->
-                    {
-                         this.TopLaunchMotor.setVoltage(voltage.magnitude());
-                    },
-                    (log) ->
-                    {
-                        var wheelVelocity = this.GetSpeeds();
-
-                        log.motor("launch-flywheel-top")
-                            .voltage(Units.Volts.of(this.TopLaunchMotor.getBusVoltage()))
-                            .linearVelocity(Units.MetersPerSecond.of(wheelVelocity.TopMetersPerSecond))
-                            .linearPosition(Units.Meters.of(this.TopLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));
-                    },
-                    this));
-
-        var bottomSysId = new SysIdRoutine(new SysIdRoutine.Config(
-                Units.Volts.of(1).per(Units.Seconds.of(1)),
-                Units.Volts.of(8),
-                Units.Seconds.of(6)),
-                new SysIdRoutine.Mechanism(
-                    (voltage) -> 
-                    {
-                        System.out.println(voltage);
-                        this.BottomLaunchMotor.setVoltage(voltage.magnitude());
-                    },
-                    (log) ->
-                    {
-                        var wheelVelocity = this.GetSpeeds();
-
-                        log.motor("launch-flywheel-bottom")
-                            .voltage(Units.Volts.of(this.BottomLaunchMotor.getBusVoltage()))
-                            .linearVelocity(Units.MetersPerSecond.of(wheelVelocity.BottomMetersPerSecond))
-                            .linearPosition(Units.Meters.of(this.BottomLaunchMotor.getEncoder().getPosition() * Constants.Launcher.WheelCircumference));
-                    },
-                    this));
-
-        return bottomSysId.quasistatic(Direction.kForward)
-            .andThen(new WaitCommand(2))
-            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
-            .andThen(bottomSysId.quasistatic(Direction.kReverse))
-            .andThen(new WaitCommand(2))
-            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
-            .andThen(bottomSysId.dynamic(Direction.kForward))
-            .andThen(new WaitCommand(2))
-            .andThen(Commands.runOnce(() -> this.BottomLaunchMotor.getEncoder().setPosition(0)))
-            .andThen(bottomSysId.dynamic(Direction.kReverse))
-            .finallyDo(() -> this.Stop());
     }
 }

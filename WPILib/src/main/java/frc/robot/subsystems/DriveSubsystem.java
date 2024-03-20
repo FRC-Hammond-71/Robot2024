@@ -202,9 +202,9 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            this.RightFollowMotor.setIdleMode(mode);
+            this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
             this.RightLeadMotor.setIdleMode(mode);
-            this.LeftFollowMotor.setIdleMode(mode);
+            this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
             this.LeftLeadMotor.setIdleMode(mode);
         }
     }
@@ -217,21 +217,21 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             return;
         }
 
-        var setWheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
+        var wheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
             Math.min(Math.max(this.Speeds.vxMetersPerSecond, -Constants.Drivetrain.MaxXSpeed), Constants.Drivetrain.MaxXSpeed),
             0,
             Math.min(Math.max(this.Speeds.omegaRadiansPerSecond, -Constants.Drivetrain.MaxAngularSpeed.getRadians()), Constants.Drivetrain.MaxAngularSpeed.getRadians())));
 
         if (RobotBase.isReal())
         {
-            this.LeftLeadMotor.setVoltage(FeedForward.calculate(setWheelSpeeds.leftMetersPerSecond, 0.05));
-            this.RightLeadMotor.setVoltage(FeedForward.calculate(setWheelSpeeds.rightMetersPerSecond, 0.05));
+            this.LeftLeadMotor.setVoltage(FeedForward.calculate(wheelSpeeds.leftMetersPerSecond, 0.05));
+            this.RightLeadMotor.setVoltage(FeedForward.calculate(wheelSpeeds.rightMetersPerSecond, 0.05));
         } 
         else
         {
             this.SimulatedDrive.setInputs(
-                FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(), setWheelSpeeds.leftMetersPerSecond, 0.02),
-                FeedForward.calculate(this.SimulatedDrive.getRightVelocityMetersPerSecond(), setWheelSpeeds.rightMetersPerSecond, 0.02));
+                FeedForward.calculate(this.SimulatedDrive.getLeftVelocityMetersPerSecond(), wheelSpeeds.leftMetersPerSecond, 0.02),
+                FeedForward.calculate(this.SimulatedDrive.getRightVelocityMetersPerSecond(), wheelSpeeds.rightMetersPerSecond, 0.02));
         }
     }
 
