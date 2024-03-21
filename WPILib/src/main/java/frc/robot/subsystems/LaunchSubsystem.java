@@ -127,8 +127,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
         
-        return this.runEnd(() -> { this.FeederMotor.set(0.3); this.IntakeMotor.set(0.6); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
-            .until(() -> this.NoteSensor.getProximity() > 300)
+        return this.runEnd(() -> { this.FeederMotor.set(0.4); this.IntakeMotor.set(0.8); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
+            .until(() -> this.NoteSensor.getProximity() > 200)
             .withName("Intake");
     }
 
@@ -136,10 +136,21 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
 
+        return new RampCommand(0, percentageTop, 1 / 2, (speed) -> this.SetLaunchSpeed(speed), this)
+            .andThen(this.Feed(0.3).withTimeout(1))
+            .finallyDo(() -> this.Stop())
+            .withName("Launch Note");
+    }
+    public Command AutoLaunch()
+    {
+        if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
+
         double percentage = SpeakerCalculations.CalculateLaunchPercentageForSpeaker();
 
-        return new RampCommand(0, percentage, 1 / 2, (speed) -> this.SetLaunchSpeed(speed), this)
-            .andThen(this.Feed(0.3).withTimeout(1))
+        System.out.println("Shooting at " + percentage + " percent!");
+
+        return new RampCommand(this.TopLaunchMotor.get(), percentage, 1, (speed) -> this.SetLaunchSpeed(speed), this)
+            .andThen(this.Feed(0.3).withTimeout(0.5))
             .finallyDo(() -> this.Stop())
             .withName("Launch Note");
     }

@@ -45,7 +45,7 @@ public class GameCommands
 		// }
 
 		return AutoPitch()
-			.andThen(Robot.Launcher.Launch(0.7, 0.7))
+			.andThen(Robot.Launcher.AutoLaunch())
 			.withName("AutoPitchAndLaunch");
 	}
 
@@ -59,7 +59,7 @@ public class GameCommands
 		return new ParallelCommandGroup(
 				new FaceAtCommand(FieldConstants.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
 				Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker))
-				.andThen(Robot.Launcher.Launch(0.7, 0.7))
+				.andThen(Robot.Launcher.AutoLaunch())
 				.withName("AutoRotateAndLaunch");
 	}
 }

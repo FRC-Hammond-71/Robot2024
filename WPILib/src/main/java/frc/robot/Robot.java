@@ -115,16 +115,16 @@ public class Robot extends TimedRobot
 		AutoSpinUp.setDefaultOption("Disabled", false);
 
 		AutoOptions = new SendableChooser<>();
-		AutoOptions.setDefaultOption("None", Commands.none());
-		AutoOptions.addOption("Amp-A1-2N", new PathPlannerAuto("Amp-A1-2N"));
-		AutoOptions.addOption("Amp-A1-M1-3N", new PathPlannerAuto("Amp-A1-M1-3N"));
+		// AutoOptions.setDefaultOption("None", Commands.none());
+		// AutoOptions.addOption("Amp-A1-2N", new PathPlannerAuto("Amp-A1-2N"));
+		// AutoOptions.addOption("Amp-A1-M1-3N", new PathPlannerAuto("Amp-A1-M1-3N"));
 		AutoOptions.addOption("Center-1N", new PathPlannerAuto("Center-1N"));
 		AutoOptions.addOption("Center-2N", new PathPlannerAuto("Center-2N"));
-		AutoOptions.addOption("Center-A2-M1-3N", new PathPlannerAuto("Center-A2-M1-3N"));
-		AutoOptions.addOption("Center-A2-M2-3N", new PathPlannerAuto("Center-A2-M2-3N"));
-		AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
+		// AutoOptions.addOption("Center-A2-M1-3N", new PathPlannerAuto("Center-A2-M1-3N"));
+		// AutoOptions.addOption("Center-A2-M2-3N", new PathPlannerAuto("Center-A2-M2-3N"));
+		// AutoOptions.addOption("Source-M5-2N", new PathPlannerAuto("Source-M5-2N"));
 		AutoOptions.addOption("Source-O-1N", new PathPlannerAuto("Source-O-1N"));
-		AutoOptions.addOption("Source-M5-M3-3N", new PathPlannerAuto("Source-M5-M3-3N"));
+		// AutoOptions.addOption("Source-M5-M3-3N", new PathPlannerAuto("Source-M5-M3-3N"));
 
 		AutoOptions.addOption("Simple Center", GameCommands.AutoPitchAndLaunch()
 			.andThen(Commands.runEnd(() -> Drive.Set(new ChassisSpeeds(-1,0,0)), () -> Drive.Stop(), Drive)
@@ -186,7 +186,7 @@ public class Robot extends TimedRobot
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
 			final double x = -Controllers.DriverController.getLeftY();
-			final double rotation = Controllers.DriverController.getRightX();
+			final double rotation = -Controllers.DriverController.getRightX();
 
             Drive.SetArcade(x, rotation);
 
@@ -270,7 +270,6 @@ public class Robot extends TimedRobot
 			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
 			{
 				GameCommands.AutoPitchAndLaunch().schedule();
-				// Enable with caution - needs to be tested!
 				// GameCommands.AutoRotateAndLaunch().schedule();
 			}
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)

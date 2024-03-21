@@ -28,6 +28,6 @@ public class SpeakerCalculations
     {
         double distanceFromSpeaker = CalculateDistanceFromSpeaker();
 
-        return Math.min(Math.max(Math.pow(distanceFromSpeaker / 2, 2) + 0.4, 0), 1);
+        return Math.min(Math.max(Math.pow(distanceFromSpeaker / 5, 2) + 0.45, 0), 0.85);
     }
 }

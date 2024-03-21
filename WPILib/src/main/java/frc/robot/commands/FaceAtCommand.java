@@ -26,7 +26,7 @@ public class FaceAtCommand extends Command
 		this.Point = position;
 		this.AllowedError = error;
 		
-		this.RotationPID.setTolerance(0.5);
+		this.RotationPID.setTolerance(3);
 		this.RotationPID.calculate(this.GetHeadingError().getDegrees());
 	}
 

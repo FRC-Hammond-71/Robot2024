@@ -130,7 +130,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             Robot.Drive.GetRightWheelPosition(),
             startingPosition.isPresent() ? startingPosition.get() : new Pose2d(),
             VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
-            VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(30)));
+            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),

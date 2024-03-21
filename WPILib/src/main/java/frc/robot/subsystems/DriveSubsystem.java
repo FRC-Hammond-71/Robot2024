@@ -32,7 +32,8 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     private CANSparkMax LeftLeadMotor, RightLeadMotor, LeftFollowMotor, RightFollowMotor;
     public DifferentialDriveKinematics Kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TrackWidth);
     
-    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.10158, 2, 0.53799);
+    private SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.15, 2.5, 0.53);
+    private SimpleMotorFeedforward RotationFeedForward = new SimpleMotorFeedforward(0.65, 1, 0);
 
     private ChassisSpeeds Speeds = new ChassisSpeeds();
 
@@ -74,7 +75,6 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             null
             // VecBuilder.fill(0.001, 0.001, 0.001, 0.05, 0.05, 0.005, 0.005)
         );
-
 
         var startingPosition = FieldConstants.GetStartingPosition();
         if (startingPosition.isPresent())
@@ -202,9 +202,9 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isReal())
         {
-            this.RightFollowMotor.setIdleMode(IdleMode.kCoast);
+            this.RightFollowMotor.setIdleMode(mode);
             this.RightLeadMotor.setIdleMode(mode);
-            this.LeftFollowMotor.setIdleMode(IdleMode.kCoast);
+            this.LeftFollowMotor.setIdleMode(mode);
             this.LeftLeadMotor.setIdleMode(mode);
         }
     }
@@ -217,10 +217,12 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
             return;
         }
 
+        double omegaRadiansPerSecond = this.RotationFeedForward.calculate(-this.Speeds.omegaRadiansPerSecond);
+
         var wheelSpeeds = this.Kinematics.toWheelSpeeds(new ChassisSpeeds(
             Math.min(Math.max(this.Speeds.vxMetersPerSecond, -Constants.Drivetrain.MaxXSpeed), Constants.Drivetrain.MaxXSpeed),
             0,
-            Math.min(Math.max(this.Speeds.omegaRadiansPerSecond, -Constants.Drivetrain.MaxAngularSpeed.getRadians()), Constants.Drivetrain.MaxAngularSpeed.getRadians())));
+            Math.min(Math.max(omegaRadiansPerSecond, -Constants.Drivetrain.MaxAngularSpeed.getRadians()), Constants.Drivetrain.MaxAngularSpeed.getRadians())));
 
         if (RobotBase.isReal())
         {
@@ -259,7 +261,7 @@ public class DriveSubsystem extends RobotSubsystem<Robot>
 
         builder.addDoubleProperty("Actual Speed", () ->this.GetWheelSpeeds().vxMetersPerSecond, null);
         builder.addDoubleProperty("Actual Rotation",
-                () -> edu.wpi.first.math.util.Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
+                () -> -edu.wpi.first.math.util.Units.radiansToDegrees(this.GetWheelSpeeds().omegaRadiansPerSecond), null);
 
         builder.addStringProperty("Blocking Command", () ->
         {
