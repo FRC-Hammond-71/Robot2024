@@ -15,19 +15,19 @@ public class FaceAtCommand extends Command
 	public final Translation2d Point;
 	public final Rotation2d AllowedError;
 
-	private final PIDController RotationPID = new PIDController(0.07, 0, 0.005);
+	private final PIDController RotationPID = new PIDController(0.1, 0, 0.0025);
 
 	public FaceAtCommand(Translation2d position, Rotation2d error)
 	{
 		super();
 
-		addRequirements(Robot.Drive);
-
 		this.Point = position;
 		this.AllowedError = error;
 		
-		this.RotationPID.setTolerance(3);
+		this.RotationPID.setTolerance(error.getDegrees());
 		this.RotationPID.calculate(this.GetHeadingError().getDegrees());
+		
+		addRequirements(Robot.Drive);
 	}
 
 	/**

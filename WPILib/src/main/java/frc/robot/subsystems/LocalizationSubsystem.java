@@ -237,20 +237,18 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         // double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get()
         //         / Constants.Drivetrain.TrackCircumference;
 
-        SmartDashboard.putNumber("IMU - DeltaX", deltaX);
-        SmartDashboard.putNumber("IMU - DeltaY", deltaY);
-        // SmartDashboard.putNumber("IMU - Delta Rotation", deltaRotation);
+        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaX", deltaX);
+        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaY", deltaY);
 
-        this.IMUAccumulatedPose = this.IMUAccumulatedPose.transformBy(new Transform2d(
-            new Translation2d(deltaX, deltaY),
 
-            // TODO: Use yaw
-            Rotation2d.fromDegrees(0)
-        ));
+        // var translation = new Translation2d(
+        //     this.IMUAccumulatedPose.getX() + deltaX,
+        //     this.IMUAccumulatedPose.getY() + deltaY
+        // );
 
         // TODO: Contribute IMU Accumulated Position to PoseEstimator!
 
-        Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
+        // Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
 
         this.IMUTimer.Timer.reset();
     }

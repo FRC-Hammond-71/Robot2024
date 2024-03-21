@@ -40,13 +40,12 @@ public class RampCommand extends Command
     public void execute()
     {
         var elapsed = Timer.getFPGATimestamp() - this.StartedAt;
-        double delta = Rate * elapsed;
 
-        Current = Initial + delta;
-        // Clamp limit
+        Current = Initial + (Rate * elapsed);
+        // Clamp value
         Current = Math.min(Current, Max);
+
         Output.accept(Current);
-        System.out.println("Updated Value: " + Current);
     }
 
     @Override
@@ -59,5 +58,6 @@ public class RampCommand extends Command
     public void end(boolean interrupted)
     {
         StartedAt = 0;
+        Current = Initial;
     }
 }

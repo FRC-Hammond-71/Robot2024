@@ -61,7 +61,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeReal()
     {
-        this.PositionalPID = new PIDController(7, 0, 0.4);
+        this.PositionalPID = new PIDController(7.5, 0, 0.4);
         
         this.FeedForward = new ArmFeedforward(0.02, 0.02, 0.04);
         
@@ -72,7 +72,6 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         
         this.AbsoluteEncoder = new DutyCycleEncoder(new DigitalInput(1));
         this.RelativeEncoder = new Encoder(2, 3);
-        // this.RelativeEncoder.setDistancePerPulse(1 / 8192 * Math.PI);
     }
 
     @Override

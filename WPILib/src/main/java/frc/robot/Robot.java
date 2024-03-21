@@ -185,10 +185,18 @@ public class Robot extends TimedRobot
 	{
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
-			final double x = -Controllers.DriverController.getLeftY();
-			final double rotation = -Controllers.DriverController.getRightX();
+			if (Controllers.DriverController.getRightTriggerAxis() > 0.3)
+			{
+				GameCommands.FaceAtSpeaker().schedule();
+			}
+			else
+			{
+				final double x = -Controllers.DriverController.getLeftY();
+				final double rotation = -Controllers.DriverController.getRightX();
+				
+				Drive.SetArcade(x, rotation);
+			}
 
-            Drive.SetArcade(x, rotation);
 
 			// boolean runNoteAssistance = Controllers.ShooterController.getYButton()
 			// 	&& rotation == 0
@@ -222,14 +230,18 @@ public class Robot extends TimedRobot
 					.onlyWhile(() -> Controllers.ShooterController.getYButton())
 					.finallyDo(() -> 
 					{
-						ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
-						ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
+						if (Launcher.IsLoaded())
+						{
+							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
+							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
+						}
 					}))
 					.schedule();
 			}
 			else if (Controllers.ShooterController.getXButton())
 			{
-				Arm.RunUntilHolding(ArmPosition.BySideSpeaker).andThen(Launcher.Launch(0.7, 0.7)).schedule();
+				// In case auto-shooting logic or position is not-optimal.
+				Arm.RunUntilHolding(ArmPosition.BySideSpeaker).andThen(Launcher.Launch(0.5, 0.5)).schedule();
 			}
 			// Retake note
 			else if (Controllers.ShooterController.getAButton())
@@ -270,7 +282,6 @@ public class Robot extends TimedRobot
 			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
 			{
 				GameCommands.AutoPitchAndLaunch().schedule();
-				// GameCommands.AutoRotateAndLaunch().schedule();
 			}
 			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
 			{

@@ -49,6 +49,11 @@ public class GameCommands
 			.withName("AutoPitchAndLaunch");
 	}
 
+	public static Command FaceAtSpeaker()
+	{
+		return new FaceAtCommand(FieldConstants.GetSpeakerPosition(), Rotation2d.fromDegrees(3));
+	}
+
 	public static Command AutoRotateAndLaunch()
 	{
 		// if (!Robot.Arm.InBounds(firingSolution.ArmAngle))
@@ -57,7 +62,7 @@ public class GameCommands
 		// }
 
 		return new ParallelCommandGroup(
-				new FaceAtCommand(FieldConstants.GetSpeakerPosition(), Rotation2d.fromDegrees(1.5)),
+				FaceAtSpeaker(),
 				Robot.Arm.RunUntilHolding(ArmPosition.TrackingSpeaker))
 				.andThen(Robot.Launcher.AutoLaunch())
 				.withName("AutoRotateAndLaunch");

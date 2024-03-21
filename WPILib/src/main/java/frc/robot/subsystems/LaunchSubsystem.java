@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.I2C.Port;
 
@@ -10,7 +11,9 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
+import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.RobotSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.Arm;
 import frc.robot.Robot;
 import frc.robot.commands.RampCommand;
 import frc.robot.math.SpeakerCalculations;
@@ -36,13 +40,17 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
     // public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.05, 0.2);
 
-    public ColorSensorV3 NoteSensor;
+    private ColorSensorV3 NoteSensor;
 
     public LaunchSpeeds TargetSpeeds = new LaunchSpeeds();
+
+    private final BooleanLogEntry NoteSensorLog;
 
     public LaunchSubsystem(Robot robot)
     {
         super(robot);
+
+        this.NoteSensorLog = new BooleanLogEntry(DataLogManager.getLog(), "launcher/noteSensorConnected");
     }
 
     @Override
@@ -74,12 +82,23 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         this.NoteSensor.configureProximitySensor(ProximitySensorResolution.kProxRes11bit, ProximitySensorMeasurementRate.kProxRate6ms);
     }
 
+    @Override
+    public void periodic()
+    {
+        this.NoteSensorLog.append(this.IsNoteSensorConnected());
+    }
+
     /**
      * @return Whether or not the launcher is loaded with a note.
      */
     public boolean IsLoaded()
     {
-        return RobotBase.isReal() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
+        return this.IsNoteSensorConnected() ? this.NoteSensor.getProximity() > NoteProximityThreshold : false;
+    }
+
+    public boolean IsNoteSensorConnected()
+    {
+        return RobotBase.isReal() ? this.NoteSensor.isConnected() : false;
     }
 
     public LaunchSpeeds GetSpeeds()
@@ -94,10 +113,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
     public void SetLaunchSpeed(double percentage)
     {
-        if (RobotBase.isSimulation()) return;
-
-        this.TopLaunchMotor.set(percentage);
-        this.BottomLaunchMotor.set(percentage);
+        this.SetLaunchSpeed(percentage, percentage);
     }
     public void SetLaunchSpeed(double percentageTop, double percentageBottom)
     {
@@ -120,7 +136,18 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
     public Command Feed(double speed)
     {
-        return this.runEnd(() -> this.FeederMotor.set(speed), () -> this.FeederMotor.stopMotor());
+        return this.runEnd(() -> this.FeederMotor.set(speed), () -> this.FeederMotor.stopMotor())
+            .withName("Feed");
+    }
+
+    /**
+     * Feed the loaded note into the Launcher until it is no longer detected!
+     */
+    public Command AutoFeed()
+    {
+        return this.Feed(0.3)
+            .until(() -> !this.IsLoaded())
+            .withName("Auto Feed");
     }
 
     public Command AutoIntake()
@@ -129,18 +156,28 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         
         return this.runEnd(() -> { this.FeederMotor.set(0.4); this.IntakeMotor.set(0.8); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
             .until(() -> this.NoteSensor.getProximity() > 200)
-            .withName("Intake");
+            .withName("Auto Intake");
     }
 
     public Command Launch(double percentageTop, double percentageBottom)
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
 
-        return new RampCommand(0, percentageTop, 1 / 2, (speed) -> this.SetLaunchSpeed(speed), this)
-            .andThen(this.Feed(0.3).withTimeout(1))
-            .finallyDo(() -> this.Stop())
+        return new RampCommand(0, percentageTop, 1, (speed) -> this.SetLaunchSpeed(speed), this)
+            .andThen(this.AutoFeed().withTimeout(1.5))
+            .finallyDo((interrupted) -> 
+            {
+                this.Stop();
+
+                if (!interrupted) 
+                {
+                    // We just fired a shot, switch to intake mode!
+                    Robot.Arm.Mode = ArmPosition.Intake;
+                } 
+            })
             .withName("Launch Note");
     }
+
     public Command AutoLaunch()
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
@@ -149,10 +186,19 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         System.out.println("Shooting at " + percentage + " percent!");
 
-        return new RampCommand(this.TopLaunchMotor.get(), percentage, 1, (speed) -> this.SetLaunchSpeed(speed), this)
-            .andThen(this.Feed(0.3).withTimeout(0.5))
-            .finallyDo(() -> this.Stop())
-            .withName("Launch Note");
+        return new RampCommand(0, percentage, 1, (speed) -> this.SetLaunchSpeed(speed), this)
+            .andThen(this.AutoFeed().withTimeout(1.5))
+            .finallyDo((interrupted) -> 
+            {
+                this.Stop();
+
+                if (!interrupted) 
+                {
+                    // We just fired a shot, switch to intake mode!
+                    Robot.Arm.Mode = ArmPosition.Intake;
+                } 
+            })
+            .withName("Auto Launch Note");
     }
 
     @Override
