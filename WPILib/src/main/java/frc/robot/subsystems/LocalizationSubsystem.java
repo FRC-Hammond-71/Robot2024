@@ -231,15 +231,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         // System.out.printf("Updating IMU Measurements at %d\n", this.IMU.getLastSensorTimestamp());
 
-        double deltaX = this.IMU.getVelocityX() * this.IMUTimer.Timer.get();
-        double deltaY = this.IMU.getVelocityY() * this.IMUTimer.Timer.get();
+        double deltaX = this.IMU.getVelocityX() * Robot.kDefaultPeriod;
+        double deltaY = this.IMU.getVelocityY() * Robot.kDefaultPeriod;
         // double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get();
         // double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get()
         //         / Constants.Drivetrain.TrackCircumference;
 
         SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaX", deltaX);
         SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaY", deltaY);
-
 
         // var translation = new Translation2d(
         //     this.IMUAccumulatedPose.getX() + deltaX,
@@ -292,7 +291,7 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     protected void realPeriodic()
     {
         this.UpdatePoseEstimationUsingWheels();
-        // this.UpdatePoseEstimationUsingIMU();
+        this.UpdatePoseEstimationUsingIMU();
         this.UpdatePoseEstimationUsingVision();
         
     }

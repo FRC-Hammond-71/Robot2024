@@ -92,12 +92,11 @@ public class Robot extends TimedRobot
 		NamedCommands.registerCommand("BeginTrackingSpeaker", GameCommands.BeginTrackingSpeaker());
 
 		// Configure PathPlanner to use the LTV path follower! (LTV appears to work better than ramsete)
-		AutoBuilder.configureLTV(
+		AutoBuilder.configureRamsete(
 			Localization::GetEstimatedPose180, 
 			(pose) -> Localization.ResetPosition(pose),
 			() -> Drive.GetSpeeds(), 
 			(speeds) -> Drive.Set(speeds), 
-			0.02,
 			new ReplanningConfig(true, false), 
 			() -> DriverStation.getAlliance().get() != DriverStation.Alliance.Red, 
 			Drive);

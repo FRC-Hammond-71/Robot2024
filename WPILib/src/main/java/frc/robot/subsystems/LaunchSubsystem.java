@@ -154,8 +154,8 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
         
-        return this.runEnd(() -> { this.FeederMotor.set(0.4); this.IntakeMotor.set(0.8); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
-            .until(() -> this.NoteSensor.getProximity() > 200)
+        return this.runEnd(() -> { this.FeederMotor.set(0.4); this.IntakeMotor.set(0.5); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
+            .until(() -> this.IsLoaded())
             .withName("Auto Intake");
     }
 

@@ -17,7 +17,7 @@ public class GameCommands
 		// Need to fix (bad code)
 		return Robot.Arm.RunUntilHolding(ArmPosition.Intake)
 			.andThen(Robot.Launcher.AutoIntake())
-			.onlyWhile(() -> DriverStation.isTeleop() ? true : Controllers.ShooterController.getAButton())
+			.onlyWhile(() -> DriverStation.isTeleop() ? Controllers.ShooterController.getAButton() : true)
 			.withName("Intake Note");
 	}
 
