@@ -26,7 +26,7 @@ public enum ArmPosition
     /**
      * Moves the arm into the intake position.
      */
-    Intake(() -> Rotation2d.fromDegrees(60)),
+    Intake(() -> Rotation2d.fromDegrees(50)),
     /**
      * Moves the arm to track the speaker shooting angle.
      */
