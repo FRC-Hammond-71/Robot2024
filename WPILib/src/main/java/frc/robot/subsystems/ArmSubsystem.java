@@ -50,7 +50,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         super(robot);    
         
         this.PositionalPID.setSetpoint(90);
-        this.PositionalPID.setTolerance(3);
+        this.PositionalPID.setTolerance(5);
 
         SmartDashboard.putData("Arm PID", this.PositionalPID);
 
@@ -61,9 +61,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     @Override
     protected void initializeReal()
     {
-        this.PositionalPID = new PIDController(8, 0, 0.25);
+        this.PositionalPID = new PIDController(6, 0, 0.3);
         
-        this.FeedForward = new ArmFeedforward(0.02, 0.02, 0.04);
+        this.FeedForward = new ArmFeedforward(0.01, 0, 0.06);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);

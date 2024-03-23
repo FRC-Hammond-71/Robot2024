@@ -81,7 +81,7 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotInit() 
 	{		
-		// LEDs.Setup();
+		LEDs.Setup();
 		
 		// These are all the command which are invoked in PathPlanner. Commands are mapped to their name!
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
@@ -173,7 +173,7 @@ public class Robot extends TimedRobot
 			}
 		}
 
-		// LEDs.Rainbow();
+		LEDs.Rainbow();
 
 		// Execute / iterate all subsystems, then commands.
 		CommandScheduler.getInstance().run();
@@ -246,7 +246,7 @@ public class Robot extends TimedRobot
 			else if (Controllers.ShooterController.getAButton())
 			{
 				speed = -0.1;
-				Launcher.IntakeMotor.set(-0.1);
+				Launcher.IntakeMotor.set(-0.3);
 				Launcher.FeederMotor.set(-0.1);
 			}
 			else if (Controllers.ShooterController.getBButton())

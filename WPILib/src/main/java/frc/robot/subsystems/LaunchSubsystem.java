@@ -33,7 +33,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     /**
      * Any value larger than this threshold from the sensor will mark a detected note. 
      */
-    public static final int NoteProximityThreshold = 150;
+    public static final int NoteProximityThreshold = 200;
 
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax IntakeMotor, FeederMotor, TopLaunchMotor, BottomLaunchMotor;

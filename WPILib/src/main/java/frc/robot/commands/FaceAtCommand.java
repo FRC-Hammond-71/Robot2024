@@ -15,7 +15,7 @@ public class FaceAtCommand extends Command
 	public final Translation2d Point;
 	public final Rotation2d AllowedError;
 
-	private final PIDController RotationPID = new PIDController(0.1, 0, 0.0025);
+	private final PIDController RotationPID = new PIDController(0.08, 0, 0);
 
 	public FaceAtCommand(Translation2d position, Rotation2d error)
 	{

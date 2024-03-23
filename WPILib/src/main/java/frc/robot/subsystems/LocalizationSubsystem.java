@@ -55,7 +55,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     // -------
     private AHRS IMU;
     private ElapsedTimer IMUTimer;
-    private Pose2d IMUAccumulatedPose = new Pose2d();
+    private Translation2d IMUAccumulatedPose = new Translation2d();
+    private Translation2d IMUVelocity = new Translation2d();
     
     // private PhotonCamera LauncherCamera, IntakeCamera;
 
@@ -125,12 +126,12 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         
         this.PoseEstimator = new DifferentialDrivePoseEstimator(
             Robot.Drive.Kinematics,
-            this.GetIMUHeading(),  
+            this.GetIMUHeading(),
             Robot.Drive.GetLeftWheelPosition(), 
             Robot.Drive.GetRightWheelPosition(),
             startingPosition.isPresent() ? startingPosition.get() : new Pose2d(),
-            VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(5)),
-            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+            VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+            VecBuilder.fill(0.4, 0.4, Units.degreesToRadians(30)));
 
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
             AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
@@ -173,11 +174,12 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         
         if (RobotBase.isReal())
         {
+            this.IMU.resetDisplacement();
             // Reset Yaw Gyro
             Robot.Drive.ResetEncoders();
             this.IMU.reset();
             this.IMU.setAngleAdjustment(this.IMU.getAngle() - position.getRotation().getDegrees());
-            this.IMUAccumulatedPose = position;
+            this.IMUAccumulatedPose = position.getTranslation();
             this.PoseEstimator.resetPosition(position.getRotation(), 0, 0, position);
         }
         else
@@ -231,23 +233,29 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     {
         // System.out.printf("Updating IMU Measurements at %d\n", this.IMU.getLastSensorTimestamp());
 
-        double deltaX = this.IMU.getVelocityX() * Robot.kDefaultPeriod;
-        double deltaY = this.IMU.getVelocityY() * Robot.kDefaultPeriod;
+        double accelX = this.IMU.getWorldLinearAccelX();
+        double accelY = this.IMU.getWorldLinearAccelY();
+        double accelZ = this.IMU.getWorldLinearAccelZ();
+
         // double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get();
         // double deltaRotation = this.IMU.getVelocityZ() * this.IMUTimer.Timer.get()
         //         / Constants.Drivetrain.TrackCircumference;
 
-        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaX", deltaX);
-        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaY", deltaY);
-
-        // var translation = new Translation2d(
-        //     this.IMUAccumulatedPose.getX() + deltaX,
-        //     this.IMUAccumulatedPose.getY() + deltaY
+        
+        this.IMUVelocity = this.IMUVelocity.plus(new Translation2d(accelX, accelY));
+        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaX", accelX);
+        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaY", accelY);
+        SmartDashboard.putNumber(this.getName() + "/" + "IMUDeltaZ", accelZ);
+        
+        // this.IMUVelocity = new Translation2d(
+        //     Math.this.IMUVelocity.getX(), )
         // );
+        
+        this.IMUAccumulatedPose = this.IMUAccumulatedPose.plus(this.IMUVelocity);
 
         // TODO: Contribute IMU Accumulated Position to PoseEstimator!
 
-        // Constants.Field.getObject("Robot - IMU").setPose(this.IMUAccumulatedPose);
+        // Constants.Field.getObject("Robot - IMU").setPose(new Pose2d(this.IMUAccumulatedPose, this.GetIMUHeading()));
 
         this.IMUTimer.Timer.reset();
     }
