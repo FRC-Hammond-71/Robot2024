@@ -1,7 +1,7 @@
 {
   "Docking": {
     "Data": [
-      "DockSpace         ID=0x8B93E3BD Window=0xA787BDB4 Pos=0,28 Size=1920,963 Split=Y",
+      "DockSpace         ID=0x8B93E3BD Window=0xA787BDB4 Pos=0,22 Size=1918,762 Split=Y",
       "DockNode        ID=0x00000004 Parent=0x8B93E3BD SizeRef=1920,698 CentralNode=1 Selected=0xB5CBE9F0",
       "DockNode        ID=0x00000005 Parent=0x8B93E3BD SizeRef=1920,263 Split=X Selected=0x80A7FE88",
       "DockNode      ID=0x00000003 Parent=0x00000005 SizeRef=351,408 Selected=0x80A7FE88",
@@ -18,7 +18,7 @@
       "height": "981",
       "maximized": "1",
       "style": "0",
-      "userScale": "4",
+      "userScale": "2",
       "width": "958",
       "xpos": "0",
       "ypos": "29"
@@ -33,31 +33,31 @@
     "###/SmartDashboard/Arm Visualization": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "0,728",
-      "Size": "595,263"
+      "Pos": "0,521",
+      "Size": "594,263"
     },
     "###/SmartDashboard/Auto Options": {
       "Collapsed": "0",
       "DockId": "0x00000009,0",
-      "Pos": "1636,728",
+      "Pos": "1634,521",
       "Size": "284,263"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
       "DockId": "0x00000004,0",
-      "Pos": "0,28",
-      "Size": "1920,698"
+      "Pos": "0,22",
+      "Size": "1918,497"
     },
     "###/SmartDashboard/Scheduler": {
       "Collapsed": "0",
       "DockId": "0x00000001,0",
-      "Pos": "597,728",
-      "Size": "748,263"
+      "Pos": "596,521",
+      "Size": "747,263"
     },
     "###/SmartDashboard/Starting Positions": {
       "Collapsed": "0",
       "DockId": "0x00000007,0",
-      "Pos": "1347,728",
+      "Pos": "1345,521",
       "Size": "287,263"
     },
     "###NetworkTables": {
@@ -82,8 +82,8 @@
     },
     "DockSpaceViewport_11111111": {
       "Collapsed": "0",
-      "Pos": "0,28",
-      "Size": "1920,963"
+      "Pos": "0,22",
+      "Size": "1918,762"
     }
   }
 }

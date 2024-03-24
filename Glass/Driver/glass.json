@@ -15,6 +15,9 @@
             "open": true
           }
         },
+        "LaunchSubsystem": {
+          "open": true
+        },
         "open": true
       }
     },
@@ -29,7 +32,6 @@
     },
     "windows": {
       "/SmartDashboard/Arm Visualization": {
-        "image": "C:\\Users\\Team Hammond\\Downloads\\OIP.jpg",
         "window": {
           "name": "live arm footage",
           "visible": true
@@ -46,12 +48,28 @@
           "arrowSize": 0,
           "weight": 0.0
         },
+        "Robot - Intake Vision": {
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            255.0
+          ]
+        },
+        "Robot - Launcher Vision": {
+          "color": [
+            0.0,
+            0.5822784900665283,
+            1.0,
+            255.0
+          ]
+        },
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
         "right": 2961,
         "top": 79,
-        "width": 16.541748046875,
+        "width": 16.541751951985063,
         "window": {
           "visible": true
         }
@@ -77,5 +95,58 @@
   },
   "NetworkTables View": {
     "visible": false
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 293,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/LaunchSubsystem/Top Launcher Speed"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/LaunchSubsystem/Bottom Launcher Speed"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/LaunchSubsystem/desiredTopSpeed"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/LaunchSubsystem/voltage"
+            }
+          ]
+        }
+      ]
+    }
   }
 }

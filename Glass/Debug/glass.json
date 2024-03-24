@@ -1,0 +1,32 @@
+{
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "retained": {
+      "SmartDashboard": {
+        "open": false
+      }
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "Arm Visualization": {
+          "double[]##v_/SmartDashboard/Arm Visualization/dims": {
+            "open": false
+          }
+        }
+      }
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot - IMU": {
+          "arrowSize": 0,
+          "weight": 0.0
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "serverTeam": "71"
+  }
+}

@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
+import frc.robot.math.SpeakerCalculations;
 import frc.robot.utilities.Rotation2dUtils;
 
 public enum ArmPosition 
@@ -32,14 +33,15 @@ public enum ArmPosition
      */
     TrackingSpeaker(() ->
     {
-        double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
+        return SpeakerCalculations.CalculatePitchToSpeaker();
+        // double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
         
-        final double heightOfSpeakerIntake = Units.inchesToMeters(83);
-        final double shooterYOffset = Units.feetToMeters(1.8);
+        // final double heightOfSpeakerIntake = Units.feetToMeters(4);
+        // final double shooterYOffset = Units.feetToMeters(1.8);
         
-        double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
+        // double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
 
-        return Rotation2d.fromRadians(rotationRadians);
+        // return Rotation2d.fromRadians(rotationRadians);
     }),
     BySideSpeaker(() -> Rotation2d.fromDegrees(57)),
     AcrossMap(() -> Rotation2d.fromDegrees(40));

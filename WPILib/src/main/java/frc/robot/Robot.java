@@ -6,6 +6,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,6 +26,7 @@ import frc.robot.commands.UntilNoteLoadedCommand;
 import frc.robot.subsystems.ArmPosition;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LaunchSpeeds;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.LocalizationSubsystem;
 
@@ -82,6 +85,8 @@ public class Robot extends TimedRobot
 	public void robotInit() 
 	{		
 		LEDs.Setup();
+
+		LEDs.SetAll(180, 255, 255);
 		
 		// These are all the command which are invoked in PathPlanner. Commands are mapped to their name!
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());
@@ -143,6 +148,8 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData(Localization);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 		SmartDashboard.putData("Arm Visualization", Arm.Visualization);
+
+		Constants.Field.getObject("Speaker").setPose(new Pose2d(FieldConstants.GetSpeakerPosition(), new Rotation2d()));
 	}
 
 	public void Stop()
@@ -173,7 +180,9 @@ public class Robot extends TimedRobot
 			}
 		}
 
-		LEDs.Rainbow();
+		// LEDs.Rainbow();
+		// LEDs.RedCycle();
+		// LEDs.RedBreath();
 
 		// Execute / iterate all subsystems, then commands.
 		CommandScheduler.getInstance().run();
@@ -184,7 +193,7 @@ public class Robot extends TimedRobot
 	{
 		Drive.setDefaultCommand(Commands.run(() -> 
 		{
-			if (Controllers.DriverController.getRightTriggerAxis() > 0.3)
+			if (Controllers.DriverController.getLeftTriggerAxis() > 0.3)
 			{
 				GameCommands.FaceAtSpeaker().schedule();
 			}
@@ -213,8 +222,9 @@ public class Robot extends TimedRobot
 		{	
 			if (RobotBase.isSimulation()) return;
 
-			var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY()) * 1;
-			speed = Math.copySign(speed * speed, speed);
+			// var speed = -Controllers.ApplyDeadzone(Controllers.ShooterController.getLeftY());
+			// speed = Math.copySign(speed * speed, speed) * 10;
+			double speed = 0d;
 
 			// if (AutoSpinUp.getSelected().booleanValue() && speed == 0 && Launcher.IsLoaded() && Arm.Mode == ArmPosition.TrackingSpeaker)
 			// {
@@ -222,34 +232,34 @@ public class Robot extends TimedRobot
 			// }
 			
 			// Intake note 
-			if (Controllers.ShooterController.getYButton())
+			if (Controllers.DriverController.getYButton())
 			{
 				Arm.RunUntilHolding(ArmPosition.Intake)
 					.andThen(Launcher.AutoIntake()
-					.onlyWhile(() -> Controllers.ShooterController.getYButton())
+					.onlyWhile(() -> Controllers.DriverController.getYButton())
 					.finallyDo(() -> 
 					{
 						if (Launcher.IsLoaded())
 						{
 							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
-							ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
+							// ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
 						}
 					}))
 					.schedule();
 			}
-			else if (Controllers.ShooterController.getXButton())
+			else if (Controllers.DriverController.getXButton())
 			{
 				// In case auto-shooting logic or position is not-optimal.
 				Arm.RunUntilHolding(ArmPosition.BySideSpeaker).andThen(Launcher.Launch(0.5, 0.5)).schedule();
 			}
 			// Retake note
-			else if (Controllers.ShooterController.getAButton())
+			else if (Controllers.DriverController.getAButton())
 			{
 				speed = -0.1;
 				Launcher.IntakeMotor.set(-0.3);
 				Launcher.FeederMotor.set(-0.1);
 			}
-			else if (Controllers.ShooterController.getBButton())
+			else if (Controllers.DriverController.getBButton())
 			{
 				// SHOOT ACROSS MAP
 				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.Launch(0.60, 0.60)).schedule();
@@ -260,31 +270,32 @@ public class Robot extends TimedRobot
 				Launcher.FeederMotor.stopMotor();
 			}
 			
-			Launcher.SetLaunchSpeed(speed);
+			Launcher.SetLaunchSpeed(new LaunchSpeeds(speed, speed));
 
 		}, Launcher).withName("Launcher Teleop Command"));
 
 		Arm.setDefaultCommand(Commands.run(() ->
 		{
-			if (Controllers.ShooterController.getRightBumperPressed())
+			if (Controllers.DriverController.getRightBumperPressed())
 			{
 				// Arm will begin tracking teh speaker!
 				Arm.Mode = ArmPosition.TrackingSpeaker;
 			}
-			else if (Controllers.ShooterController.getLeftBumperPressed())
+			else if (Controllers.DriverController.getLeftBumperPressed())
 			{
 				// Arm will rotate to the Amp shooting position!
+				// Arm.Mode = ArmPosition.Amp;
 				Arm.Mode = ArmPosition.Amp;
 			}
 
 			// if (Controllers.DriverController.getAButton())
-			if (Controllers.ShooterController.getRightTriggerAxis() > 0.3)
+			if (Controllers.DriverController.getRightTriggerAxis() > 0.3)
 			{
 				GameCommands.AutoPitchAndLaunch().schedule();
 			}
-			else if (Controllers.ShooterController.getLeftTriggerAxis() > 0.3)
+			else if (Controllers.DriverController.getLeftTriggerAxis() > 0.3)
 			{
-				GameCommands.ScoreAmp().schedule();
+				// GameCommands.ScoreAmp().schedule();
 			}
 			else
 			{

@@ -1,11 +1,6 @@
 {
   "Docking": {
     "Data": [
-      "DockNode  ID=0x00000001 Pos=1024,171 Size=312,355 Selected=0x7BD1C6E1",
-      "DockNode  ID=0x00000002 Pos=1022,103 Size=307,60 Selected=0x707E77BF",
-      "DockNode  ID=0x00000005 Pos=1348,34 Size=479,490 Selected=0x80A7FE88",
-      "DockNode  ID=0x00000007 Pos=1021,37 Size=307,60 Selected=0x4393743C",
-      "DockNode  ID=0x00000009 Pos=18,38 Size=985,352",
       "DockSpace ID=0x8B93E3BD Window=0xA787BDB4 Pos=0,22 Size=1918,762 CentralNode=1"
     ]
   },
@@ -24,38 +19,33 @@
   "Window": {
     "###/SmartDashboard/Arm Visualization": {
       "Collapsed": "0",
-      "DockId": "0x00000005,0",
-      "Pos": "1348,34",
-      "Size": "479,490"
+      "Pos": "0,22",
+      "Size": "512,532"
     },
     "###/SmartDashboard/Auto Options": {
       "Collapsed": "0",
-      "DockId": "0x00000002,0",
-      "Pos": "1022,103",
-      "Size": "307,60"
+      "Pos": "1498,556",
+      "Size": "420,228"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "DockId": "0x00000009,0",
-      "Pos": "18,38",
-      "Size": "985,352"
+      "Pos": "0,22",
+      "Size": "1726,532"
     },
     "###/SmartDashboard/Scheduler": {
       "Collapsed": "0",
-      "DockId": "0x00000001,0",
-      "Pos": "1024,171",
-      "Size": "312,355"
+      "Pos": "0,556",
+      "Size": "961,228"
     },
     "###/SmartDashboard/Starting Positions": {
       "Collapsed": "0",
-      "DockId": "0x00000007,0",
-      "Pos": "1021,37",
-      "Size": "307,60"
+      "Pos": "0,556",
+      "Size": "1726,228"
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "783,248",
-      "Size": "937,442"
+      "Pos": "250,277",
+      "Size": "750,185"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
@@ -64,13 +54,8 @@
     },
     "###NetworkTables Settings": {
       "Collapsed": "0",
-      "Pos": "20,34",
+      "Pos": "30,30",
       "Size": "400,190"
-    },
-    "###Plot <0>": {
-      "Collapsed": "0",
-      "Pos": "22,404",
-      "Size": "984,361"
     },
     "Debug##Default": {
       "Collapsed": "0",

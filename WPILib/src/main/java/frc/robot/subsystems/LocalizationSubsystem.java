@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -9,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -22,6 +25,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
@@ -133,15 +137,28 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(0.4, 0.4, Units.degreesToRadians(30)));
 
+        var aprilTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+
+        try 
+        {
+            aprilTagLayout = new AprilTagFieldLayout(Path.of(Filesystem.getDeployDirectory().toString(), "demo_field.json"));
+        }
+        catch (IOException ex)
+        {
+            System.out.println("Failed to Load Custom April Tag Field!\n" + ex);
+        }
+
+        System.out.println("Loaded " + aprilTagLayout.getTags().size() + " tags!");
+
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
-            AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+            aprilTagLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Roz"),
             new Transform3d(-0.3429, 0.1920875, 0.26035, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
             // UPDATE THESE OFFSETS!
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
-            AprilTagFields.k2024Crescendo.loadAprilTagLayoutField(),
+            aprilTagLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             new PhotonCamera("Sauron"),
             new Transform3d(0.3429, 0.16, 0.26035, new Rotation3d(0, Units.degreesToRadians(24), 0)));

@@ -20,17 +20,17 @@ public final class Constants
 		/**
 		 * The maximum speed the robot may go forward per second.
 		 */
-		public static double MaxXSpeed = 6;
+		public static double MaxXSpeed = 2;
 
 		/**
 		 * The maximum rate-of-change of forward speeds in (M/s).
 		 */
-		public static double MaxXAcceleration = 1;
+		public static double MaxXAcceleration = 0.5;
 
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxAngularSpeed = Rotation2d.fromDegrees(300);
+		public static Rotation2d MaxAngularSpeed = Rotation2d.fromDegrees(150);
 
 		/**
 		 * Wheel radius in Meters.

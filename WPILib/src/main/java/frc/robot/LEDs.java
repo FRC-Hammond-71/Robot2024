@@ -62,10 +62,52 @@ public class LEDs
         }
 
         // Increase by to make the rainbow "move"
-        RainbowHueStep += 3;
+        // RainbowHueStep += 3;
 
         // Check bounds
         RainbowHueStep %= 180;
+
+        Write();
+    }
+
+    private static int RedCycleStep = 0;
+    public static void RedCycle()
+    {
+        // For every pixel
+        for (var i = 0; i < ColorBuffer.getLength(); i++) {
+            // Calculate hue within the range of red to orange (0-60)
+            final int hue = 155 + (RedCycleStep + (i * 50 / ColorBuffer.getLength())) % 50;
+    
+            // Set the value
+            ColorBuffer.setHSV(i, hue, 255, 128);
+        }
+
+        // Increase by to make the rainbow "move"
+        RedCycleStep += 1;
+
+        // Check bounds
+        RedCycleStep %= 180;
+
+        Write();
+    }
+
+    private static int RedBreathStep = 0;
+    public static void RedBreath()
+    {
+        // For every pixel
+        for (var i = 0; i < ColorBuffer.getLength(); i++) {
+            // Calculate hue within the range of red to orange (0-60)
+            // final int hue = 155 + (RedCycleStep + (i * 50 / ColorBuffer.getLength())) % 50;
+    
+            // Set the value
+            ColorBuffer.setHSV(i, 255, 255, 255 * (RedBreathStep / 50));
+        }
+
+        // Increase by to make the rainbow "move"
+        RedBreathStep += 5;
+
+        // Check bounds
+        RedBreathStep %= 50;
 
         Write();
     }

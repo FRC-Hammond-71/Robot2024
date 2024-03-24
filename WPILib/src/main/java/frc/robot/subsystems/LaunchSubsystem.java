@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
@@ -11,6 +12,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3.ProximitySensorMeasurementRate;
 import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.Arm;
+import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.commands.RampCommand;
 import frc.robot.math.SpeakerCalculations;
@@ -38,7 +41,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax IntakeMotor, FeederMotor, TopLaunchMotor, BottomLaunchMotor;
 
-    // public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0.05, 0.2);
+    public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0, 1.3);
 
     private ColorSensorV3 NoteSensor;
 
@@ -86,6 +89,15 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     public void periodic()
     {
         this.NoteSensorLog.append(this.IsNoteSensorConnected());
+
+        if (this.IsLoaded())
+        {
+            LEDs.SetAll(71, 255, 40);
+        }
+        else
+        {
+            LEDs.SetAll(180, 255, 40);
+        }
     }
 
     /**
@@ -119,8 +131,20 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return;
 
-        this.TopLaunchMotor.set(percentageTop);
-        this.BottomLaunchMotor.set(percentageBottom);
+        this.TopLaunchMotor.set(Math.min(percentageTop, 0.4));
+        this.BottomLaunchMotor.set(Math.min(percentageBottom, 0.4));
+    }
+    public void SetLaunchSpeed(LaunchSpeeds speeds)
+    {
+        if (RobotBase.isSimulation()) return;
+
+        SmartDashboard.putNumber(getName() + "/desiredTopSpeed", speeds.TopMetersPerSecond);
+        SmartDashboard.putNumber(getName() + "/desiredBottomSpeed", speeds.BottomMetersPerSecond);
+        SmartDashboard.putNumber(getName() + "/voltage", this.FeedForward.calculate(speeds.TopMetersPerSecond));
+
+        this.TargetSpeeds = speeds;
+        this.TopLaunchMotor.setVoltage(this.FeedForward.calculate(speeds.TopMetersPerSecond));
+        this.BottomLaunchMotor.setVoltage(this.FeedForward.calculate(speeds.BottomMetersPerSecond));
     }
 
     public void Stop()
@@ -145,7 +169,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
      */
     public Command AutoFeed()
     {
-        return this.Feed(0.3)
+        return this.Feed(0.5)
             .until(() -> !this.IsLoaded())
             .withName("Auto Feed");
     }
@@ -182,11 +206,12 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     {
         if (RobotBase.isSimulation()) return Commands.waitSeconds(2);
 
-        double percentage = SpeakerCalculations.CalculateLaunchPercentageForSpeaker();
+        double speed = SpeakerCalculations.CalculateLaunchSpeedForSpeaker();
 
-        System.out.println("Shooting at " + percentage + " percent!");
+        System.out.println("Shooting at " + speed + " M/s!");
 
-        return new RampCommand(0, percentage, 1, (speed) -> this.SetLaunchSpeed(speed), this)
+        return new RampCommand(0, speed, 5, (v) -> this.SetLaunchSpeed(new LaunchSpeeds(v, v)), this)
+        // return this.run(() -> this.SetLaunchSpeed(new LaunchSpeeds(speed, speed))).withTimeout(1)
             .andThen(this.AutoFeed().withTimeout(1.5))
             .finallyDo((interrupted) -> 
             {
@@ -204,8 +229,10 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     @Override
     public void initSendable(SendableBuilder builder)
     {
-        // builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
-        // builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
+        builder.addDoubleProperty("Top Launcher Speed", () -> this.GetSpeeds().TopMetersPerSecond, null);
+        builder.addDoubleProperty("Bottom Launcher Speed", () -> this.GetSpeeds().BottomMetersPerSecond, null);
+        // builder.addDoubleProperty("Bottom Launcher Speed", () -> this.TargetSpeeds., null);
+
         builder.addBooleanProperty("Note Loaded", () -> this.IsLoaded(), null);
         // builder.addBooleanProperty("Note Sensor Connected", () -> this.NoteSensor.isConnected(), null);
 
