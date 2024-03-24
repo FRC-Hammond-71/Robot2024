@@ -32,7 +32,7 @@ public class SpeakerCalculations
 
         var distanceFromSpeaker = CalculateDistanceFromSpeaker();
         // Offset launcher in ft
-        var ys = 1.8;
+        var ys = 1.5;
         // // Distance away in ft
         var xs = Units.metersToFeet(distanceFromSpeaker);
         // Range from 0-10 ("oomph" value)
@@ -59,7 +59,7 @@ public class SpeakerCalculations
     {
         var distanceFromSpeaker = CalculateDistanceFromSpeaker();
         // Offset launcher in ft
-        var ys = 1.8;
+        var ys = 1.5;
         // // Distance away in ft
         var xs = Units.metersToFeet(distanceFromSpeaker);
         // Range from 0-10 ("oomph" value)
@@ -75,7 +75,7 @@ public class SpeakerCalculations
         double launchSpeed = Units.feetToMeters(Math.sqrt(Math.pow(vy, 2) + Math.pow(vx, 2)));
 
         // Dampen launch speed!
-        launchSpeed = launchSpeed * (2d / 3d);
+        // launchSpeed = launchSpeed * (2d / 3d);
 
         return launchSpeed;
     }

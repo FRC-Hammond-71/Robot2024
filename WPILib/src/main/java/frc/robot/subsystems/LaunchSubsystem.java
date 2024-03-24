@@ -92,11 +92,11 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         if (this.IsLoaded())
         {
-            LEDs.SetAll(71, 255, 40);
+            LEDs.SetAll(71, 255, 20);
         }
         else
         {
-            LEDs.SetAll(180, 255, 40);
+            LEDs.SetAll(180, 255, 20);
         }
     }
 
@@ -210,7 +210,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         System.out.println("Shooting at " + speed + " M/s!");
 
-        return new RampCommand(0, speed, 5, (v) -> this.SetLaunchSpeed(new LaunchSpeeds(v, v)), this)
+        return new RampCommand(0, speed, 10, (v) -> this.SetLaunchSpeed(new LaunchSpeeds(v, v)), this)
         // return this.run(() -> this.SetLaunchSpeed(new LaunchSpeeds(speed, speed))).withTimeout(1)
             .andThen(this.AutoFeed().withTimeout(1.5))
             .finallyDo((interrupted) -> 

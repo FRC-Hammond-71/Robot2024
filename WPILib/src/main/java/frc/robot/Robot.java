@@ -86,7 +86,7 @@ public class Robot extends TimedRobot
 	{		
 		LEDs.Setup();
 
-		LEDs.SetAll(180, 255, 255);
+		LEDs.SetAll(152, 255, 40);
 		
 		// These are all the command which are invoked in PathPlanner. Commands are mapped to their name!
 		NamedCommands.registerCommand("AutoPitchAndLaunch", GameCommands.AutoPitchAndLaunch());

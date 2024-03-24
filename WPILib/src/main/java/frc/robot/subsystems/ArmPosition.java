@@ -27,7 +27,7 @@ public enum ArmPosition
     /**
      * Moves the arm into the intake position.
      */
-    Intake(() -> Rotation2d.fromDegrees(50)),
+    Intake(() -> Rotation2d.fromDegrees(55)),
     /**
      * Moves the arm to track the speaker shooting angle.
      */
@@ -55,6 +55,7 @@ public enum ArmPosition
 
     public Rotation2d GetAngle()
     {
-        return Rotation2dUtils.Clamp(this.AngleSupplier.get(), Constants.Arm.MinAngle, Constants.Arm.MaxAngle);
+        // return Rotation2dUtils.Clamp(this.AngleSupplier.get(), Constants.Arm.MinAngle, Constants.Arm.MaxAngle);
+        return this.AngleSupplier.get();
     }
 }

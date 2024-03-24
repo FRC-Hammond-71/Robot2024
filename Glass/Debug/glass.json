@@ -28,5 +28,8 @@
   },
   "NetworkTables Settings": {
     "serverTeam": "71"
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
