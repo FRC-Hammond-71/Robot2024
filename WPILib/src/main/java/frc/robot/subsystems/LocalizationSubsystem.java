@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.RobotSubsystem;
+import frc.robot.Cameras;
 import frc.robot.Constants;
 import frc.robot.ElapsedTimer;
 import frc.robot.FieldConstants;
@@ -153,14 +154,14 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
         this.IntakeCameraPoseEstimator = new PhotonPoseEstimator(
             aprilTagLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            new PhotonCamera("Roz"),
+            Cameras.Roz,
             new Transform3d(-0.3429, 0.1920875, 0.26035, new Rotation3d(0, Units.degreesToRadians(-24), Math.PI)));
             // UPDATE THESE OFFSETS!
 
         this.LauncherCameraPoseEstimator = new PhotonPoseEstimator(
             aprilTagLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            new PhotonCamera("Sauron"),
+            Cameras.Sauron,
             new Transform3d(0.3429, 0.16, 0.26035, new Rotation3d(0, Units.degreesToRadians(24), 0)));
             // UPDATE THESE OFFSETS!
     }
@@ -316,9 +317,8 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
     protected void realPeriodic()
     {
         this.UpdatePoseEstimationUsingWheels();
-        this.UpdatePoseEstimationUsingIMU();
+        // this.UpdatePoseEstimationUsingIMU();
         this.UpdatePoseEstimationUsingVision();
-        
     }
 
     @Override

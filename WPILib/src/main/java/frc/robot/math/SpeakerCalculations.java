@@ -20,32 +20,32 @@ public class SpeakerCalculations
 
     public static Rotation2d CalculatePitchToSpeaker()
     {
-        // double distanceFromSpeaker = CalculateDistanceFromSpeaker();
+        double distanceFromSpeaker = CalculateDistanceFromSpeaker();
         
-        // // final double heightOfSpeakerIntake = Units.inchesToMeters(83);
-        // final double heightOfSpeakerIntake = Units.feetToMeters(4);
-        // final double shooterYOffset = Units.feetToMeters(1.8);
+        // final double heightOfSpeakerIntake = Units.inchesToMeters(83);
+        final double heightOfSpeakerIntake = Units.inchesToMeters(46);
+        final double shooterYOffset = Units.feetToMeters(1.8);
         
-        // double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
+        double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
 
-        // return Rotation2d.fromRadians(rotationRadians);
+        return Rotation2d.fromRadians(rotationRadians);
 
-        var distanceFromSpeaker = CalculateDistanceFromSpeaker();
-        // Offset launcher in ft
-        var ys = 1.5;
-        // // Distance away in ft
-        var xs = Units.metersToFeet(distanceFromSpeaker);
-        // Range from 0-10 ("oomph" value)
-        var h = 0;
+        // var distanceFromSpeaker = CalculateDistanceFromSpeaker();
+        // // Offset launcher in ft
+        // var ys = 1.5;
+        // // // Distance away in ft
+        // var xs = Units.metersToFeet(distanceFromSpeaker);
+        // // Range from 0-10 ("oomph" value)
+        // var h = 0;
 
-        var vy = Math.sqrt(Math.pow(h, 2) + ((46 / 12) - ys) * 32 * 2);
-        var tm = (vy - h) / 35;
-        var vx = xs / tm;
+        // var vy = Math.sqrt(Math.pow(h, 2) + ((46 / 12) - ys) * 32 * 2);
+        // var tm = (vy - h) / 35;
+        // var vx = xs / tm;
 
-        // Launch angle (deg) 
-        var launchAngle = Rotation2d.fromDegrees(Math.tanh(vy / vx) * 180 / Math.PI);
+        // // Launch angle (deg) 
+        // var launchAngle = Rotation2d.fromDegrees(Math.tanh(vy / vx) * 180 / Math.PI);
 
-        return launchAngle;
+        // return launchAngle;
     }
 
     public static double CalculateLaunchPercentageForSpeaker()

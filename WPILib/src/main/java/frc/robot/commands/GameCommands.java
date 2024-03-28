@@ -1,10 +1,15 @@
 package frc.robot.commands;
 
+import org.photonvision.PhotonUtils;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import frc.robot.Cameras;
 import frc.robot.Controllers;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
@@ -12,6 +17,43 @@ import frc.robot.subsystems.ArmPosition;
 
 public class GameCommands
 {
+	public static Command SeekAndIntakeNote()
+	{
+		return Robot.Arm.RunUntilHolding(ArmPosition.Intake)
+			.andThen(new ParallelRaceGroup(
+				Robot.Launcher.AutoIntake(),
+				Commands.run(() -> 
+				{
+					var result = Cameras.NoteDetector.getLatestResult();
+
+					if (!result.hasTargets()) return;
+
+					var target = result.getBestTarget();
+
+					if (target == null) 
+					{
+						System.out.println("No target!");
+						return;
+					};
+
+					final double cameraHeightMeters = Units.inchesToMeters(10.5);
+					final double targetHeight = Units.inchesToMeters(1);
+					final double cameraPitchRadians = Units.degreesToRadians(-12);
+
+					final double targetPitch = Units.degreesToRadians(target.getPitch());
+
+					double distance = PhotonUtils.calculateDistanceToTargetMeters(cameraHeightMeters, targetHeight, cameraPitchRadians, targetPitch);
+
+					System.out.println(distance);
+
+					// SmartDashboard.putNumber("", distance)
+
+					// AssistedNoteIntake.CalculateSpeeds(null, 0, 0);
+				})))
+			.onlyWhile(() -> DriverStation.isTeleop() ? Controllers.ShooterController.getAButton() : true)
+			.withName("Intake Note");
+	}
+
 	public static Command IntakeNote()
 	{
 		// Need to fix (bad code)

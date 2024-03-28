@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.photonvision.PhotonUtils;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -9,6 +11,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -20,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import frc.robot.commands.ControllerCommands;
 import frc.robot.commands.GameCommands;
 import frc.robot.commands.UntilNoteLoadedCommand;
@@ -234,18 +238,63 @@ public class Robot extends TimedRobot
 			// Intake note 
 			if (Controllers.DriverController.getYButton())
 			{
-				Arm.RunUntilHolding(ArmPosition.Intake)
-					.andThen(Launcher.AutoIntake()
-					.onlyWhile(() -> Controllers.DriverController.getYButton())
-					.finallyDo(() -> 
-					{
-						if (Launcher.IsLoaded())
+				// Arm.RunUntilHolding(ArmPosition.Intake)
+				// 	.andThen(Launcher.AutoIntake()
+				// 	.onlyWhile(() -> Controllers.DriverController.getYButton())
+				// 	.finallyDo(() -> 
+				// 	{
+				// 		if (Launcher.IsLoaded())
+				// 		{
+				// 			ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
+				// 			// ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
+				// 		}
+				// 	}))
+				// 	.schedule();
+
+				Robot.Arm
+					.RunUntilHolding(ArmPosition.Intake)
+					.andThen(new ParallelRaceGroup(
+						Robot.Launcher.AutoIntake(),
+						Commands.runEnd(() -> 
 						{
-							ControllerCommands.RumbleController(Controllers.DriverController, RumbleType.kBothRumble, 4, 0.3).schedule();
-							// ControllerCommands.RumbleController(Controllers.ShooterController, RumbleType.kBothRumble, 4, 0.3).schedule();
-						}
-					}))
-					.schedule();
+							var result = Cameras.NoteDetector.getLatestResult();
+
+							if (!result.hasTargets())
+							{
+								DataLogManager.log("No targets!");
+							}
+
+							var target = result.getBestTarget();
+
+							if (target == null) 
+							{
+								DataLogManager.log("No target!");
+								return;
+							};
+
+							final double cameraHeightMeters = Units.inchesToMeters(10.5);
+							final double targetHeight = Units.inchesToMeters(1);
+							final double cameraPitchRadians = Units.degreesToRadians(-12);
+
+							final double targetPitch = Units.degreesToRadians(target.getPitch());
+
+							double distance = PhotonUtils.calculateDistanceToTargetMeters(cameraHeightMeters, targetHeight, cameraPitchRadians, targetPitch);
+
+							System.out.println(distance);
+							System.out.println(targetPitch);
+
+							var rotation = AssistedNoteIntake.CalculateRotationSpeeds(Localization.GetEstimatedPose(), target.getYaw(), distance);
+							System.out.println(rotation.toString());
+
+							Drive.Set(new ChassisSpeeds(
+								Drive.GetSpeeds().vxMetersPerSecond,
+								Drive.GetSpeeds().vyMetersPerSecond,
+								rotation.getRadians()
+							));
+						
+						}, () -> Drive.Stop())))
+					.onlyWhile(() -> Controllers.DriverController.getYButton())
+					.withName("Intake Note").schedule();
 			}
 			else if (Controllers.DriverController.getXButton())
 			{

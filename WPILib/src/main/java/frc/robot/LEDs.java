@@ -62,7 +62,7 @@ public class LEDs
         }
 
         // Increase by to make the rainbow "move"
-        // RainbowHueStep += 3;
+        RainbowHueStep += 3;
 
         // Check bounds
         RainbowHueStep %= 180;

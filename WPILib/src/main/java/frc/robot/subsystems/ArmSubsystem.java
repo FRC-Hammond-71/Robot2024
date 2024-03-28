@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
+import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -161,7 +162,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         var outputRot = this.PositionalPID.calculate(this.GetAngle().getDegrees(), desiredAngle.getDegrees());
         outputRot = Math.min(outputRot, Constants.Arm.MaxSpeed.getDegrees());
 
-        SmartDashboard.putNumber("Arm PID Rotation", outputRot);
+        // SmartDashboard.putNumber("Arm PID Rotation", outputRot);
 
         boolean isPushingMax = this.GetAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees() + 1 && outputRot > 0;
         boolean isPushingMin = this.GetAngle().getDegrees() <= Constants.Arm.MinAngle.getDegrees() - 1 && outputRot < 0;
@@ -191,11 +192,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         if (!DriverStation.isDisabled()) this.UpdateMotors();
 
-       /*  if (this.IsHolding())
-        {
-            LEDs.SetArm(146, 70, 53);
-        }
-        else LEDs.SetArm(0, 53, 47); */
+    //    if (this.IsHolding())
+    //     {
+    //         LEDs.SetArm(146, 70, 53);
+    //     }
+    //     else LEDs.SetArm(0, 53, 47);
 
         this.Visualization.Update(this);
     }
@@ -219,9 +220,9 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         builder.addStringProperty("Mode", () -> this.Mode.name(), null);
 
-        builder.addBooleanProperty("Holding", this::IsHolding, null);
+        // builder.addBooleanProperty("Holding", this::IsHolding, null);
 
-        builder.addDoubleProperty("Angular Velocity", () -> this.GetAngularVelocity().getDegrees(), null);
+        // builder.addDoubleProperty("Angular Velocity", () -> this.GetAngularVelocity().getDegrees(), null);
         
         this.addChild("Visualization", this.Visualization);
     }
