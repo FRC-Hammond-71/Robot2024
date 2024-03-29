@@ -12,6 +12,7 @@ import frc.robot.utilities.Rotation2dUtils;
 
 public enum ArmPosition 
 {
+    None(() -> Rotation2d.fromDegrees(-1)),
     /**
      * Moves the arm into an up-right position, 90 degrees.
      */
@@ -34,14 +35,6 @@ public enum ArmPosition
     TrackingSpeaker(() ->
     {
         return SpeakerCalculations.CalculatePitchToSpeaker();
-        // double distanceFromSpeaker = Robot.Localization.GetEstimatedPose180().getTranslation().getDistance(FieldConstants.GetSpeakerPosition());
-        
-        // final double heightOfSpeakerIntake = Units.feetToMeters(4);
-        // final double shooterYOffset = Units.feetToMeters(1.8);
-        
-        // double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
-
-        // return Rotation2d.fromRadians(rotationRadians);
     }),
     BySideSpeaker(() -> Rotation2d.fromDegrees(57)),
     AcrossMap(() -> Rotation2d.fromDegrees(40));

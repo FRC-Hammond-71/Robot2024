@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.RobotSubsystem;
 import frc.robot.Constants;
 import frc.robot.LEDs;
+import frc.robot.LEDs;
 import frc.robot.Robot;
 import frc.robot.utilities.Rotation2dUtils;
 
@@ -42,7 +43,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     
     private PIDController PositionalPID;
 
-    public ArmPosition Mode = ArmPosition.Default;
+    public ArmPosition Mode = ArmPosition.None;
 
     public final ArmVisualization Visualization = new ArmVisualization();
     
@@ -148,24 +149,26 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     
     protected void UpdateMotors()
     {
-        if (DriverStation.isDisabled()) 
+        Rotation2d desiredAngle = this.Mode.GetAngle();
+
+        // If the desired angle is negative, do nothing!
+        if (DriverStation.isDisabled() || desiredAngle.getDegrees() < 0) 
         {
             this.Stop();
             return;
         }
 
-        Rotation2d desiredAngle = this.Mode.GetAngle();
         desiredAngle = Rotation2d.fromRadians(
             Math.max(Constants.Arm.MinAngle.getRadians(),
             Math.min(desiredAngle.getRadians(), Constants.Arm.MaxAngle.getRadians())));
 
         var outputRot = this.PositionalPID.calculate(this.GetAngle().getDegrees(), desiredAngle.getDegrees());
-        outputRot = Math.min(outputRot, Constants.Arm.MaxSpeed.getDegrees());
+        // outputRot = Math.min(outputRot, Constants.Arm.MaxSpeed.getDegrees());
 
         // SmartDashboard.putNumber("Arm PID Rotation", outputRot);
 
-        boolean isPushingMax = this.GetAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees() + 1 && outputRot > 0;
-        boolean isPushingMin = this.GetAngle().getDegrees() <= Constants.Arm.MinAngle.getDegrees() - 1 && outputRot < 0;
+        boolean isPushingMax = this.GetAngle().getDegrees() >= Constants.Arm.MaxAngle.getDegrees() && outputRot > 0;
+        boolean isPushingMin = this.GetAngle().getDegrees() <= Constants.Arm.MinAngle.getDegrees() && outputRot < 0;
         if (isPushingMin || isPushingMax)
         {
             // If PID is responding in a way which goes beyond the soft-limits. DO NOT ALLOW IT!
@@ -192,11 +195,11 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
 
         if (!DriverStation.isDisabled()) this.UpdateMotors();
 
-    //    if (this.IsHolding())
-    //     {
-    //         LEDs.SetArm(146, 70, 53);
-    //     }
-    //     else LEDs.SetArm(0, 53, 47);
+       /*  if (this.IsHolding())
+        {
+            LEDs.SetArm(146, 70, 53);
+        }
+        else LEDs.SetArm(0, 53, 47); */
 
         this.Visualization.Update(this);
     }
