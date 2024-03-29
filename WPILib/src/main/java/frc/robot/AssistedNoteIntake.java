@@ -13,7 +13,9 @@ public class AssistedNoteIntake
         // double yawCorrection = Math.abs(yaw) > 6 ?  Math.copySign(Math.pow(yaw / 4, 2), -yaw) : 0;
         
         // Flipped parabola representing a percentage of correct to be applied (0 - 100%) 
-        yawCorrection *= Math.max(-Math.pow(distance / 1, 2) + 1, 0);
+        yawCorrection *= Math.max(-Math.pow(distance / 1.5, 2) + 1, 0);
+
+        yawCorrection = -yawCorrection;
 
         return Rotation2d.fromDegrees(yawCorrection);
     }

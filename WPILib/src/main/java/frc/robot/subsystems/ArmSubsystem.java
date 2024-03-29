@@ -65,7 +65,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
     {
         this.PositionalPID = new PIDController(6, 0, 0.3);
         
-        this.FeedForward = new ArmFeedforward(0, 0.5, 0.06);
+        this.FeedForward = new ArmFeedforward(0, 0, 0.06);
         
         this.Motor = new CANSparkMax(Constants.Arm.PitchMotorCANPort, MotorType.kBrushless);
         this.Motor.setSmartCurrentLimit(25);

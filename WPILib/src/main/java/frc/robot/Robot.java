@@ -236,7 +236,7 @@ public class Robot extends TimedRobot
 			// }
 			
 			// Intake note 
-			if (Controllers.DriverController.getYButton())
+			if (Controllers.DriverController.getYButton() && !Launcher.IsLoaded())
 			{
 				// Arm.RunUntilHolding(ArmPosition.Intake)
 				// 	.andThen(Launcher.AutoIntake()
@@ -304,7 +304,7 @@ public class Robot extends TimedRobot
 			// Retake note
 			else if (Controllers.DriverController.getAButton())
 			{
-				speed = -0.1;
+				speed = -0.5;
 				Launcher.IntakeMotor.set(-0.3);
 				Launcher.FeederMotor.set(-0.1);
 			}
@@ -312,6 +312,11 @@ public class Robot extends TimedRobot
 			{
 				// SHOOT ACROSS MAP
 				Arm.RunUntilHolding(ArmPosition.AcrossMap).andThen(Launcher.Launch(0.60, 0.60)).schedule();
+			}
+			else if (Launcher.IsLoaded() && Launcher.NoteSensor.getProximity() < 2000 && Launcher.NoteSensor.getProximity() > 600)
+			{
+				speed = -0.3;
+				Launcher.FeederMotor.set(-0.05);
 			}
 			else
 			{

@@ -18,6 +18,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -36,14 +37,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     /**
      * Any value larger than this threshold from the sensor will mark a detected note. 
      */
-    public static final int NoteProximityThreshold = 200;
+    public static final int NoteProximityThreshold = 400;
 
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax IntakeMotor, FeederMotor, TopLaunchMotor, BottomLaunchMotor;
 
     public SimpleMotorFeedforward FeedForward = new SimpleMotorFeedforward(0, 1.3);
 
-    private ColorSensorV3 NoteSensor;
+    public ColorSensorV3 NoteSensor;
 
     public LaunchSpeeds TargetSpeeds = new LaunchSpeeds();
 

@@ -24,7 +24,7 @@ public class SpeakerCalculations
         
         // final double heightOfSpeakerIntake = Units.inchesToMeters(83);
         final double heightOfSpeakerIntake = Units.inchesToMeters(46);
-        final double shooterYOffset = Units.feetToMeters(1.8);
+        final double shooterYOffset = Units.feetToMeters(1.4);
         
         double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
 
