@@ -30,7 +30,7 @@ public final class Constants
 		/**
 		 * The maximum rotational speed the robot may go per second.
 		 */
-		public static Rotation2d MaxAngularSpeed = Rotation2d.fromDegrees(100);
+		public static Rotation2d MaxAngularSpeed = Rotation2d.fromDegrees(200);
 
 		/**
 		 * Wheel radius in Meters.
@@ -77,7 +77,7 @@ public final class Constants
 		public static Rotation2d MinAngle = Rotation2d.fromDegrees(25);
 
 		// Shooting from further would require a 0.5 degree inaccuracy
-		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(1);
+		public static Rotation2d AllowedAngleError = Rotation2d.fromDegrees(2);
 
 		public static double MomentOfInertia = 30;
 

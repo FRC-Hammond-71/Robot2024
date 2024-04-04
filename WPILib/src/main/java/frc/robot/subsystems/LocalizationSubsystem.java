@@ -136,18 +136,18 @@ public class LocalizationSubsystem extends RobotSubsystem<Robot>
             Robot.Drive.GetRightWheelPosition(),
             startingPosition.isPresent() ? startingPosition.get() : new Pose2d(),
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-            VecBuilder.fill(0.4, 0.4, Units.degreesToRadians(30)));
+            VecBuilder.fill(0.6, 0.6, Units.degreesToRadians(45)));
 
         var aprilTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
-        try 
-        {
-            aprilTagLayout = new AprilTagFieldLayout(Path.of(Filesystem.getDeployDirectory().toString(), "demo_field.json"));
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Failed to Load Custom April Tag Field!\n" + ex);
-        }
+        // try 
+        // {
+        //     aprilTagLayout = new AprilTagFieldLayout(Path.of(Filesystem.getDeployDirectory().toString(), "demo_field.json"));
+        // }
+        // catch (IOException ex)
+        // {
+        //     System.out.println("Failed to Load Custom April Tag Field!\n" + ex);
+        // }
 
         System.out.println("Loaded " + aprilTagLayout.getTags().size() + " tags!");
 

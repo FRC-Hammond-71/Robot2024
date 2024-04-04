@@ -22,8 +22,8 @@ public class SpeakerCalculations
     {
         double distanceFromSpeaker = CalculateDistanceFromSpeaker();
         
-        // final double heightOfSpeakerIntake = Units.inchesToMeters(83);
-        final double heightOfSpeakerIntake = Units.inchesToMeters(46);
+        final double heightOfSpeakerIntake = Units.inchesToMeters(83);
+        // final double heightOfSpeakerIntake = Units.inchesToMeters(46);
         final double shooterYOffset = Units.feetToMeters(1.4);
         
         double rotationRadians = Math.atan((heightOfSpeakerIntake - shooterYOffset) / distanceFromSpeaker);
@@ -67,7 +67,7 @@ public class SpeakerCalculations
 
         // final double heightOfSpeakerIntake = Units.feetToMeters(4);
 
-        var vy = Math.sqrt(Math.pow(h, 2) + ((46 / 12) - ys) * 32 * 2);
+        var vy = Math.sqrt(Math.pow(h, 2) + ((83 / 12) - ys) * 32 * 2);
         var tm = (vy - h) / 35;
         var vx = xs / tm;
 
@@ -75,7 +75,7 @@ public class SpeakerCalculations
         double launchSpeed = Units.feetToMeters(Math.sqrt(Math.pow(vy, 2) + Math.pow(vx, 2)));
 
         // Dampen launch speed!
-        // launchSpeed = launchSpeed * (2d / 3d);
+        launchSpeed = launchSpeed * 0.85;
 
         return launchSpeed;
     }

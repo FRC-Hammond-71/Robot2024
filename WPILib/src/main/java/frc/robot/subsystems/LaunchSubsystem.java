@@ -37,7 +37,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
     /**
      * Any value larger than this threshold from the sensor will mark a detected note. 
      */
-    public static final int NoteProximityThreshold = 400;
+    public static final int NoteProximityThreshold = 350;
 
     // https://www.revrobotics.com/rev-21-1650/
     public CANSparkMax IntakeMotor, FeederMotor, TopLaunchMotor, BottomLaunchMotor;
@@ -93,7 +93,14 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         if (this.IsLoaded())
         {
-            LEDs.SetAll(71, 255, 20);
+            if (Robot.Arm.IsAt(Robot.Arm.Mode.GetAngle()))
+            {
+                LEDs.SetAll(55, 255, 20);
+            }
+            else 
+            {
+                LEDs.SetAll(71, 255, 20);
+            }
         }
         else
         {
@@ -181,6 +188,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
         
         return this.runEnd(() -> { this.FeederMotor.set(0.4); this.IntakeMotor.set(0.5); }, () -> { this.FeederMotor.stopMotor(); this.IntakeMotor.stopMotor(); })
             .until(() -> this.IsLoaded())
+            .andThen(this.Feed(-0.1).withTimeout(0.2))
             .withName("Auto Intake");
     }
 
@@ -209,7 +217,7 @@ public class LaunchSubsystem extends RobotSubsystem<Robot>
 
         double speed = SpeakerCalculations.CalculateLaunchSpeedForSpeaker();
 
-        System.out.println("Shooting at " + speed + " M/s!");
+        DataLogManager.log("Shooting at " + speed + " M/s!");
 
         return new RampCommand(0, speed, 10, (v) -> this.SetLaunchSpeed(new LaunchSpeeds(v, v)), this)
         // return this.run(() -> this.SetLaunchSpeed(new LaunchSpeeds(speed, speed))).withTimeout(1)

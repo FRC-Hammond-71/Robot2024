@@ -209,7 +209,6 @@ public class Robot extends TimedRobot
 				Drive.SetArcade(x, rotation);
 			}
 
-
 			// boolean runNoteAssistance = Controllers.ShooterController.getYButton()
 			// 	&& rotation == 0
 			// 	&& !Launcher.IsLoaded()

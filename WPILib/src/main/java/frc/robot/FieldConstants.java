@@ -33,13 +33,13 @@ public class FieldConstants
 
     public static Translation2d GetSpeakerPosition()
     {
-        return new Translation2d(0, 0.3429);
+        // return new Translation2d(0, 0.3429);
 
-        // final var position = new Translation2d(16.518642, 5.534473);
+        final var position = new Translation2d(16.518642, 5.534473);
 
-        // DriverStationUtils.EnsureAllianceSelected();
+        DriverStationUtils.EnsureAllianceSelected();
 
-        // return DriverStation.getAlliance().get() == Alliance.Red ? position : GeometryUtil.flipFieldPosition(position);
+     return DriverStation.getAlliance().get() == Alliance.Red ? position : GeometryUtil.flipFieldPosition(position);
     }
 
     public static Pose2d GetAmplifierPose() throws MissingResourceException

@@ -52,7 +52,7 @@ public class ArmSubsystem extends RobotSubsystem<frc.robot.Robot>
         super(robot);    
         
         this.PositionalPID.setSetpoint(90);
-        this.PositionalPID.setTolerance(3);
+        this.PositionalPID.setTolerance(Constants.Arm.AllowedAngleError.getDegrees());
 
         SmartDashboard.putData("Arm PID", this.PositionalPID);
 
